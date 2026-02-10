@@ -6,1047 +6,1018 @@
   <title>duangor-mail</title>
   <style>
     :root{
-      --bg0:#0b0c12;
-      --bg1:#111320;
-      --panel: rgba(22,24,36,.72);
+      --bg1:#1a1c24;
+      --bg2:#2a2f3c;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.06);
       --stroke: rgba(255,255,255,.18);
-      --stroke2: rgba(255,255,255,.10);
-      --text:#eef0ff;
-      --muted: rgba(238,240,255,.70);
-      --gold:#f2d27c;
+      --text:#e9ecf3;
+      --muted: rgba(233,236,243,.70);
+      --gold:#d8b36a;
       --btn: rgba(255,255,255,.10);
-      --btn2: rgba(255,255,255,.16);
-      --shadow: 0 24px 60px rgba(0,0,0,.55);
+      --btn2: rgba(255,255,255,.14);
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
       --radius: 26px;
-      --radius2: 18px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
-    html,body{height:100%; margin:0; background: radial-gradient(1200px 900px at 30% 20%, rgba(93,97,255,.18), transparent 60%),
-      radial-gradient(900px 700px at 80% 40%, rgba(255,121,168,.12), transparent 55%),
-      linear-gradient(160deg,var(--bg0),var(--bg1)); color:var(--text); font-family:var(--font);}
-    *{box-sizing:border-box;}
-    .wrap{
-      min-height:100%;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background: radial-gradient(1200px 900px at 30% 20%, #3a3450 0%, transparent 60%),
+                  radial-gradient(1000px 700px at 80% 30%, #2b4a59 0%, transparent 60%),
+                  linear-gradient(180deg, var(--bg2), var(--bg1));
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:24px 16px calc(24px + env(safe-area-inset-bottom));
+      padding: 24px 16px;
     }
-    .card{
-      width:min(860px, 92vw);
-      min-height:min(680px, 84vh);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border:1px solid var(--stroke);
+    .wrap{
+      width:min(520px, 96vw);
       border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border: 1px solid var(--stroke);
       box-shadow: var(--shadow);
-      position:relative;
+      padding: 26px 18px 22px;
+      position: relative;
       overflow:hidden;
     }
-    .card::before{
+    .wrap:before{
       content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(800px 400px at 20% 0%, rgba(255,255,255,.10), transparent 60%),
-                  radial-gradient(600px 400px at 80% 30%, rgba(255,255,255,.06), transparent 55%);
+      position:absolute; inset:-40px;
+      background: radial-gradient(600px 240px at 40% 15%, rgba(255,255,255,.08), transparent 60%);
       pointer-events:none;
+      filter: blur(2px);
     }
-    .inner{position:relative; z-index:1; padding:36px 26px;}
-    .center{display:flex; flex-direction:column; align-items:center; text-align:center;}
-    h1{margin:0; font-size: clamp(28px, 4.6vw, 54px); letter-spacing:.2px;}
-    h2{margin:0; font-size: clamp(22px, 3.8vw, 44px); letter-spacing:.2px;}
-    p{margin:10px 0 0; font-size: clamp(14px, 2.0vw, 18px); color:var(--muted); line-height:1.45;}
-    .gold{color:var(--gold);}
-    .spacer{height:18px;}
-    .row{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; align-items:center;}
-    .pill{
-      padding:10px 14px;
-      border-radius: 999px;
-      border:1px solid var(--stroke2);
-      background: rgba(0,0,0,.22);
-      color: rgba(238,240,255,.78);
-      font-size: 14px;
-      min-width: 140px;
+    h1{
+      margin: 6px 0 8px;
+      font-weight: 800;
+      letter-spacing: .2px;
       text-align:center;
+      font-size: 44px;
+      line-height: 1.05;
+    }
+    .sub{
+      text-align:center;
+      color: var(--gold);
+      font-size: 18px;
+      line-height:1.35;
+      margin-bottom: 14px;
+    }
+    .center{display:flex; align-items:center; justify-content:center;}
+    .panel{
+      margin: 16px auto 0;
+      width: min(420px, 92%);
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 22px;
+      padding: 18px;
     }
     .btn{
-      appearance:none; border:1px solid var(--stroke);
+      appearance:none; border:1px solid rgba(255,255,255,.18);
       background: var(--btn);
       color: var(--text);
-      padding: 12px 18px;
-      border-radius: 14px;
-      cursor:pointer;
-      transition: transform .08s ease, background .2s ease;
-      font-weight:600;
+      padding: 14px 20px;
+      border-radius: 18px;
+      font-weight: 700;
       letter-spacing:.2px;
+      cursor:pointer;
+      transition: transform .08s ease, background .15s ease, border-color .15s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
     }
-    .btn:hover{background:var(--btn2);}
-    .btn:active{transform:scale(.98);}
-    .btnWide{min-width: 240px;}
-    .hidden{display:none !important;}
-    .fadeIn{animation: fadeIn .25s ease both;}
-    @keyframes fadeIn{from{opacity:0; transform: translateY(6px);} to{opacity:1; transform: translateY(0);} }
+    .btn:hover{ background: var(--btn2); border-color: rgba(255,255,255,.26); }
+    .btn:active{ transform: translateY(1px) scale(.99); }
 
-    /* ===== Pages ===== */
-    .page{display:none;}
-    .page.active{display:block;}
+    .pillRow{
+      display:flex; gap: 12px; justify-content:center; flex-wrap:wrap;
+      margin: 12px 0 10px;
+    }
+    .pill{
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      padding: 10px 14px;
+      color: rgba(233,236,243,.88);
+      min-width: 150px;
+      text-align:center;
+      font-weight:700;
+    }
+    .hint{
+      text-align:center;
+      color: rgba(233,236,243,.55);
+      margin-top: 10px;
+      font-size: 14px;
+    }
 
-    /* ===== Envelope A (clean) ===== */
-    .envelopeWrap{
-      margin-top: 26px;
-      width:min(520px, 84%);
-      height: 280px;
+    /* Envelope */
+    .mailBox{
+      width:min(360px, 86%);
+      aspect-ratio: 1/1;
       border-radius: 22px;
-      background: rgba(0,0,0,.22);
-      border:1px solid var(--stroke2);
+      background: rgba(0,0,0,.14);
+      border: 1px solid rgba(255,255,255,.12);
       display:flex;
       align-items:center;
       justify-content:center;
+      padding: 18px;
+      margin: 10px auto 0;
       position:relative;
-      overflow:hidden;
     }
-    .envelopeBtn{
-      border:0;
-      background:transparent;
+    .mailClick{
       cursor:pointer;
-      padding:0;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
       transform: translateZ(0);
+      transition: transform .15s ease;
     }
-    .envSvg{width: 280px; height: 200px; filter: drop-shadow(0 18px 30px rgba(0,0,0,.35));}
-    .envFlap{
-      transform-origin: 140px 56px;
-      transition: transform .45s cubic-bezier(.2,.9,.2,1);
-    }
-    .envOpen .envFlap{ transform: rotateX(180deg); }
-    .youGotMail{
-      position:absolute;
-      bottom:28px;
-      left:0; right:0;
-      font-weight:800;
-      font-size: 30px;
+    .mailClick:active{ transform: scale(.99); }
+    .mailText{
+      text-align:center;
+      margin-top: 12px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: .2px;
       opacity:0;
-      transform: translateY(10px);
+      transform: translateY(6px);
       transition: opacity .25s ease, transform .25s ease;
     }
-    .envOpen .youGotMail{
-      opacity:1;
-      transform: translateY(0);
-    }
+    .mailText.show{ opacity:1; transform: translateY(0); }
 
-    /* ===== Game ===== */
-    .gameBox{
-      margin: 16px auto 0;
-      width:min(520px, 92%);
+    /* Canvas areas */
+    .gameWrap{
+      width:min(420px, 92%);
+      margin: 10px auto 0;
       border-radius: 22px;
-      background: rgba(0,0,0,.22);
-      border:1px solid var(--stroke2);
-      padding: 14px;
-    }
-    canvas{
-      width:100%;
-      height: 360px;
-      display:block;
-      border-radius: 16px;
-      background: radial-gradient(700px 320px at 30% 10%, rgba(255,255,255,.06), transparent 60%),
-                  linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
-      border:1px solid rgba(255,255,255,.10);
-      touch-action: manipulation;
-    }
-    .tiny{font-size: 13px; color: rgba(238,240,255,.62); margin-top:8px;}
-
-    /* ===== Win + Coin ===== */
-    .bigWin{font-size: clamp(38px, 6vw, 70px); font-weight:900; margin-top:6px;}
-    .coinArea{
-      margin-top: 18px;
-      width:min(520px, 92%);
-      border-radius: 22px;
-      background: rgba(0,0,0,.22);
-      border:1px solid var(--stroke2);
-      padding: 18px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap: 12px;
-    }
-    .coinRow{display:flex; align-items:center; gap:18px; margin-top:6px;}
-    .coin{
-      width: 62px; height: 62px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 25%, #fff2b5, #d4a640 55%, #8c6a1f 100%);
-      border: 2px solid rgba(255,255,255,.35);
-      box-shadow: 0 16px 30px rgba(0,0,0,.35);
-      cursor:pointer;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
       position:relative;
     }
-    .coin::after{
-      content:"";
-      position:absolute; inset:14px;
-      border-radius: 50%;
-      border: 2px dashed rgba(0,0,0,.18);
-    }
-    .slot{
-      width: 120px; height: 28px;
-      border-radius: 999px;
-      border: 2px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.28);
-      position:relative;
+    canvas{ display:block; width:100%; height:auto; }
+
+    /* Confetti */
+    .confetti{
+      position:absolute; inset:0;
+      pointer-events:none;
       overflow:hidden;
     }
-    .slot::before{
-      content:"";
-      position:absolute; inset: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.10);
+    .confetti i{
+      position:absolute;
+      width:10px; height:16px;
+      opacity:.9;
+      transform: translateY(-60px) rotate(0deg);
+      animation: fall 900ms linear forwards;
+      border-radius: 2px;
     }
-    .coinInsertAnim{
-      animation: insert .85s cubic-bezier(.2,.9,.25,1) forwards;
-    }
-    @keyframes insert{
-      0%{transform: translateX(0) translateY(0) scale(1);}
-      55%{transform: translateX(86px) translateY(0) scale(.95);}
-      75%{transform: translateX(86px) translateY(6px) scale(.9);}
-      100%{transform: translateX(86px) translateY(26px) scale(.2); opacity:0;}
+    @keyframes fall{
+      to{ transform: translateY(110vh) rotate(540deg); opacity:1;}
     }
 
-    /* ===== Wheel ===== */
+    /* Wheel */
     .wheelWrap{
-      margin: 12px auto 0;
-      width:min(560px, 96%);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap: 14px;
-    }
-    .wheelCanvas{
-      width: 520px;
-      height: 520px;
-      max-width: 92vw;
-      max-height: 92vw;
-      border-radius: 50%;
+      width:min(420px, 92%);
+      margin: 10px auto 0;
+      position:relative;
+      border-radius: 22px;
+      overflow:hidden;
       border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.22);
-      box-shadow: 0 28px 60px rgba(0,0,0,.45);
-      touch-action: manipulation;
+      background: rgba(0,0,0,.18);
+      padding: 14px 14px 18px;
     }
     .pointer{
+      position:absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
       width: 0; height: 0;
       border-left: 14px solid transparent;
       border-right: 14px solid transparent;
-      border-bottom: 26px solid #ff4d7d;
-      filter: drop-shadow(0 10px 16px rgba(0,0,0,.45));
-      margin-top: -6px;
-      z-index: 2;
-    }
-    .subText{font-size: 16px; color: rgba(238,240,255,.72);}
-
-    /* ===== Confetti ===== */
-    #confetti{
-      position:absolute; inset:0;
-      pointer-events:none;
-      z-index: 50;
+      border-bottom: 22px solid #ff4d7d;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,.35));
+      z-index: 5;
     }
 
-    /* ===== Luck report ===== */
-    .reportBox{
-      margin: 12px auto 0;
-      width:min(640px, 96%);
+    /* Swipe pages */
+    .pages{
+      width:min(420px, 92%);
+      margin: 10px auto 0;
       border-radius: 22px;
-      background: rgba(0,0,0,.22);
-      border:1px solid var(--stroke2);
-      padding: 18px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+    }
+    .pageInner{
+      display:flex;
+      width: 600%;
+      transform: translateX(0%);
+      transition: transform .28s ease;
+    }
+    .page{
+      width: 100%;
       min-height: 420px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      gap: 14px;
-      user-select:none;
-      touch-action: pan-y;
+      padding: 18px;
+      position:relative;
     }
-    .reportTop{
-      display:flex; align-items:center; justify-content:space-between;
-      gap: 10px;
-      color: rgba(238,240,255,.75);
-      font-size: 14px;
+    .pageTitle{
+      font-size: 34px;
+      font-weight: 900;
+      text-align:center;
+      margin: 6px 0 0;
     }
-    .reportMid{
-      flex:1;
-      display:flex;
-      align-items:flex-start;
-      justify-content:flex-start;
-      padding-top: 16px;
-      font-weight: 800;
-      font-size: 22px;
-      color: rgba(238,240,255,.92);
+    .pageSub{
+      text-align:center;
+      color: rgba(233,236,243,.70);
+      margin: 8px 0 12px;
+      font-weight:700;
     }
-    .reportNav{
-      display:flex;
-      justify-content:space-between;
-      gap: 10px;
-    }
-    .ghostBtn{
+    .bigStat{
+      margin: 18px auto 0;
+      width: 92%;
+      border-radius: 18px;
       border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color: rgba(238,240,255,.85);
-      border-radius: 14px;
-      padding: 10px 14px;
-      font-weight: 700;
-      cursor:pointer;
-      min-width: 110px;
+      background: rgba(255,255,255,.05);
+      padding: 18px;
+      font-size: 24px;
+      font-weight: 900;
+      text-align:left;
     }
-    .ghostBtn:active{transform:scale(.98);}
+    .pager{
+      text-align:center;
+      color: rgba(233,236,243,.50);
+      padding: 10px 0 0;
+      font-weight:700;
+    }
   </style>
 </head>
-
 <body>
-  <canvas id="confetti" class="hidden"></canvas>
-
-  <div class="wrap">
-    <div class="card">
-      <div class="inner">
-
-        <!-- PAGE 1: Envelope -->
-        <section id="pageEnvelope" class="page active">
-          <div class="center">
-            <h1>Dear Mr Wong Duan Chiang,</h1>
-            <p class="gold">Have you turned your audio on? Click on the envelope.</p>
-
-            <div class="envelopeWrap">
-              <button id="envelopeBtn" class="envelopeBtn" aria-label="Open envelope">
-                <svg class="envSvg" viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
-                  <!-- body -->
-                  <rect x="40" y="60" width="200" height="120" rx="18" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.26)" stroke-width="2"/>
-                  <!-- inner X -->
-                  <path d="M55 78 L140 140 L225 78" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2"/>
-                  <path d="M55 172 L140 118 L225 172" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="2"/>
-                  <!-- flap -->
-                  <g class="envFlap" id="envFlap">
-                    <path d="M55 78 L140 20 L225 78 Z" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.28)" stroke-width="2"/>
-                    <path d="M70 70 L140 40 L210 70" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
-                  </g>
-                  <!-- heart seal -->
-                  <g>
-                    <path d="M140 155
-                             C132 144, 110 144, 110 160
-                             C110 176, 132 186, 140 194
-                             C148 186, 170 176, 170 160
-                             C170 144, 148 144, 140 155 Z"
-                          fill="#ff4d7d" opacity=".95" stroke="rgba(255,255,255,.25)" stroke-width="2"/>
-                  </g>
-                </svg>
-              </button>
-
-              <div id="youGotMail" class="youGotMail">You've got a mail!</div>
-            </div>
-          </div>
-        </section>
-
-        <!-- PAGE 2: Game -->
-        <section id="pageGame" class="page">
-          <div class="center">
-            <h1>How OP are you?</h1>
-            <p class="gold">Reach 11 to win the game.</p>
-            <p>Tap Start to start the game.<br/>Tap screen to move left/right.</p>
-
-            <div class="row" style="margin-top:14px;">
-              <div class="pill">Player: dcop</div>
-              <div class="pill" id="scorePill">Score: 0/11</div>
-              <div class="pill">Goal: 11</div>
-            </div>
-
-            <div class="gameBox">
-              <canvas id="gameCanvas" width="520" height="360"></canvas>
-              <div class="tiny">Tip: tap the left half to move left, right half to move right.</div>
-            </div>
-
-            <div class="spacer"></div>
-            <button id="startGameBtn" class="btn btnWide">Start</button>
-          </div>
-        </section>
-
-        <!-- PAGE 3: Win + Coin -->
-        <section id="pageWin" class="page">
-          <div class="center">
-            <div class="bigWin">YOU WON 🏆</div>
-            <p class="gold" style="font-weight:800; font-size:22px; margin-top:10px;">Damn, you’re an 11/10 indeed!</p>
-
-            <div class="coinArea">
-              <h2 style="font-size:34px; margin:0;">+1 Coin</h2>
-              <p class="muted" style="margin:0;">Insert your coin to spin.</p>
-
-              <div class="coinRow">
-                <div id="coin" class="coin" title="Click to insert"></div>
-                <div class="slot" aria-hidden="true"></div>
-              </div>
-
-              <p class="tiny" style="margin:0;">(Click the coin.)</p>
-            </div>
-          </div>
-        </section>
-
-        <!-- PAGE 4: Wheel -->
-        <section id="pageWheel" class="page">
-          <div class="center">
-            <h1>Spin to win 🎡</h1>
-
-            <div class="wheelWrap">
-              <div class="pointer"></div>
-              <canvas id="wheelCanvas" class="wheelCanvas" width="520" height="520"></canvas>
-              <button id="spinBtn" class="btn btnWide">SPIN</button>
-              <div id="wheelAfterText" class="subText hidden"> </div>
-              <button id="wildBtn" class="btn btnWide hidden">Wild card? Hmmmm</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- PAGE 5: Aha -->
-        <section id="pageAha" class="page">
-          <div class="center" style="padding-top:30px;">
-            <h1 style="font-size: clamp(30px, 4.8vw, 56px);">Aha! Thought you were lucky? I’m the luckier one.</h1>
-            <div class="spacer"></div>
-            <button id="toLuckBtn" class="btn btnWide">Click to check your Luck stats</button>
-          </div>
-        </section>
-
-        <!-- PAGE 6: Luck Stats -->
-        <section id="pageLuck" class="page">
-          <div class="center">
-            <h1>📊 Luck Stats Report</h1>
-            <p>Swipe left/right.</p>
-
-            <div id="reportBox" class="reportBox">
-              <div class="reportTop">
-                <div id="pageCount">1 / 5</div>
-                <div class="muted">Luck Stat</div>
-              </div>
-
-              <div id="reportText" class="reportMid">Luck stat: 1</div>
-
-              <div class="reportNav">
-                <button id="prevBtn" class="ghostBtn">◀ Prev</button>
-                <button id="nextBtn" class="ghostBtn">Next ▶</button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-      </div>
-    </div>
-  </div>
+  <div class="wrap" id="app"></div>
 
   <script>
-    // ======================
-    // Helpers
-    // ======================
-    const pages = {
-      envelope: document.getElementById('pageEnvelope'),
-      game: document.getElementById('pageGame'),
-      win: document.getElementById('pageWin'),
-      wheel: document.getElementById('pageWheel'),
-      aha: document.getElementById('pageAha'),
-      luck: document.getElementById('pageLuck'),
+    // ---------- Audio (file names MUST match your repo exactly) ----------
+    const audio = {
+      hmmmm: new Audio("hmmmm.mp3"),
+      bgm:   new Audio("bgm.mp3"),
+      happy: new Audio("happy.mp3"),
+      spin:  new Audio("spin.mp3"),
+      yay:   new Audio("yay-yay-yay.mp3"),
+      yay2:  new Audio("yay.mp3")
     };
 
-    function showPage(key){
-      Object.values(pages).forEach(p => p.classList.remove('active'));
-      pages[key].classList.add('active');
-      window.scrollTo({top:0, behavior:'instant'});
-    }
+    // Set loops
+    audio.bgm.loop = true;
+    audio.happy.loop = true;
 
-    async function safePlay(audio){
+    // Safe play helper (prevents iOS errors)
+    async function safePlay(a, {volume=1, restart=false}={}){
       try{
-        audio.currentTime = 0;
-        const p = audio.play();
-        if(p && typeof p.then === 'function') await p;
+        if(restart) a.currentTime = 0;
+        a.volume = Math.max(0, Math.min(1, volume));
+        await a.play();
+        return true;
       }catch(e){
-        // If iOS blocks it, it will still be able to play on the next user gesture.
-        console.log('Audio play blocked:', e?.message || e);
+        return false;
       }
     }
-
-    function stopAudio(audio){
-      try{ audio.pause(); audio.currentTime = 0; } catch {}
+    function safePause(a){
+      try{ a.pause(); }catch(e){}
     }
 
-    // ======================
-    // Audio (filenames must match repo exactly)
-    // ======================
-    const sfxHmm   = new Audio('./hmmmm.mp3');
-    const bgm      = new Audio('./bgm.mp3');
-    const happy    = new Audio('./happy.mp3');
-    const spinSfx  = new Audio('./spin.mp3');
-    const yayBig   = new Audio('./yay-yay-yay.mp3');
-    const yayShort = new Audio('./yay.mp3');
-
-    // recommended settings
-    [sfxHmm, spinSfx, yayBig, yayShort].forEach(a => { a.preload = 'auto'; a.volume = 1.0; });
-    bgm.preload = 'auto';
-    bgm.loop = true;
-    bgm.volume = 1.0;
-    happy.preload = 'auto';
-    happy.loop = true;
-    happy.volume = 1.0;
-
-    // ======================
-    // PAGE 1: Envelope
-    // ======================
-    const envelopeBtn = document.getElementById('envelopeBtn');
-    const envFlap = document.getElementById('envFlap');
-    const youGotMail = document.getElementById('youGotMail');
-    let envelopeOpened = false;
-
-    envelopeBtn.addEventListener('click', async () => {
-      if(envelopeOpened) return;
-      envelopeOpened = true;
-
-      // play Hmmmm (must be triggered by this click for iOS)
-      await safePlay(sfxHmm);
-
-      // open flap + show text
-      envelopeBtn.classList.add('envOpen'); // toggles flap transform
-      youGotMail.classList.add('fadeIn');
-
-      // wait 1.5s then go game
-      setTimeout(() => {
-        showPage('game');
-      }, 1500);
-    });
-
-    // ======================
-    // PAGE 2: Football Cones Game
-    // ======================
-    const gameCanvas = document.getElementById('gameCanvas');
-    const gctx = gameCanvas.getContext('2d');
-    const startGameBtn = document.getElementById('startGameBtn');
-    const scorePill = document.getElementById('scorePill');
-
-    // game state
-    let gRunning = false;
-    let gScore = 0;
-    const GOAL = 11;
-
-    const player = {
-      x: gameCanvas.width/2,
-      y: gameCanvas.height - 56,
-      r: 14,
-      speed: 34
-    };
-
-    let cones = [];
-    let lastSpawn = 0;
-    let lastTime = 0;
-
-    function resetGame(){
-      gRunning = false;
-      gScore = 0;
-      scorePill.textContent = `Score: ${gScore}/${GOAL}`;
-      cones = [];
-      player.x = gameCanvas.width/2;
-      lastSpawn = 0;
-      lastTime = 0;
-      drawGame(0);
+    // Choose yay file gracefully
+    async function playYay(){
+      // try yay-yay-yay first, if missing, fallback to yay.mp3
+      const ok = await safePlay(audio.yay, {volume:1, restart:true});
+      if(!ok) await safePlay(audio.yay2, {volume:1, restart:true});
     }
 
-    function spawnCone(){
-      // cone occupies a lane; keep simple
-      const laneCount = 5;
-      const laneW = gameCanvas.width / laneCount;
-      const lane = Math.floor(Math.random() * laneCount);
-      const x = laneW * lane + laneW/2;
-      cones.push({ x, y: -30, w: 22, h: 30, passed:false });
+    // Global state
+    const app = document.getElementById("app");
+    let current = "mail"; // mail -> game -> wheel -> aha -> luck
+    let gameWon = false;
+
+    // ---------- UI RENDER ----------
+    function renderMail(){
+      current = "mail";
+      app.innerHTML = `
+        <h1>Dear Mr Wong<br/>Duan Chiang,</h1>
+        <div class="sub">Have you turned your audio on? Click on the envelope.</div>
+
+        <div class="mailBox">
+          <div class="mailClick" id="mailBtn" aria-label="Open mail">
+            ${niceEnvelopeSVG()}
+          </div>
+        </div>
+
+        <div class="mailText" id="mailText">You’ve got a mail!</div>
+      `;
+
+      const btn = document.getElementById("mailBtn");
+      const mailText = document.getElementById("mailText");
+
+      btn.addEventListener("click", async () => {
+        // Start happy background at A (must be user gesture to satisfy iOS autoplay)
+        await safePlay(audio.happy, {volume: 0.55, restart:false});
+
+        // Play hmmmm exactly on click
+        await safePlay(audio.hmmmm, {volume: 1, restart:true});
+
+        // Open envelope (CSS/attribute toggle)
+        btn.querySelector("svg").setAttribute("data-open", "1");
+        mailText.classList.add("show");
+
+        // Move to game after 1.5s
+        setTimeout(() => renderGame(), 1500);
+      });
     }
 
-    function drawCone(c){
-      // stylized cone (orange with white stripe)
-      gctx.save();
-      gctx.translate(c.x, c.y);
-      gctx.beginPath();
-      gctx.moveTo(0, -c.h/2);
-      gctx.lineTo(-c.w/2, c.h/2);
-      gctx.lineTo(c.w/2, c.h/2);
-      gctx.closePath();
-      gctx.fillStyle = 'rgba(255,170,70,.95)';
-      gctx.fill();
-      gctx.strokeStyle = 'rgba(255,255,255,.22)';
-      gctx.lineWidth = 2;
-      gctx.stroke();
+    // ---------- GAME (Flappy-ish, boy jersey 27 + "dcop" above) ----------
+    let game = null;
 
-      // stripe
-      gctx.beginPath();
-      gctx.moveTo(-c.w*0.28, c.h*0.05);
-      gctx.lineTo(c.w*0.28, c.h*0.05);
-      gctx.strokeStyle = 'rgba(255,255,255,.55)';
-      gctx.lineWidth = 3;
-      gctx.stroke();
-      gctx.restore();
-    }
+    function renderGame(){
+      current = "game";
+      // Stop/quiet happy while playing the game
+      safePause(audio.happy);
 
-    function drawBall(){
-      gctx.save();
-      gctx.translate(player.x, player.y);
-      gctx.beginPath();
-      gctx.arc(0,0,player.r,0,Math.PI*2);
-      gctx.fillStyle = 'rgba(255,255,255,.92)';
-      gctx.fill();
-      gctx.strokeStyle = 'rgba(0,0,0,.25)';
-      gctx.lineWidth = 2;
-      gctx.stroke();
+      app.innerHTML = `
+        <h1>How OP are you? <span style="font-size:.7em">🎮</span></h1>
+        <div class="sub" style="color:rgba(233,236,243,.78)">
+          <div><span style="color:var(--gold)">Reach 11</span> to win the game.</div>
+          <div>Tap <b>Start</b> to start the game.</div>
+          <div>Tap screen to <b>jump</b>.</div>
+        </div>
 
-      // small pattern
-      gctx.beginPath();
-      gctx.arc(0,0,player.r*0.45,0,Math.PI*2);
-      gctx.fillStyle = 'rgba(0,0,0,.18)';
-      gctx.fill();
-      gctx.restore();
-    }
+        <div class="pillRow">
+          <div class="pill">Player: <b>dcop</b></div>
+          <div class="pill">Score: <b id="scoreTxt">0/11</b></div>
+          <div class="pill">Goal: <b>11</b></div>
+        </div>
 
-    function drawPitch(){
-      // pitch lines
-      gctx.save();
-      gctx.strokeStyle = 'rgba(255,255,255,.10)';
-      gctx.lineWidth = 2;
+        <div class="gameWrap">
+          <canvas id="gameCanvas" width="420" height="520"></canvas>
+        </div>
 
-      // center lane lines
-      const lanes = 5;
-      for(let i=1;i<lanes;i++){
-        const x = (gameCanvas.width/lanes)*i;
-        gctx.beginPath();
-        gctx.moveTo(x, 0);
-        gctx.lineTo(x, gameCanvas.height);
-        gctx.stroke();
+        <div class="center" style="margin-top:14px;">
+          <button class="btn" id="startBtn">Start</button>
+        </div>
+        <div class="hint">Tip: tap anywhere to jump.</div>
+      `;
+
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+      const scoreTxt = document.getElementById("scoreTxt");
+      const startBtn = document.getElementById("startBtn");
+
+      // Game state
+      const W = canvas.width, H = canvas.height;
+      const groundY = H - 60;
+
+      const player = {
+        x: 110, y: 220, vy: 0,
+        r: 18
+      };
+
+      let pipes = [];
+      let score = 0;
+      let running = false;
+      let lastTime = 0;
+      let spawnT = 0;
+
+      function reset(){
+        player.y = 220; player.vy = 0;
+        pipes = [];
+        score = 0;
+        scoreTxt.textContent = `${score}/11`;
+        gameWon = false;
+        spawnT = 0;
       }
 
-      // top arc
-      gctx.beginPath();
-      gctx.arc(gameCanvas.width/2, 18, 90, 0, Math.PI);
-      gctx.stroke();
-
-      gctx.restore();
-    }
-
-    function collideBallCone(c){
-      const dx = Math.abs(player.x - c.x);
-      const dy = Math.abs(player.y - c.y);
-      const hitX = dx < (player.r + c.w/2);
-      const hitY = dy < (player.r + c.h/2);
-      return hitX && hitY;
-    }
-
-    function drawGame(t){
-      gctx.clearRect(0,0,gameCanvas.width,gameCanvas.height);
-
-      // background vignette
-      gctx.save();
-      const grd = gctx.createLinearGradient(0,0,0,gameCanvas.height);
-      grd.addColorStop(0,'rgba(255,255,255,.05)');
-      grd.addColorStop(1,'rgba(0,0,0,.20)');
-      gctx.fillStyle = grd;
-      gctx.fillRect(0,0,gameCanvas.width,gameCanvas.height);
-      gctx.restore();
-
-      drawPitch();
-
-      // cones
-      cones.forEach(drawCone);
-
-      // player
-      drawBall();
-
-      // little HUD
-      gctx.save();
-      gctx.fillStyle = 'rgba(238,240,255,.72)';
-      gctx.font = '700 14px system-ui, -apple-system, Segoe UI, Roboto';
-      gctx.fillText('Tap left/right to dribble', 14, 24);
-      gctx.restore();
-    }
-
-    function gameLoop(ts){
-      if(!gRunning) return;
-
-      if(!lastTime) lastTime = ts;
-      const dt = Math.min(32, ts - lastTime);
-      lastTime = ts;
-
-      // spawn cones every ~650ms
-      lastSpawn += dt;
-      if(lastSpawn > 650){
-        spawnCone();
-        lastSpawn = 0;
+      function spawnPipe(){
+        const gap = 150;
+        const minTop = 80;
+        const maxTop = groundY - 80 - gap;
+        const topH = Math.floor(minTop + Math.random()*(maxTop - minTop));
+        pipes.push({
+          x: W + 40,
+          w: 64,
+          topH,
+          gap,
+          passed: false
+        });
       }
 
-      // move cones down
-      const speed = 0.23 * dt; // pixels per ms
-      cones.forEach(c => c.y += speed * 60);
+      function collideRectCircle(rx, ry, rw, rh, cx, cy, cr){
+        const nx = Math.max(rx, Math.min(cx, rx+rw));
+        const ny = Math.max(ry, Math.min(cy, ry+rh));
+        const dx = cx - nx;
+        const dy = cy - ny;
+        return (dx*dx + dy*dy) <= cr*cr;
+      }
 
-      // remove cones offscreen, scoring when passed
-      cones = cones.filter(c => {
-        if(!c.passed && c.y > player.y){
-          c.passed = true;
-          gScore++;
-          scorePill.textContent = `Score: ${gScore}/${GOAL}`;
-          if(gScore >= GOAL){
-            finishGameWin();
-            return false;
+      function drawBackground(){
+        // Soft gradient background
+        const g = ctx.createLinearGradient(0,0,0,H);
+        g.addColorStop(0, "rgba(255,255,255,0.04)");
+        g.addColorStop(1, "rgba(0,0,0,0.18)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0,0,W,H);
+
+        // subtle stars
+        ctx.fillStyle = "rgba(255,255,255,0.10)";
+        for(let i=0;i<40;i++){
+          const x = (i*97)%W;
+          const y = (i*53)%groundY;
+          ctx.fillRect(x, y, 2, 2);
+        }
+
+        // ground
+        ctx.fillStyle = "rgba(0,0,0,0.22)";
+        ctx.fillRect(0, groundY, W, H-groundY);
+        ctx.strokeStyle = "rgba(255,255,255,0.10)";
+        ctx.beginPath();
+        ctx.moveTo(0, groundY);
+        ctx.lineTo(W, groundY);
+        ctx.stroke();
+      }
+
+      function drawPipes(){
+        for(const p of pipes){
+          // top
+          ctx.fillStyle = "rgba(255,255,255,0.10)";
+          ctx.strokeStyle = "rgba(255,255,255,0.14)";
+          ctx.lineWidth = 2;
+
+          const topRect = {x:p.x, y:0, w:p.w, h:p.topH};
+          const botY = p.topH + p.gap;
+          const botRect = {x:p.x, y:botY, w:p.w, h:groundY - botY};
+
+          ctx.beginPath();
+          roundRect(ctx, topRect.x, topRect.y, topRect.w, topRect.h, 14);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.beginPath();
+          roundRect(ctx, botRect.x, botRect.y, botRect.w, botRect.h, 14);
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+
+      function drawPlayer(){
+        // Label "dcop" above
+        ctx.font = "800 18px ui-sans-serif, system-ui";
+        ctx.fillStyle = "rgba(233,236,243,0.85)";
+        ctx.textAlign = "center";
+        ctx.fillText("dcop", player.x, player.y - 34);
+
+        // Body (simple boy)
+        // Head
+        ctx.fillStyle = "rgba(255,255,255,0.90)";
+        ctx.beginPath();
+        ctx.arc(player.x, player.y - 14, 10, 0, Math.PI*2);
+        ctx.fill();
+
+        // Hair (dark)
+        ctx.fillStyle = "rgba(20,20,25,0.90)";
+        ctx.beginPath();
+        ctx.arc(player.x, player.y - 17, 10, Math.PI*1.05, Math.PI*1.95);
+        ctx.fill();
+
+        // Jersey (white)
+        ctx.fillStyle = "rgba(255,255,255,0.95)";
+        ctx.strokeStyle = "rgba(0,0,0,0.12)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        roundRect(ctx, player.x - 14, player.y - 4, 28, 28, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        // Number 27 (non-nego)
+        ctx.fillStyle = "rgba(30,30,35,0.85)";
+        ctx.font = "900 14px ui-sans-serif, system-ui";
+        ctx.fillText("27", player.x, player.y + 14);
+
+        // Legs
+        ctx.strokeStyle = "rgba(255,255,255,0.70)";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(player.x - 6, player.y + 24);
+        ctx.lineTo(player.x - 6, player.y + 38);
+        ctx.moveTo(player.x + 6, player.y + 24);
+        ctx.lineTo(player.x + 6, player.y + 38);
+        ctx.stroke();
+      }
+
+      function draw(){
+        drawBackground();
+        drawPipes();
+        drawPlayer();
+      }
+
+      function step(t){
+        if(!running) return;
+        const dt = Math.min(0.033, (t - lastTime)/1000 || 0);
+        lastTime = t;
+
+        // physics
+        player.vy += 900 * dt; // gravity
+        player.y += player.vy * dt;
+
+        // bounds
+        if(player.y > groundY - 10){
+          player.y = groundY - 10;
+          lose();
+          return;
+        }
+        if(player.y < 40){
+          player.y = 40;
+          player.vy = 0;
+        }
+
+        // spawn pipes
+        spawnT += dt;
+        if(spawnT > 1.2){
+          spawnT = 0;
+          spawnPipe();
+        }
+
+        // move pipes
+        for(const p of pipes){
+          p.x -= 220 * dt;
+          // scoring
+          if(!p.passed && p.x + p.w < player.x){
+            p.passed = true;
+            score++;
+            scoreTxt.textContent = `${score}/11`;
+            if(score >= 11){
+              win();
+              return;
+            }
+          }
+
+          // collision
+          const topHit = collideRectCircle(p.x, 0, p.w, p.topH, player.x, player.y, player.r);
+          const botY = p.topH + p.gap;
+          const botHit = collideRectCircle(p.x, botY, p.w, groundY - botY, player.x, player.y, player.r);
+          if(topHit || botHit){
+            lose();
+            return;
           }
         }
-        return c.y < gameCanvas.height + 40;
+        // cleanup
+        pipes = pipes.filter(p => p.x > -120);
+
+        draw();
+        requestAnimationFrame(step);
+      }
+
+      function jump(){
+        if(!running) return;
+        player.vy = -340;
+      }
+
+      function start(){
+        reset();
+        running = true;
+        lastTime = performance.now();
+
+        // Start bgm when Start pressed (user gesture)
+        safePlay(audio.bgm, {volume: 1, restart:false});
+
+        draw();
+        requestAnimationFrame(step);
+      }
+
+      function lose(){
+        running = false;
+        // simple reset prompt
+        showOverlay("Oof. Try again?", "Retry", () => start());
+      }
+
+      function win(){
+        running = false;
+        gameWon = true;
+
+        // Lower bgm by 50% AFTER game ends
+        audio.bgm.volume = 0.5;
+
+        showOverlay("Nice. You win. 😈", "Continue", () => renderWheel());
+      }
+
+      function showOverlay(title, btnText, onClick){
+        const ov = document.createElement("div");
+        ov.style.position="absolute";
+        ov.style.inset="0";
+        ov.style.display="flex";
+        ov.style.alignItems="center";
+        ov.style.justifyContent="center";
+        ov.style.background="rgba(0,0,0,.35)";
+        ov.style.backdropFilter="blur(4px)";
+        ov.innerHTML = `
+          <div style="width:min(360px, 88%); border-radius:18px; border:1px solid rgba(255,255,255,.16);
+                      background: rgba(20,20,25,.60); padding:18px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.35);">
+            <div style="font-size:22px; font-weight:900; margin-bottom:12px;">${title}</div>
+            <button class="btn" id="ovBtn" style="min-width:160px;">${btnText}</button>
+          </div>
+        `;
+        document.querySelector(".gameWrap").appendChild(ov);
+        ov.querySelector("#ovBtn").addEventListener("click", () => {
+          ov.remove();
+          onClick();
+        });
+      }
+
+      // Input
+      startBtn.addEventListener("click", start);
+      canvas.addEventListener("click", () => {
+        if(!running) return;
+        jump();
+      }, {passive:true});
+      canvas.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        if(!running) return;
+        jump();
+      }, {passive:false});
+
+      // Initial draw
+      draw();
+    }
+
+    // ---------- WHEEL ----------
+    function renderWheel(){
+      current = "wheel";
+
+      app.innerHTML = `
+        <h1>Spin to win <span style="font-size:.7em">🎡</span></h1>
+        <div class="sub" style="color:rgba(233,236,243,.75)">No backing out now.</div>
+
+        <div class="wheelWrap">
+          <div class="pointer"></div>
+          <canvas id="wheelCanvas" width="420" height="420"></canvas>
+        </div>
+
+        <div class="center" style="margin-top:14px;">
+          <button class="btn" id="spinBtn">SPIN</button>
+        </div>
+      `;
+
+      const canvas = document.getElementById("wheelCanvas");
+      const ctx = canvas.getContext("2d");
+      const spinBtn = document.getElementById("spinBtn");
+
+      const segments = [
+        "WILD CARD",
+        "DATE NIGHT PLANNING",
+        "FREE MASSAGE FOR GF",
+        "OMYUM RAMEN ON",
+        "X MINS ONYX"
+      ];
+
+      // We will FORCE land on WILD CARD to guarantee
+      const forcedIndex = 0;
+
+      let angle = 0;
+      let spinning = false;
+
+      function drawWheel(){
+        const W = canvas.width, H = canvas.height;
+        const cx = W/2, cy = H/2;
+        const rOuter = 190;
+        const rInner = 46;
+        const n = segments.length;
+        const slice = (Math.PI*2)/n;
+
+        ctx.clearRect(0,0,W,H);
+
+        // Outer ring
+        ctx.beginPath();
+        ctx.arc(cx,cy,rOuter+8,0,Math.PI*2);
+        ctx.strokeStyle="rgba(255,255,255,.14)";
+        ctx.lineWidth=2;
+        ctx.stroke();
+
+        for(let i=0;i<n;i++){
+          const a0 = angle + i*slice;
+          const a1 = a0 + slice;
+
+          // Segment fill
+          ctx.beginPath();
+          ctx.moveTo(cx,cy);
+          ctx.arc(cx,cy,rOuter,a0,a1);
+          ctx.closePath();
+
+          ctx.fillStyle = (i%2===0) ? "rgba(255,255,255,.08)" : "rgba(255,255,255,.05)";
+          ctx.fill();
+          ctx.strokeStyle="rgba(255,255,255,.12)";
+          ctx.lineWidth=2;
+          ctx.stroke();
+
+          // Text
+          const mid = (a0+a1)/2;
+          ctx.save();
+          ctx.translate(cx,cy);
+          ctx.rotate(mid);
+
+          // We draw text centered along radial direction, keeping it readable
+          const label = segments[i];
+          const lines = wrapLabel(label, 14); // auto-wrap
+          ctx.textAlign="center";
+          ctx.fillStyle="rgba(233,236,243,.90)";
+          ctx.font="900 16px ui-sans-serif, system-ui";
+          const ty = -120;
+
+          if(lines.length === 1){
+            ctx.fillText(lines[0], 0, ty);
+          }else{
+            ctx.fillText(lines[0], 0, ty-10);
+            ctx.fillText(lines[1], 0, ty+10);
+          }
+
+          ctx.restore();
+        }
+
+        // center hub
+        ctx.beginPath();
+        ctx.arc(cx,cy,rInner,0,Math.PI*2);
+        ctx.fillStyle="rgba(0,0,0,.30)";
+        ctx.fill();
+        ctx.strokeStyle="rgba(255,255,255,.12)";
+        ctx.lineWidth=2;
+        ctx.stroke();
+      }
+
+      drawWheel();
+
+      function angleForIndex(i){
+        const n = segments.length;
+        const slice = (Math.PI*2)/n;
+
+        // Pointer is at top. We want chosen segment centered at top.
+        const targetMid = -Math.PI/2; // top
+        const segMid = i*slice + slice/2;
+        return targetMid - segMid;
+      }
+
+      spinBtn.addEventListener("click", async () => {
+        if(spinning) return;
+        spinning = true;
+        spinBtn.disabled = true;
+
+        // wheel sound
+        await safePlay(audio.spin, {volume: 1, restart:true});
+
+        // animate spin and land on forcedIndex
+        const base = angleForIndex(forcedIndex);
+        const extraTurns = 6; // for drama
+        const startA = angle;
+        const endA = base + extraTurns*Math.PI*2;
+
+        const dur = 3200;
+        const t0 = performance.now();
+
+        function easeOutCubic(x){ return 1 - Math.pow(1-x, 3); }
+
+        function anim(t){
+          const p = Math.min(1, (t - t0)/dur);
+          angle = startA + (endA - startA) * easeOutCubic(p);
+          drawWheel();
+          if(p < 1){
+            requestAnimationFrame(anim);
+          }else{
+            spinning = false;
+            spinBtn.disabled = false;
+
+            // stop spin sound
+            safePause(audio.spin);
+
+            // Confetti + button “Wild card? Hmmmm”
+            doConfetti(document.querySelector(".wheelWrap"));
+
+            setTimeout(async () => {
+              await playYay();
+              showWildCardButton();
+            }, 250);
+          }
+        }
+        requestAnimationFrame(anim);
       });
 
-      // collision = reset that cone (no sfx, as requested)
-      for(const c of cones){
-        if(collideBallCone(c)){
-          // gentle penalty: score doesn't drop, but push cone away
-          c.y = gameCanvas.height + 999;
-        }
+      function showWildCardButton(){
+        const c = document.querySelector(".wheelWrap");
+        const holder = document.createElement("div");
+        holder.className="center";
+        holder.style.marginTop="14px";
+        holder.innerHTML = `<button class="btn" id="wildBtn">Wild card? Hmmmm</button>`;
+        c.insertAdjacentElement("afterend", holder);
+
+        holder.querySelector("#wildBtn").addEventListener("click", () => {
+          holder.remove();
+          renderAha();
+        });
+      }
+    }
+
+    // ---------- AHA PAGE ----------
+    function renderAha(){
+      current = "aha";
+
+      app.innerHTML = `
+        <h1 style="font-size:40px">Aha! Thought you were lucky? I’m the luckier one.</h1>
+        <div class="sub" style="color:rgba(233,236,243,.72)">Click to check your luck stats</div>
+
+        <div class="center" style="margin-top:18px;">
+          <button class="btn" id="luckBtn">Click to check your luck stats</button>
+        </div>
+      `;
+
+      document.getElementById("luckBtn").addEventListener("click", () => {
+        renderLuckPages();
+      });
+    }
+
+    // ---------- LUCK PAGES (1-5) ----------
+    function renderLuckPages(){
+      current = "luck";
+
+      // At this point: stop bgm completely, happy only
+      safePause(audio.bgm);
+      safePlay(audio.happy, {volume: 0.80, restart:false});
+
+      app.innerHTML = `
+        <h1 style="font-size:40px">📊 Luck Stats Report</h1>
+        <div class="sub" style="color:rgba(233,236,243,.72)">Swipe left/right.</div>
+
+        <div class="pages" id="pages">
+          <div class="pageInner" id="pageInner">
+            ${luckPage("Luck stat: 1", "1 / 5")}
+            ${luckPage("Luck stat increasing… 2", "2 / 5")}
+            ${luckPage("Luck stat increasing more… 3", "3 / 5")}
+            ${luckPage("Luck stat increasing morer… 4", "4 / 5")}
+            ${luckPage("Luck stat increasing morerest… 5", "5 / 5")}
+          </div>
+        </div>
+
+        <div class="pager" id="pager">1 / 5</div>
+      `;
+
+      const inner = document.getElementById("pageInner");
+      const pager = document.getElementById("pager");
+      let idx = 0;
+
+      function update(){
+        inner.style.transform = `translateX(${-idx*100}%)`;
+        pager.textContent = `${idx+1} / 5`;
       }
 
-      drawGame(ts);
-      requestAnimationFrame(gameLoop);
+      // Swipe handling
+      let startX = null;
+      const pages = document.getElementById("pages");
+
+      pages.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
+      }, {passive:true});
+
+      pages.addEventListener("touchend", (e) => {
+        if(startX === null) return;
+        const endX = (e.changedTouches[0] || {}).clientX;
+        const dx = endX - startX;
+        startX = null;
+        if(Math.abs(dx) < 40) return;
+        if(dx < 0 && idx < 4) idx++;
+        if(dx > 0 && idx > 0) idx--;
+        update();
+      }, {passive:true});
+
+      // Desktop fallback
+      pages.addEventListener("click", () => {
+        if(idx < 4) idx++;
+        else idx = 0;
+        update();
+      });
+
+      update();
     }
 
-    function movePlayer(dir){
-      // dir: -1 left, +1 right
-      player.x += dir * player.speed;
-      const minX = 24;
-      const maxX = gameCanvas.width - 24;
-      player.x = Math.max(minX, Math.min(maxX, player.x));
-      drawGame(0);
+    function luckPage(text, footer){
+      return `
+        <div class="page">
+          <div class="bigStat">${text}</div>
+        </div>
+      `;
     }
 
-    // tap controls (mobile friendly)
-    gameCanvas.addEventListener('pointerdown', (e) => {
-      if(!gRunning) return;
-      const rect = gameCanvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width * gameCanvas.width;
-      if(x < gameCanvas.width/2) movePlayer(-1);
-      else movePlayer(+1);
-    });
-
-    startGameBtn.addEventListener('click', async () => {
-      if(gRunning) return;
-
-      resetGame();
-      gRunning = true;
-
-      // bgm starts here only
-      stopAudio(happy);
-      bgm.volume = 1.0;
-      await safePlay(bgm);
-
-      requestAnimationFrame(gameLoop);
-    });
-
-    function finishGameWin(){
-      gRunning = false;
-
-      // lower bgm volume by 50% (so later sfx are audible)
-      bgm.volume = 0.5;
-
-      // short cheer
-      safePlay(yayShort);
-
-      setTimeout(() => {
-        showPage('win');
-      }, 650);
+    // ---------- Helpers ----------
+    function roundRect(ctx, x, y, w, h, r){
+      const rr = Math.min(r, w/2, h/2);
+      ctx.moveTo(x+rr, y);
+      ctx.arcTo(x+w, y, x+w, y+h, rr);
+      ctx.arcTo(x+w, y+h, x, y+h, rr);
+      ctx.arcTo(x, y+h, x, y, rr);
+      ctx.arcTo(x, y, x+w, y, rr);
     }
 
-    // Initialize game view
-    resetGame();
+    function wrapLabel(label, maxLen){
+      // Return up to 2 lines, tries to break on spaces
+      const words = label.split(" ");
+      let line1 = "";
+      let line2 = "";
 
-    // ======================
-    // PAGE 3: Coin Insert
-    // ======================
-    const coin = document.getElementById('coin');
-    let coinInserted = false;
-
-    coin.addEventListener('click', async () => {
-      if(coinInserted) return;
-      coinInserted = true;
-      coin.classList.add('coinInsertAnim');
-
-      // small delay then go wheel
-      setTimeout(() => {
-        showPage('wheel');
-        drawWheel(); // ensure wheel visible
-      }, 900);
-    });
-
-    // ======================
-    // PAGE 4: Wheel (guaranteed wild card)
-    // ======================
-    const wheelCanvas = document.getElementById('wheelCanvas');
-    const wctx = wheelCanvas.getContext('2d');
-    const spinBtn = document.getElementById('spinBtn');
-    const wheelAfterText = document.getElementById('wheelAfterText');
-    const wildBtn = document.getElementById('wildBtn');
-
-    // Segments: wild is smaller
-    const segments = [
-      { label: 'DATE NIGHT PLANNING', weight: 3.2 },
-      { label: 'FREE MASSAGE FOR', weight: 3.2 },
-      { label: 'OMYUM RAMEN ON', weight: 3.2 },
-      { label: 'X MINS ONYX', weight: 3.2 },
-      { label: 'WILD CARD', weight: 1.0 }, // smaller slice
-    ];
-
-    let wheelAngle = 0;
-    let spinning = false;
-
-    function drawWheel(){
-      const cx = wheelCanvas.width/2;
-      const cy = wheelCanvas.height/2;
-      const r = wheelCanvas.width/2 - 16;
-
-      wctx.clearRect(0,0,wheelCanvas.width,wheelCanvas.height);
-
-      // base circle
-      wctx.save();
-      wctx.translate(cx, cy);
-      wctx.rotate(wheelAngle);
-
-      const total = segments.reduce((s,a)=>s+a.weight,0);
-      let start = -Math.PI/2; // start at top
-
-      for(let i=0;i<segments.length;i++){
-        const seg = segments[i];
-        const ang = (seg.weight/total) * Math.PI*2;
-        const end = start + ang;
-
-        // alternating fills
-        wctx.beginPath();
-        wctx.moveTo(0,0);
-        wctx.arc(0,0,r,start,end);
-        wctx.closePath();
-        wctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,.07)' : 'rgba(0,0,0,.16)';
-        wctx.fill();
-        wctx.strokeStyle = 'rgba(255,255,255,.12)';
-        wctx.lineWidth = 2;
-        wctx.stroke();
-
-        // text (readable, not jumbled)
-        const mid = (start + end)/2;
-        wctx.save();
-        wctx.rotate(mid);
-        wctx.textAlign = 'center';
-        wctx.textBaseline = 'middle';
-        wctx.fillStyle = 'rgba(238,240,255,.88)';
-        wctx.font = '800 16px system-ui, -apple-system, Segoe UI, Roboto';
-        // place text along radius
-        wctx.translate(r*0.62, 0);
-        wctx.rotate(Math.PI/2);
-        // shrink if too long
-        let txt = seg.label;
-        if(txt.length > 18){
-          wctx.font = '800 14px system-ui, -apple-system, Segoe UI, Roboto';
-        }
-        wctx.fillText(txt, 0, 0);
-        wctx.restore();
-
-        start = end;
-      }
-
-      // hub
-      wctx.beginPath();
-      wctx.arc(0,0,42,0,Math.PI*2);
-      wctx.fillStyle = 'rgba(0,0,0,.35)';
-      wctx.fill();
-      wctx.strokeStyle = 'rgba(255,255,255,.14)';
-      wctx.lineWidth = 2;
-      wctx.stroke();
-
-      wctx.restore();
-    }
-
-    function angleForSegmentLabel(label){
-      const total = segments.reduce((s,a)=>s+a.weight,0);
-      let start = -Math.PI/2;
-      for(const seg of segments){
-        const ang = (seg.weight/total) * Math.PI*2;
-        const end = start + ang;
-        if(seg.label === label){
-          const mid = (start+end)/2;
-          return mid;
-        }
-        start = end;
-      }
-      return 0;
-    }
-
-    spinBtn.addEventListener('click', async () => {
-      if(spinning) return;
-      spinning = true;
-      wheelAfterText.classList.add('hidden');
-      wildBtn.classList.add('hidden');
-
-      // spin sound
-      await safePlay(spinSfx);
-
-      // Guarantee: land on WILD CARD under pointer at top.
-      // Pointer at top means we want the segment's MID to align with -90deg in world,
-      // but we rotate wheel, so we set final wheelAngle so that mid ends at -PI/2.
-      const targetMid = angleForSegmentLabel('WILD CARD');
-      const targetAngle = (-Math.PI/2) - targetMid;
-
-      // add multiple turns for drama (slow)
-      const turns = 6;
-      const startAngle = wheelAngle;
-      const endAngle = targetAngle + turns*Math.PI*2;
-
-      const duration = 4200; // slow spin
-      const start = performance.now();
-
-      function easeOutCubic(t){ return 1 - Math.pow(1-t,3); }
-
-      function anim(now){
-        const t = Math.min(1, (now - start)/duration);
-        const eased = easeOutCubic(t);
-        wheelAngle = startAngle + (endAngle - startAngle) * eased;
-        drawWheel();
-        if(t < 1) requestAnimationFrame(anim);
-        else{
-          spinning = false;
-          onWheelWildCard();
-        }
-      }
-
-      requestAnimationFrame(anim);
-    });
-
-    function onWheelWildCard(){
-      // confetti + big yay
-      fireConfetti(1700);
-      safePlay(yayBig);
-
-      wheelAfterText.textContent = "What’s wild card? Hmmm";
-      wheelAfterText.classList.remove('hidden');
-      wildBtn.classList.remove('hidden');
-    }
-
-    wildBtn.addEventListener('click', () => {
-      // go to Aha page and start happy music here (Option A)
-      showPage('aha');
-
-      // switch off bgm fully, start happy.mp3
-      stopAudio(bgm);
-      safePlay(happy);
-    });
-
-    // draw wheel initially
-    drawWheel();
-
-    // ======================
-    // PAGE 5: Aha -> Luck
-    // ======================
-    const toLuckBtn = document.getElementById('toLuckBtn');
-    toLuckBtn.addEventListener('click', () => {
-      showPage('luck');
-    });
-
-    // ======================
-    // PAGE 6: Luck Stats pages
-    // ======================
-    const reportBox = document.getElementById('reportBox');
-    const reportText = document.getElementById('reportText');
-    const pageCount = document.getElementById('pageCount');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-
-    const luckPages = [
-      'Luck stat: 1',
-      'Luck stat increasing… 2',
-      'Luck stat increasing more… 3',
-      'Luck stat increasing morer… 4',
-      'Luck stat increasing morerest… 5',
-    ];
-    let luckIndex = 0;
-
-    function renderLuck(){
-      reportText.textContent = luckPages[luckIndex];
-      pageCount.textContent = `${luckIndex+1} / ${luckPages.length}`;
-      prevBtn.disabled = luckIndex === 0;
-      nextBtn.disabled = luckIndex === luckPages.length - 1;
-      prevBtn.style.opacity = prevBtn.disabled ? .45 : 1;
-      nextBtn.style.opacity = nextBtn.disabled ? .45 : 1;
-    }
-
-    prevBtn.addEventListener('click', () => {
-      if(luckIndex > 0){ luckIndex--; renderLuck(); }
-    });
-    nextBtn.addEventListener('click', () => {
-      if(luckIndex < luckPages.length - 1){ luckIndex++; renderLuck(); }
-    });
-
-    // swipe support
-    let startX = null;
-    reportBox.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
-    }, {passive:true});
-    reportBox.addEventListener('touchend', (e) => {
-      if(startX == null) return;
-      const endX = e.changedTouches[0].clientX;
-      const dx = endX - startX;
-      startX = null;
-      if(Math.abs(dx) < 40) return;
-      if(dx < 0 && luckIndex < luckPages.length - 1){ luckIndex++; renderLuck(); }
-      if(dx > 0 && luckIndex > 0){ luckIndex--; renderLuck(); }
-    }, {passive:true});
-
-    renderLuck();
-
-    // ======================
-    // Confetti (simple)
-    // ======================
-    const confettiCanvas = document.getElementById('confetti');
-    const cctx = confettiCanvas.getContext('2d');
-    let confettiTimer = null;
-
-    function resizeConfetti(){
-      confettiCanvas.width = window.innerWidth * devicePixelRatio;
-      confettiCanvas.height = window.innerHeight * devicePixelRatio;
-    }
-    window.addEventListener('resize', resizeConfetti);
-    resizeConfetti();
-
-    function fireConfetti(ms=1200){
-      confettiCanvas.classList.remove('hidden');
-      resizeConfetti();
-
-      const W = confettiCanvas.width;
-      const H = confettiCanvas.height;
-
-      const pieces = Array.from({length: 170}, () => ({
-        x: Math.random()*W,
-        y: -Math.random()*H*0.4,
-        r: 4 + Math.random()*6,
-        vy: 3 + Math.random()*6,
-        vx: -2 + Math.random()*4,
-        rot: Math.random()*Math.PI*2,
-        vr: -0.2 + Math.random()*0.4,
-        a: 0.75 + Math.random()*0.25
-      }));
-
-      const start = performance.now();
-      function tick(now){
-        const t = now - start;
-        cctx.clearRect(0,0,W,H);
-        for(const p of pieces){
-          p.x += p.vx*devicePixelRatio;
-          p.y += p.vy*devicePixelRatio;
-          p.rot += p.vr;
-          cctx.save();
-          cctx.translate(p.x,p.y);
-          cctx.rotate(p.rot);
-          cctx.globalAlpha = p.a;
-          cctx.fillStyle = `hsla(${Math.floor(Math.random()*360)}, 90%, 65%, 1)`;
-          cctx.fillRect(-p.r, -p.r, p.r*2, p.r*2);
-          cctx.restore();
-        }
-        if(t < ms){
-          requestAnimationFrame(tick);
+      for(const w of words){
+        const test = (line1 ? line1 + " " : "") + w;
+        if(test.length <= maxLen){
+          line1 = test;
         }else{
-          confettiCanvas.classList.add('hidden');
-          cctx.clearRect(0,0,W,H);
+          line2 = (line2 ? line2 + " " : "") + w;
         }
       }
-      requestAnimationFrame(tick);
+
+      if(!line2) return [line1];
+      // If line2 still too long, hard cut (rare)
+      if(line2.length > maxLen) line2 = line2.slice(0, maxLen-1) + "…";
+      return [line1, line2];
     }
+
+    function doConfetti(container){
+      const layer = document.createElement("div");
+      layer.className = "confetti";
+      container.appendChild(layer);
+
+      const colors = ["#ff4d7d","#ffd166","#7bdff2","#b8f2a6","#cdb4ff"];
+      for(let i=0;i<32;i++){
+        const p = document.createElement("i");
+        p.style.left = (Math.random()*100)+"%";
+        p.style.top = (-20 - Math.random()*120)+"px";
+        p.style.background = colors[i%colors.length];
+        p.style.animationDelay = (Math.random()*120)+"ms";
+        p.style.transform = `translateY(-60px) rotate(${Math.random()*90}deg)`;
+        layer.appendChild(p);
+      }
+      setTimeout(()=> layer.remove(), 1100);
+    }
+
+    function niceEnvelopeSVG(){
+      // A nicer envelope with subtle gradients + clean flap open animation.
+      return `
+      <svg width="300" height="300" viewBox="0 0 300 300" role="img" aria-label="Envelope"
+           style="overflow:visible" data-open="0">
+        <defs>
+          <linearGradient id="g1" x1="0" x2="1">
+            <stop offset="0" stop-color="rgba(255,255,255,.18)"/>
+            <stop offset="1" stop-color="rgba(255,255,255,.08)"/>
+          </linearGradient>
+          <linearGradient id="g2" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="rgba(0,0,0,.10)"/>
+            <stop offset="1" stop-color="rgba(0,0,0,.28)"/>
+          </linearGradient>
+          <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="rgba(0,0,0,.35)"/>
+          </filter>
+        </defs>
+
+        <!-- Back plate -->
+        <rect x="30" y="70" width="240" height="170" rx="26"
+              fill="rgba(0,0,0,.18)" stroke="rgba(255,255,255,.14)" filter="url(#sh)"/>
+
+        <!-- Envelope body -->
+        <g transform="translate(0,0)">
+          <rect x="55" y="110" width="190" height="120" rx="18"
+                fill="url(#g2)" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
+
+          <!-- X lines -->
+          <path d="M65 120 L150 185 L235 120" fill="none" stroke="rgba(255,255,255,.20)" stroke-width="2"/>
+          <path d="M65 220 L150 155 L235 220" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="2"/>
+
+          <!-- Flap (animated) -->
+          <g id="flap" transform-origin="150px 122px"
+             style="transition: transform 320ms cubic-bezier(.2,.9,.2,1)">
+            <path d="M65 120 L150 70 L235 120 Z"
+                  fill="url(#g1)" stroke="rgba(255,255,255,.22)" stroke-width="2"/>
+          </g>
+
+          <!-- Heart seal -->
+          <g transform="translate(150,205)">
+            <path d="M0 18
+                     C-18 6 -26 -8 -12 -18
+                     C-4 -24 0 -18 0 -14
+                     C0 -18 4 -24 12 -18
+                     C26 -8 18 6 0 18 Z"
+                  fill="#ff4d7d" opacity=".95"/>
+            <path d="M0 18
+                     C-18 6 -26 -8 -12 -18
+                     C-4 -24 0 -18 0 -14
+                     C0 -18 4 -24 12 -18
+                     C26 -8 18 6 0 18 Z"
+                  fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2"/>
+          </g>
+        </g>
+
+        <style>
+          svg[data-open="1"] #flap { transform: rotateX(65deg) translateY(-6px); }
+        </style>
+      </svg>`;
+    }
+
+    // ---------- Start ----------
+    renderMail();
   </script>
 </body>
 </html>
