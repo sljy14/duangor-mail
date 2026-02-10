@@ -13,8 +13,12 @@
     .note{opacity:.85;font-size:14px;line-height:1.35}
     .btn{padding:12px 16px;border-radius:12px;border:1px solid #3a3a66;background:#1d1d33;color:#fff;cursor:pointer}
     .btn:active{transform:scale(.98)}
-    .envelope{font-size:84px;cursor:pointer;user-select:none}
     .divider{height:1px;background:#2a2a44;margin:16px 0}
+
+    /* Landing envelope */
+    .envelope{font-size:140px;cursor:pointer;user-select:none;display:inline-block;line-height:1}
+    .envelope:active{transform:scale(.98)}
+    .envelopeWrap{margin-top:14px}
 
     /* Confetti */
     .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
@@ -26,16 +30,28 @@
     .hud{display:flex;justify-content:space-between;gap:10px;max-width:520px;margin:10px auto 0 auto;flex-wrap:wrap}
     .pill{font-size:12px;opacity:.9;border:1px solid #2a2a44;background:rgba(0,0,0,.25);padding:7px 10px;border-radius:999px}
 
-    /* Wheel */
-    .wheelBox{position:relative;width:280px;height:280px;margin:0 auto}
-    #wheel{width:280px;height:280px;border-radius:50%;border:2px solid #3a3a66}
-    .pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:26px}
-    .result{margin-top:10px;font-size:16px}
-
-    .coinSlot{display:inline-flex;align-items:center;gap:10px;margin-top:10px}
+    /* Coin insert */
+    .coinSlot{display:inline-flex;align-items:center;gap:12px;margin-top:10px;justify-content:center}
     .coin{font-size:44px;cursor:pointer;user-select:none;display:inline-block}
-    .slot{width:70px;height:20px;border:1px solid #3a3a66;border-radius:12px;position:relative;background:#0b0b10}
-    .slot:before{content:"";position:absolute;left:10px;right:10px;top:8px;height:4px;background:#2a2a44;border-radius:10px}
+    .coin.inserted{animation:coinIn .55s ease forwards}
+    @keyframes coinIn{
+      0%{transform:translateX(0) translateY(0) scale(1)}
+      70%{transform:translateX(46px) translateY(-4px) scale(.92)}
+      100%{transform:translateX(62px) translateY(-2px) scale(.55);opacity:.15}
+    }
+    .slot{width:90px;height:22px;border:1px solid #3a3a66;border-radius:12px;position:relative;background:#0b0b10}
+    .slot:before{content:"";position:absolute;left:12px;right:12px;top:9px;height:4px;background:#2a2a44;border-radius:10px}
+
+    /* Wheel */
+    .wheelBox{position:relative;width:300px;height:300px;margin:0 auto}
+    #wheel{width:300px;height:300px;border-radius:50%;border:2px solid #3a3a66;transform:rotate(0deg)}
+    .pointer{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:26px}
+    .subtitle{opacity:.9;margin-top:6px}
+    .result{margin-top:14px;font-size:16px;min-height:22px}
+
+    /* “After spin” page */
+    .bigWinMsg{font-size:34px;line-height:1.15;margin:8px 0 10px 0}
+    .hint{opacity:.92;margin-top:6px}
 
     /* Swipe Book */
     .book{position:relative;max-width:420px;margin:0 auto;height:560px;border-radius:16px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
@@ -59,12 +75,15 @@
 
     <!-- S1: Landing -->
     <section id="s1">
-      <div class="big">📬 Mr Wong Duan Chiang, you’ve got mail.</div>
-      <p class="note">Turn your audio on. Then click the envelope.</p>
+      <div class="big">Dear Mr Wong Duan Chiang,</div>
+      <p class="note">Have you turned your audio on? Click on the envelope.</p>
       <div class="divider"></div>
-      <div class="envelope" id="env" title="Click me">💌</div>
 
-      <!-- Audio (iPhone-safe: plays only after tap) -->
+      <div class="envelopeWrap">
+        <div class="envelope" id="env" title="Click me">💌</div>
+      </div>
+
+      <!-- Audio -->
       <audio id="voice" preload="auto" src="voice.mp3"></audio>
       <audio id="bgm" preload="auto" src="bgm.mp3" loop></audio>
       <audio id="spinSfx" preload="auto" src="spin.mp3"></audio>
@@ -74,12 +93,12 @@
     <!-- S2: Game -->
     <section id="s2" class="hidden">
       <div class="big">How OP are you? 🎮</div>
-      <p class="note">Reach <b>11</b> to win the game, because you’re an <b>11/10</b>.</p>
+      <p class="note">Reach 11 to win the game.</p>
 
       <div class="hud">
         <div class="pill">Player: <b>dcop</b></div>
         <div class="pill">Score: <b id="score">0</b>/11</div>
-        <div class="pill" id="statusPill">Goal: reach score 11</div>
+        <div class="pill" id="statusPill">Goal: 11</div>
       </div>
 
       <div style="margin-top:10px;">
@@ -97,14 +116,14 @@
     <!-- S3: Coin -->
     <section id="s3" class="hidden">
       <div class="big">YOU WON 🏆</div>
-      <p class="note">Damn, you’re an 11/10 indeed.</p>
+      <div class="bigWinMsg">Damn, you’re an 11/10 indeed!</div>
       <div class="divider"></div>
       <div class="big">🪙 +1 Coin</div>
       <p class="note">Insert your coin to spin.</p>
 
       <div class="coinSlot">
         <span class="coin" id="coin" title="Insert coin">🪙</span>
-        <span class="slot" title="coin slot"></span>
+        <span class="slot" id="slot" title="coin slot"></span>
       </div>
 
       <p class="note" id="coinMsg" style="margin-top:8px;"></p>
@@ -113,11 +132,11 @@
     <!-- S4: Wheel -->
     <section id="s4" class="hidden">
       <div class="big">Spin to win 🎡</div>
-      <p class="note">Whatever you land on… you’re losing 😌</p>
+      <p class="subtitle" id="wheelSubtitle"></p>
 
       <div class="wheelBox">
         <div class="pointer">🔻</div>
-        <canvas id="wheel" width="280" height="280"></canvas>
+        <canvas id="wheel" width="300" height="300"></canvas>
       </div>
 
       <div style="margin-top:12px;">
@@ -125,7 +144,13 @@
       </div>
 
       <p class="result" id="wheelResult"></p>
-      <button class="btn hidden" id="toBook" style="margin-top:10px;">Click to check your luck stats</button>
+    </section>
+
+    <!-- S4B: After wheel (next page) -->
+    <section id="s4b" class="hidden">
+      <div class="bigWinMsg">Ha! Thought you were lucky? I’m the luckier one.</div>
+      <p class="note">Click to check your luck stats</p>
+      <button class="btn" id="toBook" style="margin-top:10px;">Click to check your luck stats</button>
     </section>
 
     <!-- S5: Swipe book -->
@@ -144,7 +169,7 @@
 <script>
   // ---------- Screen router ----------
   const show = (id) => {
-    ["s1","s2","s3","s4","s5"].forEach(x => document.getElementById(x).classList.add("hidden"));
+    ["s1","s2","s3","s4","s4b","s5"].forEach(x => document.getElementById(x).classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
   };
 
@@ -159,7 +184,7 @@
     try { await audioEl.play(); } catch(e) {}
   }
 
-  // Envelope click -> play voice -> game
+  // Landing: envelope click -> play voice -> game
   document.getElementById("env").addEventListener("click", async () => {
     await safePlay(voice);
     let moved = false;
@@ -186,7 +211,8 @@
   const speed = 260;
   const targetScore = 11;
 
-  const p = { x: 120, y: groundY, vy: 0, w: 34, h: 46, onGround: true };
+  // slightly smaller + more “boy” proportions
+  const p = { x: 120, y: groundY, vy: 0, w: 28, h: 44, onGround: true };
 
   let spikes = [];
   let spawnTimer = 0;
@@ -197,12 +223,11 @@
     hearts = [];
     for(let i=0;i<18;i++){
       hearts.push({
-        x: p.x + 10 + Math.random()*20,
+        x: p.x + 4 + Math.random()*20,
         y: (p.y - p.h) - 10 + Math.random()*10,
         vx: -80 + Math.random()*160,
         vy: -220 - Math.random()*180,
-        life: 0.9 + Math.random()*0.6,
-        t: 0
+        life: 0.9 + Math.random()*0.6
       });
     }
   }
@@ -216,9 +241,9 @@
     spikes = [];
     spawnTimer = 0;
     hearts = [];
-    statusPill.textContent = "Goal: reach score 11";
+    statusPill.textContent = "Goal: 11";
     gameMsg.textContent = "Tap the screen to jump.";
-    draw(0);
+    draw();
   }
 
   function jump(){
@@ -241,15 +266,13 @@
     running = false;
     statusPill.textContent = "Try again 😭";
     gameMsg.textContent = "You touched a spike. Press Start and try again.";
-    // stop music only if you want; I’ll keep it playing to keep vibe
   }
 
   function win(){
     running = false;
     statusPill.textContent = "WIN ✅";
-    gameMsg.textContent = "Damn, you’re an 11/10 indeed.";
+    gameMsg.textContent = "Damn, you’re an 11/10 indeed!";
     spawnHearts();
-    // keep hearts animating briefly then go next
     setTimeout(() => show("s3"), 900);
   }
 
@@ -291,9 +314,8 @@
       if(hit){ lose(); return; }
     }
 
-    // update hearts (if any)
+    // update hearts
     hearts.forEach(h => {
-      h.t += dt;
       h.life -= dt;
       h.vy += 600 * dt;
       h.x += h.vx * dt;
@@ -301,40 +323,75 @@
     });
     hearts = hearts.filter(h => h.life > 0);
 
-    draw(dt);
+    draw();
   }
 
+  function drawHeart(x,y){
+    ctx.fillStyle = "rgba(255,214,231,.95)";
+    ctx.fillRect(x, y, 3, 3);
+    ctx.fillRect(x+6, y, 3, 3);
+    ctx.fillRect(x-3, y+3, 3, 3);
+    ctx.fillRect(x+3, y+3, 3, 3);
+    ctx.fillRect(x+9, y+3, 3, 3);
+    ctx.fillRect(x, y+6, 3, 3);
+    ctx.fillRect(x+6, y+6, 3, 3);
+    ctx.fillRect(x+3, y+9, 3, 3);
+  }
+
+  // New “boy-like” pixel avatar: black fringe + white shirt “27”
   function drawPixelBoy(){
     const x = p.x, y = p.y;
     const top = y - p.h;
 
+    // shadow
     ctx.fillStyle = "rgba(0,0,0,.35)";
-    ctx.fillRect(x+4, y+6, 26, 6);
+    ctx.fillRect(x+3, y+6, 22, 6);
 
+    // legs/pants (dark)
     ctx.fillStyle = "#1d1d33";
-    ctx.fillRect(x+2, top+22, 30, 22);
+    ctx.fillRect(x+6, top+28, 7, 14);
+    ctx.fillRect(x+15, top+28, 7, 14);
 
-    ctx.fillStyle = "#f1d0b5";
-    ctx.fillRect(x+7, top+6, 20, 16);
-
-    ctx.fillStyle = "#111";
-    ctx.fillRect(x+6, top+2, 22, 8);
-    ctx.fillRect(x+7, top+10, 4, 6);
-    ctx.fillRect(x+12, top+10, 4, 8);
-    ctx.fillRect(x+17, top+10, 4, 6);
-    ctx.fillRect(x+22, top+10, 4, 8);
-
-    ctx.fillStyle = "#000";
-    ctx.fillRect(x+12, top+12, 2, 2);
-    ctx.fillRect(x+20, top+12, 2, 2);
-
+    // shoes
     ctx.fillStyle = "#0b0b10";
-    ctx.fillRect(x+9, top+44, 6, 2);
-    ctx.fillRect(x+19, top+44, 6, 2);
+    ctx.fillRect(x+5, top+42, 9, 2);
+    ctx.fillRect(x+14, top+42, 9, 2);
 
+    // shirt (white)
+    ctx.fillStyle = "#f6f6ff";
+    ctx.fillRect(x+5, top+18, 18, 12);
+
+    // arms (skin)
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+3, top+20, 3, 8);
+    ctx.fillRect(x+23, top+20, 3, 8);
+
+    // head (skin)
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+7, top+4, 14, 14);
+
+    // hair (black fringe)
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+6, top+2, 16, 6);
+    ctx.fillRect(x+6, top+7, 4, 4);
+    ctx.fillRect(x+10, top+7, 4, 3);
+    ctx.fillRect(x+14, top+7, 4, 4);
+    ctx.fillRect(x+18, top+7, 4, 3);
+
+    // eyes
+    ctx.fillStyle = "#000";
+    ctx.fillRect(x+11, top+10, 2, 2);
+    ctx.fillRect(x+17, top+10, 2, 2);
+
+    // “27” on shirt
+    ctx.fillStyle = "#0b0b10";
+    ctx.font = "10px system-ui";
+    ctx.fillText("27", x+10, top+27);
+
+    // name tag
     ctx.font = "12px system-ui";
     ctx.fillStyle = "rgba(255,255,255,.92)";
-    ctx.fillText("dcop", x+2, top-6);
+    ctx.fillText("dcop", x+1, top-6);
   }
 
   function drawSpike(s){
@@ -350,20 +407,7 @@
     ctx.stroke();
   }
 
-  function drawHeart(x,y){
-    // tiny heart in simple pixel-ish blocks
-    ctx.fillStyle = "rgba(255,214,231,.95)";
-    ctx.fillRect(x, y, 3, 3);
-    ctx.fillRect(x+6, y, 3, 3);
-    ctx.fillRect(x-3, y+3, 3, 3);
-    ctx.fillRect(x+3, y+3, 3, 3);
-    ctx.fillRect(x+9, y+3, 3, 3);
-    ctx.fillRect(x, y+6, 3, 3);
-    ctx.fillRect(x+6, y+6, 3, 3);
-    ctx.fillRect(x+3, y+9, 3, 3);
-  }
-
-  function draw(dt){
+  function draw(){
     ctx.clearRect(0,0,520,360);
     ctx.fillStyle = "#0f0f1a";
     ctx.fillRect(0,0,520,360);
@@ -378,13 +422,7 @@
 
     spikes.forEach(drawSpike);
     drawPixelBoy();
-
-    // hearts (on win)
     hearts.forEach(h => drawHeart(h.x, h.y));
-
-    ctx.fillStyle = "rgba(255,255,255,.75)";
-    ctx.font = "14px system-ui";
-    ctx.fillText("Tap to jump • Avoid spikes • Goal: score 11", 14, 24);
   }
 
   function loop(now){
@@ -398,12 +436,10 @@
   document.getElementById("start").onclick = async () => {
     resetGame();
     running = true;
-    statusPill.textContent = "Goal: reach score 11";
-    // Start music only after user click (iPhone-safe)
+    statusPill.textContent = "Goal: 11";
     if(musicOn) await safePlay(bgm);
   };
 
-  // iPhone: tap on canvas to jump (no keyboard)
   canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
 
   document.getElementById("muteMusic").onclick = () => {
@@ -413,38 +449,56 @@
     if(!musicOn){
       bgm.pause(); bgm.currentTime = 0;
     } else {
-      // only resume if already in game view; user click qualifies as gesture
       safePlay(bgm);
     }
   };
 
   resetGame();
 
-  // ---------- Coin insert -> wheel ----------
-  document.getElementById("coin").onclick = () => {
+  // ---------- Coin insert animation -> wheel ----------
+  const coinEl = document.getElementById("coin");
+  let coinUsed = false;
+
+  coinEl.onclick = () => {
+    if(coinUsed) return;
+    coinUsed = true;
     document.getElementById("coinMsg").textContent = "Coin inserted 😏";
-    setTimeout(() => show("s4"), 450);
+    coinEl.classList.add("inserted");
+    setTimeout(() => show("s4"), 620);
   };
 
-  // ---------- Wheel (forced WILD CARD) + spin sound + yay recording ----------
-  const prizes = [
-    "5 mins Onyx",
-    "tomyum ramen on you!",
-    "free massage for your girlfriend",
-    "date night planning on you!",
-    "WILD CARD"
+  // ---------- Wheel with readable labels + weighted slices ----------
+  const wheelSubtitle = document.getElementById("wheelSubtitle");
+  wheelSubtitle.textContent = ""; // no “you’re losing” line
+
+  const segments = [
+    { label: "5 MINS ONYX", weight: 0.2375 },
+    { label: "TOMYUM RAMEN ON YOU!", weight: 0.2375 },
+    { label: "FREE MASSAGE FOR GIRLFRIEND", weight: 0.2375 },
+    { label: "DATE NIGHT PLANNING", weight: 0.2375 },
+    { label: "WILD CARD", weight: 0.05 } // small slice
   ];
-  const forcedText = "WILD CARD";
+
+  const forcedLabel = "WILD CARD";
 
   const wheel = document.getElementById("wheel");
   const wctx = wheel.getContext("2d");
-  const cx=140, cy=140, r=130;
+  const cx=150, cy=150, r=138;
+
+  // compute angles
+  const totalW = segments.reduce((a,s)=>a+s.weight,0);
+  segments.forEach(s => s.weight = s.weight/totalW);
 
   function drawWheel(){
-    wctx.clearRect(0,0,280,280);
-    const slice = (Math.PI*2)/prizes.length;
-    for(let i=0;i<prizes.length;i++){
-      const a0=i*slice, a1=a0+slice;
+    wctx.clearRect(0,0,300,300);
+    let a = 0;
+    for(let i=0;i<segments.length;i++){
+      const s = segments[i];
+      const slice = (Math.PI*2) * s.weight;
+      const a0 = a;
+      const a1 = a + slice;
+
+      // slice
       wctx.beginPath();
       wctx.moveTo(cx,cy);
       wctx.arc(cx,cy,r,a0,a1);
@@ -454,16 +508,30 @@
       wctx.strokeStyle="#3a3a66";
       wctx.stroke();
 
+      // label (kept readable: flipped when upside down)
+      const mid = a0 + slice/2;
       wctx.save();
       wctx.translate(cx,cy);
-      wctx.rotate(a0 + slice/2);
-      wctx.fillStyle="rgba(255,255,255,.9)";
+      wctx.rotate(mid);
+
+      const upsideDown = (mid > Math.PI/2 && mid < (Math.PI*3)/2);
+      if(upsideDown) wctx.rotate(Math.PI);
+
+      wctx.fillStyle="rgba(255,255,255,.92)";
       wctx.font="12px system-ui";
-      wctx.fillText(prizes[i].toUpperCase().slice(0,18), 18, 4);
+      wctx.textAlign="center";
+      wctx.textBaseline="middle";
+
+      // place text near edge
+      wctx.fillText(s.label, 86, 0);
       wctx.restore();
+
+      a = a1;
     }
+
+    // hub
     wctx.beginPath();
-    wctx.arc(cx,cy,26,0,Math.PI*2);
+    wctx.arc(cx,cy,28,0,Math.PI*2);
     wctx.fillStyle="#0b0b10"; wctx.fill();
     wctx.strokeStyle="#3a3a66"; wctx.stroke();
   }
@@ -473,7 +541,7 @@
     const c = document.getElementById("confetti");
     c.innerHTML="";
     c.classList.remove("hidden");
-    for(let i=0;i<60;i++){
+    for(let i=0;i<70;i++){
       const p=document.createElement("i");
       p.style.left = Math.random()*100+"vw";
       p.style.background = (i%3===0) ? "#fff" : (i%3===1 ? "#b9b9ff" : "#ffd6e7");
@@ -485,47 +553,67 @@
 
   const spinBtn = document.getElementById("spin");
   const wheelResult = document.getElementById("wheelResult");
-  const toBook = document.getElementById("toBook");
   let spinning=false;
+
+  function angleForSegmentLabel(label){
+    let a = 0;
+    for(const s of segments){
+      const slice = (Math.PI*2)*s.weight;
+      const mid = a + slice/2;
+      if(s.label === label) return { mid, aStart: a, aEnd: a+slice };
+      a += slice;
+    }
+    return { mid: 0, aStart: 0, aEnd: 0 };
+  }
 
   spinBtn.onclick = async () => {
     if(spinning) return;
     spinning=true;
     wheelResult.textContent = "";
-    toBook.classList.add("hidden");
+    wheelSubtitle.textContent = "";
 
-    // spin sound (user click -> iPhone safe)
+    // spin sound (user click)
     spinSfx.currentTime = 0;
     await safePlay(spinSfx);
 
-    const slice = (Math.PI*2)/prizes.length;
-    const targetIndex = prizes.indexOf(forcedText) >= 0 ? prizes.indexOf(forcedText) : 0;
-    const targetAngle = (Math.PI*2)*6 + (Math.PI*1.5) - (targetIndex*slice + slice/2);
+    // target: WILD CARD (pointer is at top). We want target mid to align with top.
+    const target = angleForSegmentLabel(forcedLabel);
+    // top pointer corresponds to -90deg (1.5π) on canvas orientation
+    const pointerAngle = Math.PI * 1.5;
+
+    // rotate wheel so that target.mid ends at pointerAngle.
+    // add multiple turns for fun; make it slower by extending duration.
+    const turns = 5;
+    const targetRot = (Math.PI*2)*turns + (pointerAngle - target.mid);
 
     const start = performance.now();
-    const dur = 2200;
+    const dur = 3600; // slower spin
 
     const anim = (now) => {
       const p = Math.min(1,(now-start)/dur);
       const ease = 1 - Math.pow(1-p, 3);
-      const rot = ease * targetAngle;
+      const rot = ease * targetRot;
       wheel.style.transform = `rotate(${rot}rad)`;
       if(p<1) requestAnimationFrame(anim);
       else{
         spinning=false;
+
+        // land on wild card moment
         confetti();
-        // yay yay yay recording when it hits wild card
         yay.currentTime = 0;
         safePlay(yay);
 
-        wheelResult.textContent = "WILD CARD. Ha! Thought you were lucky? I’m the luckier one.";
-        toBook.classList.remove("hidden");
+        wheelSubtitle.textContent = "What’s wild card? Hmmm";
+        wheelResult.textContent = "";
+
+        // show “next page” after a beat
+        setTimeout(() => show("s4b"), 900);
       }
     };
     requestAnimationFrame(anim);
   };
 
-  // ---------- Swipe Book ----------
+  // ---------- Book ----------
   const pages = [
     "photos/page1.jpg",
     "photos/page2.jpg",
@@ -534,12 +622,13 @@
     "photos/page5.jpg"
   ];
 
+  // Capital L “Luck stat…”
   const captions = [
     "Luck stat: 1",
-    "Luck stat increasing… 2",
-    "Luck stat increasing more… 3",
-    "luck stat increasing morer… 4",
-    "luck stat increased to moresterest… 5!"
+    "Luck stat: 2",
+    "Luck stat: 3",
+    "Luck stat: 4",
+    "Luck stat: 5"
   ];
 
   const book = document.getElementById("book");
@@ -584,7 +673,7 @@
     renderBook();
   });
 
-  toBook.onclick = () => { show("s5"); };
+  document.getElementById("toBook").onclick = () => show("s5");
 </script>
 </body>
 </html>
