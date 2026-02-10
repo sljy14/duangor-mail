@@ -334,313 +334,297 @@
     let game = null;
 
     function renderGame(){
-      current = "game";
-      // Stop/quiet happy while playing the game
-      safePause(audio.happy);
+  current = "game";
 
-      app.innerHTML = `
-        <h1>How OP are you? <span style="font-size:.7em">🎮</span></h1>
-        <div class="sub" style="color:rgba(233,236,243,.78)">
-          <div><span style="color:var(--gold)">Reach 11</span> to win the game.</div>
-          <div>Tap <b>Start</b> to start the game.</div>
-          <div>Tap screen to <b>jump</b>.</div>
-        </div>
+  // stop happy while playing
+  safePause(audio.happy);
 
-        <div class="pillRow">
-          <div class="pill">Player: <b>dcop</b></div>
-          <div class="pill">Score: <b id="scoreTxt">0/11</b></div>
-          <div class="pill">Goal: <b>11</b></div>
-        </div>
+  app.innerHTML = `
+    <h1>How OP are you? <span style="font-size:.7em">🎮</span></h1>
+    <div class="sub" style="color:rgba(233,236,243,.78)">
+      <div><span style="color:var(--gold)">Reach 11</span> to win the game.</div>
+      <div>Tap <b>Start</b> to start the game.</div>
+      <div>Tap screen to <b>jump</b>.</div>
+    </div>
 
-        <div class="gameWrap">
-          <canvas id="gameCanvas" width="420" height="520"></canvas>
-        </div>
+    <div class="pillRow">
+      <div class="pill">Player: <b>dcop</b></div>
+      <div class="pill">Score: <b id="scoreTxt">0</b>/11</div>
+      <div class="pill" id="statusPill">Goal: <b>11</b></div>
+    </div>
 
-        <div class="center" style="margin-top:14px;">
-          <button class="btn" id="startBtn">Start</button>
-        </div>
-        <div class="hint">Tip: tap anywhere to jump.</div>
-      `;
+    <div class="gameWrap">
+      <canvas id="gameCanvas" width="520" height="360"></canvas>
+    </div>
 
-      const canvas = document.getElementById("gameCanvas");
-      const ctx = canvas.getContext("2d");
-      const scoreTxt = document.getElementById("scoreTxt");
-      const startBtn = document.getElementById("startBtn");
+    <div class="center" style="margin-top:14px;">
+      <button class="btn" id="startBtn">Start</button>
+    </div>
+    <div class="hint" id="gameMsg">Tap the screen to jump.</div>
+  `;
 
-      // Game state
-      const W = canvas.width, H = canvas.height;
-      const groundY = H - 60;
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  const scoreTxt = document.getElementById("scoreTxt");
+  const statusPill = document.getElementById("statusPill");
+  const gameMsg = document.getElementById("gameMsg");
+  const startBtn = document.getElementById("startBtn");
 
-      const player = {
-        x: 110, y: 220, vy: 0,
-        r: 18
-      };
+  let running = false;
+  let last = performance.now();
+  let score = 0;
 
-      let pipes = [];
-      let score = 0;
-      let running = false;
-      let lastTime = 0;
-      let spawnT = 0;
+  const groundY = 300;
+  const gravity = 1200;
+  const jumpV = -520;
+  const speed = 260;
+  const targetScore = 11;
 
-      function reset(){
-        player.y = 220; player.vy = 0;
-        pipes = [];
-        score = 0;
-        scoreTxt.textContent = `${score}/11`;
-        gameWon = false;
-        spawnT = 0;
-      }
+  // boy proportions (your non-nego)
+  const p = { x: 120, y: groundY, vy: 0, w: 28, h: 44, onGround: true };
+  let spikes = [];
+  let spawnTimer = 0;
 
-      function spawnPipe(){
-        const gap = 150;
-        const minTop = 80;
-        const maxTop = groundY - 80 - gap;
-        const topH = Math.floor(minTop + Math.random()*(maxTop - minTop));
-        pipes.push({
-          x: W + 40,
-          w: 64,
-          topH,
-          gap,
-          passed: false
-        });
-      }
+  // hearts burst on win
+  let hearts = [];
+  function spawnHearts(){
+    hearts = [];
+    for(let i=0;i<18;i++){
+      hearts.push({
+        x: p.x + 4 + Math.random()*20,
+        y: (p.y - p.h) - 10 + Math.random()*10,
+        vx: -80 + Math.random()*160,
+        vy: -220 - Math.random()*180,
+        life: 0.9 + Math.random()*0.6
+      });
+    }
+  }
 
-      function collideRectCircle(rx, ry, rw, rh, cx, cy, cr){
-        const nx = Math.max(rx, Math.min(cx, rx+rw));
-        const ny = Math.max(ry, Math.min(cy, ry+rh));
-        const dx = cx - nx;
-        const dy = cy - ny;
-        return (dx*dx + dy*dy) <= cr*cr;
-      }
+  function resetGame(){
+    running = false;
+    last = performance.now();
+    score = 0;
+    scoreTxt.textContent = "0";
+    statusPill.textContent = "Goal: 11";
+    gameMsg.textContent = "Tap the screen to jump.";
+    p.y = groundY; p.vy = 0; p.onGround = true;
+    spikes = [];
+    spawnTimer = 0;
+    hearts = [];
+    draw();
+  }
 
-      function drawBackground(){
-        // Soft gradient background
-        const g = ctx.createLinearGradient(0,0,0,H);
-        g.addColorStop(0, "rgba(255,255,255,0.04)");
-        g.addColorStop(1, "rgba(0,0,0,0.18)");
-        ctx.fillStyle = g;
-        ctx.fillRect(0,0,W,H);
+  function jump(){
+    if(!running) return;
+    if(p.onGround){
+      p.vy = jumpV;
+      p.onGround = false;
+    }
+  }
 
-        // subtle stars
-        ctx.fillStyle = "rgba(255,255,255,0.10)";
-        for(let i=0;i<40;i++){
-          const x = (i*97)%W;
-          const y = (i*53)%groundY;
-          ctx.fillRect(x, y, 2, 2);
-        }
+  function spawnSpike(){
+    spikes.push({ x: 560, w: 26, h: 34, passed: false });
+  }
 
-        // ground
-        ctx.fillStyle = "rgba(0,0,0,0.22)";
-        ctx.fillRect(0, groundY, W, H-groundY);
-        ctx.strokeStyle = "rgba(255,255,255,0.10)";
-        ctx.beginPath();
-        ctx.moveTo(0, groundY);
-        ctx.lineTo(W, groundY);
-        ctx.stroke();
-      }
+  function collideRect(ax,ay,aw,ah, bx,by,bw,bh){
+    return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+  }
 
-      function drawPipes(){
-        for(const p of pipes){
-          // top
-          ctx.fillStyle = "rgba(255,255,255,0.10)";
-          ctx.strokeStyle = "rgba(255,255,255,0.14)";
-          ctx.lineWidth = 2;
+  function lose(){
+    running = false;
+    statusPill.textContent = "Try again 😭";
+    gameMsg.textContent = "You touched a spike. Press Start and try again.";
+  }
 
-          const topRect = {x:p.x, y:0, w:p.w, h:p.topH};
-          const botY = p.topH + p.gap;
-          const botRect = {x:p.x, y:botY, w:p.w, h:groundY - botY};
+  function win(){
+    running = false;
+    statusPill.textContent = "WIN ✅";
+    gameMsg.textContent = "Damn, you’re an 11/10 indeed!";
+    spawnHearts();
 
-          ctx.beginPath();
-          roundRect(ctx, topRect.x, topRect.y, topRect.w, topRect.h, 14);
-          ctx.fill();
-          ctx.stroke();
+    // LOWER BGM by 50% AFTER game ends (your requirement)
+    audio.bgm.volume = 0.5;
 
-          ctx.beginPath();
-          roundRect(ctx, botRect.x, botRect.y, botRect.w, botRect.h, 14);
-          ctx.fill();
-          ctx.stroke();
-        }
-      }
+    // continue to wheel after a short beat
+    setTimeout(() => renderWheel(), 900);
+  }
 
-      function drawPlayer(){
-        // Label "dcop" above
-        ctx.font = "800 18px ui-sans-serif, system-ui";
-        ctx.fillStyle = "rgba(233,236,243,0.85)";
-        ctx.textAlign = "center";
-        ctx.fillText("dcop", player.x, player.y - 34);
+  function update(dt){
+    p.vy += gravity * dt;
+    p.y += p.vy * dt;
 
-        // Body (simple boy)
-        // Head
-        ctx.fillStyle = "rgba(255,255,255,0.90)";
-        ctx.beginPath();
-        ctx.arc(player.x, player.y - 14, 10, 0, Math.PI*2);
-        ctx.fill();
+    if(p.y >= groundY){
+      p.y = groundY;
+      p.vy = 0;
+      p.onGround = true;
+    }
 
-        // Hair (dark)
-        ctx.fillStyle = "rgba(20,20,25,0.90)";
-        ctx.beginPath();
-        ctx.arc(player.x, player.y - 17, 10, Math.PI*1.05, Math.PI*1.95);
-        ctx.fill();
+    spawnTimer -= dt;
+    if(spawnTimer <= 0){
+      spawnSpike();
+      spawnTimer = 0.8 + Math.random() * 0.65;
+    }
 
-        // Jersey (white)
-        ctx.fillStyle = "rgba(255,255,255,0.95)";
-        ctx.strokeStyle = "rgba(0,0,0,0.12)";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        roundRect(ctx, player.x - 14, player.y - 4, 28, 28, 8);
-        ctx.fill();
-        ctx.stroke();
+    spikes.forEach(s => s.x -= speed * dt);
+    spikes = spikes.filter(s => s.x > -80);
 
-        // Number 27 (non-nego)
-        ctx.fillStyle = "rgba(30,30,35,0.85)";
-        ctx.font = "900 14px ui-sans-serif, system-ui";
-        ctx.fillText("27", player.x, player.y + 14);
-
-        // Legs
-        ctx.strokeStyle = "rgba(255,255,255,0.70)";
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(player.x - 6, player.y + 24);
-        ctx.lineTo(player.x - 6, player.y + 38);
-        ctx.moveTo(player.x + 6, player.y + 24);
-        ctx.lineTo(player.x + 6, player.y + 38);
-        ctx.stroke();
-      }
-
-      function draw(){
-        drawBackground();
-        drawPipes();
-        drawPlayer();
-      }
-
-      function step(t){
-        if(!running) return;
-        const dt = Math.min(0.033, (t - lastTime)/1000 || 0);
-        lastTime = t;
-
-        // physics
-        player.vy += 900 * dt; // gravity
-        player.y += player.vy * dt;
-
-        // bounds
-        if(player.y > groundY - 10){
-          player.y = groundY - 10;
-          lose();
+    for(const s of spikes){
+      if(!s.passed && s.x + s.w < p.x){
+        s.passed = true;
+        score++;
+        scoreTxt.textContent = String(score);
+        if(score >= targetScore){
+          win();
           return;
         }
-        if(player.y < 40){
-          player.y = 40;
-          player.vy = 0;
-        }
-
-        // spawn pipes
-        spawnT += dt;
-        if(spawnT > 1.2){
-          spawnT = 0;
-          spawnPipe();
-        }
-
-        // move pipes
-        for(const p of pipes){
-          p.x -= 220 * dt;
-          // scoring
-          if(!p.passed && p.x + p.w < player.x){
-            p.passed = true;
-            score++;
-            scoreTxt.textContent = `${score}/11`;
-            if(score >= 11){
-              win();
-              return;
-            }
-          }
-
-          // collision
-          const topHit = collideRectCircle(p.x, 0, p.w, p.topH, player.x, player.y, player.r);
-          const botY = p.topH + p.gap;
-          const botHit = collideRectCircle(p.x, botY, p.w, groundY - botY, player.x, player.y, player.r);
-          if(topHit || botHit){
-            lose();
-            return;
-          }
-        }
-        // cleanup
-        pipes = pipes.filter(p => p.x > -120);
-
-        draw();
-        requestAnimationFrame(step);
       }
-
-      function jump(){
-        if(!running) return;
-        player.vy = -340;
-      }
-
-      function start(){
-        reset();
-        running = true;
-        lastTime = performance.now();
-
-        // Start bgm when Start pressed (user gesture)
-        safePlay(audio.bgm, {volume: 1, restart:false});
-
-        draw();
-        requestAnimationFrame(step);
-      }
-
-      function lose(){
-        running = false;
-        // simple reset prompt
-        showOverlay("Oof. Try again?", "Retry", () => start());
-      }
-
-      function win(){
-        running = false;
-        gameWon = true;
-
-        // Lower bgm by 50% AFTER game ends
-        audio.bgm.volume = 0.5;
-
-        showOverlay("Nice. You win. 😈", "Continue", () => renderWheel());
-      }
-
-      function showOverlay(title, btnText, onClick){
-        const ov = document.createElement("div");
-        ov.style.position="absolute";
-        ov.style.inset="0";
-        ov.style.display="flex";
-        ov.style.alignItems="center";
-        ov.style.justifyContent="center";
-        ov.style.background="rgba(0,0,0,.35)";
-        ov.style.backdropFilter="blur(4px)";
-        ov.innerHTML = `
-          <div style="width:min(360px, 88%); border-radius:18px; border:1px solid rgba(255,255,255,.16);
-                      background: rgba(20,20,25,.60); padding:18px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.35);">
-            <div style="font-size:22px; font-weight:900; margin-bottom:12px;">${title}</div>
-            <button class="btn" id="ovBtn" style="min-width:160px;">${btnText}</button>
-          </div>
-        `;
-        document.querySelector(".gameWrap").appendChild(ov);
-        ov.querySelector("#ovBtn").addEventListener("click", () => {
-          ov.remove();
-          onClick();
-        });
-      }
-
-      // Input
-      startBtn.addEventListener("click", start);
-      canvas.addEventListener("click", () => {
-        if(!running) return;
-        jump();
-      }, {passive:true});
-      canvas.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        if(!running) return;
-        jump();
-      }, {passive:false});
-
-      // Initial draw
-      draw();
     }
+
+    for(const s of spikes){
+      const spikeX = s.x;
+      const spikeY = groundY - s.h;
+      const hit = collideRect(p.x, p.y - p.h, p.w, p.h, spikeX+3, spikeY+6, s.w-6, s.h-6);
+      if(hit){ lose(); return; }
+    }
+
+    // hearts
+    hearts.forEach(h => {
+      h.life -= dt;
+      h.vy += 600 * dt;
+      h.x += h.vx * dt;
+      h.y += h.vy * dt;
+    });
+    hearts = hearts.filter(h => h.life > 0);
+
+    draw();
+  }
+
+  function drawHeart(x,y){
+    ctx.fillStyle = "rgba(255,214,231,.95)";
+    ctx.fillRect(x, y, 3, 3);
+    ctx.fillRect(x+6, y, 3, 3);
+    ctx.fillRect(x-3, y+3, 3, 3);
+    ctx.fillRect(x+3, y+3, 3, 3);
+    ctx.fillRect(x+9, y+3, 3, 3);
+    ctx.fillRect(x, y+6, 3, 3);
+    ctx.fillRect(x+6, y+6, 3, 3);
+    ctx.fillRect(x+3, y+9, 3, 3);
+  }
+
+  // Non-nego pixel boy: black fringe + white shirt “27” + "dcop"
+  function drawPixelBoy(){
+    const x = p.x, y = p.y;
+    const top = y - p.h;
+
+    // shadow
+    ctx.fillStyle = "rgba(0,0,0,.35)";
+    ctx.fillRect(x+3, y+6, 22, 6);
+
+    // legs/pants
+    ctx.fillStyle = "#1d1d33";
+    ctx.fillRect(x+6, top+28, 7, 14);
+    ctx.fillRect(x+15, top+28, 7, 14);
+
+    // shoes
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+5, top+42, 9, 2);
+    ctx.fillRect(x+14, top+42, 9, 2);
+
+    // shirt (white)
+    ctx.fillStyle = "#f6f6ff";
+    ctx.fillRect(x+5, top+18, 18, 12);
+
+    // arms (skin)
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+3, top+20, 3, 8);
+    ctx.fillRect(x+23, top+20, 3, 8);
+
+    // head (skin)
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+7, top+4, 14, 14);
+
+    // hair (black fringe)
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+6, top+2, 16, 6);
+    ctx.fillRect(x+6, top+7, 4, 4);
+    ctx.fillRect(x+10, top+7, 4, 3);
+    ctx.fillRect(x+14, top+7, 4, 4);
+    ctx.fillRect(x+18, top+7, 4, 3);
+
+    // eyes
+    ctx.fillStyle = "#000";
+    ctx.fillRect(x+11, top+10, 2, 2);
+    ctx.fillRect(x+17, top+10, 2, 2);
+
+    // “27”
+    ctx.fillStyle = "#0b0b10";
+    ctx.font = "10px system-ui";
+    ctx.fillText("27", x+10, top+27);
+
+    // name tag
+    ctx.font = "12px system-ui";
+    ctx.fillStyle = "rgba(255,255,255,.92)";
+    ctx.fillText("dcop", x+1, top-6);
+  }
+
+  function drawSpike(s){
+    const spikeX = s.x, baseY = groundY, h = s.h, w = s.w;
+    ctx.fillStyle = "rgba(255,255,255,0.10)";
+    ctx.beginPath();
+    ctx.moveTo(spikeX, baseY);
+    ctx.lineTo(spikeX + w/2, baseY - h);
+    ctx.lineTo(spikeX + w, baseY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.16)";
+    ctx.stroke();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,520,360);
+
+    // bg
+    ctx.fillStyle = "rgba(0,0,0,.18)";
+    ctx.fillRect(0,0,520,360);
+
+    // subtle stars
+    ctx.fillStyle = "rgba(255,255,255,.08)";
+    for(let i=0;i<30;i++) ctx.fillRect((i*73)%520, (i*41)%260, 2, 2);
+
+    // ground
+    ctx.fillStyle = "rgba(0,0,0,.22)";
+    ctx.fillRect(0, groundY, 520, 60);
+    ctx.fillStyle = "rgba(255,255,255,.10)";
+    ctx.fillRect(0, groundY, 520, 2);
+
+    spikes.forEach(drawSpike);
+    drawPixelBoy();
+    hearts.forEach(h => drawHeart(h.x, h.y));
+  }
+
+  function loop(now){
+    const dt = Math.min(0.033, (now - last)/1000);
+    last = now;
+    if(running) update(dt);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  startBtn.addEventListener("click", async () => {
+    resetGame();
+    running = true;
+    statusPill.textContent = "Goal: 11";
+
+    // Start bgm only after Start (user gesture)
+    await safePlay(audio.bgm, {volume: 1, restart:false});
+  });
+
+  canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
+  canvas.addEventListener("touchstart", (e) => { e.preventDefault(); jump(); }, {passive:false});
+
+  resetGame();
+}
+
 
     // ---------- WHEEL ----------
     function renderWheel(){
