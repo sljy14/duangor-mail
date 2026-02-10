@@ -1,0 +1,590 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>You’ve got mail 💌</title>
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#0b0b10;color:#fff}
+    .wrap{max-width:760px;margin:0 auto;padding:18px;text-align:center}
+    .card{background:#141423;border:1px solid #2a2a44;border-radius:16px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+    .hidden{display:none}
+    .big{font-size:28px}
+    .note{opacity:.85;font-size:14px;line-height:1.35}
+    .btn{padding:12px 16px;border-radius:12px;border:1px solid #3a3a66;background:#1d1d33;color:#fff;cursor:pointer}
+    .btn:active{transform:scale(.98)}
+    .envelope{font-size:84px;cursor:pointer;user-select:none}
+    .divider{height:1px;background:#2a2a44;margin:16px 0}
+
+    /* Confetti */
+    .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+    .confetti i{position:absolute;top:-10px;width:8px;height:10px;opacity:.9;animation:fall 1.8s linear forwards}
+    @keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:0.1}}
+
+    /* Game */
+    canvas{max-width:520px;width:100%;background:#0f0f1a;border:1px solid #2a2a44;border-radius:14px;touch-action:manipulation}
+    .hud{display:flex;justify-content:space-between;gap:10px;max-width:520px;margin:10px auto 0 auto;flex-wrap:wrap}
+    .pill{font-size:12px;opacity:.9;border:1px solid #2a2a44;background:rgba(0,0,0,.25);padding:7px 10px;border-radius:999px}
+
+    /* Wheel */
+    .wheelBox{position:relative;width:280px;height:280px;margin:0 auto}
+    #wheel{width:280px;height:280px;border-radius:50%;border:2px solid #3a3a66}
+    .pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:26px}
+    .result{margin-top:10px;font-size:16px}
+
+    .coinSlot{display:inline-flex;align-items:center;gap:10px;margin-top:10px}
+    .coin{font-size:44px;cursor:pointer;user-select:none;display:inline-block}
+    .slot{width:70px;height:20px;border:1px solid #3a3a66;border-radius:12px;position:relative;background:#0b0b10}
+    .slot:before{content:"";position:absolute;left:10px;right:10px;top:8px;height:4px;background:#2a2a44;border-radius:10px}
+
+    /* Swipe Book */
+    .book{position:relative;max-width:420px;margin:0 auto;height:560px;border-radius:16px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
+    .page{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+    .page img{width:100%;height:100%;object-fit:cover}
+    .pageNumber{position:absolute;bottom:10px;right:12px;font-size:12px;opacity:.7;background:rgba(0,0,0,.35);padding:6px 8px;border-radius:10px}
+    .caption{
+      position:absolute;top:10px;left:10px;right:10px;
+      font-size:13px;opacity:.92;
+      background:rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.14);
+      padding:10px 12px;border-radius:14px;
+      text-align:left;
+      backdrop-filter: blur(6px);
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+
+    <!-- S1: Landing -->
+    <section id="s1">
+      <div class="big">📬 Mr Wong Duan Chiang, you’ve got mail.</div>
+      <p class="note">Turn your audio on. Then click the envelope.</p>
+      <div class="divider"></div>
+      <div class="envelope" id="env" title="Click me">💌</div>
+
+      <!-- Audio (iPhone-safe: plays only after tap) -->
+      <audio id="voice" preload="auto" src="voice.mp3"></audio>
+      <audio id="bgm" preload="auto" src="bgm.mp3" loop></audio>
+      <audio id="spinSfx" preload="auto" src="spin.mp3"></audio>
+      <audio id="yay" preload="auto" src="yay.mp3"></audio>
+    </section>
+
+    <!-- S2: Game -->
+    <section id="s2" class="hidden">
+      <div class="big">How OP are you? 🎮</div>
+      <p class="note">Reach <b>11</b> to win the game, because you’re an <b>11/10</b>.</p>
+
+      <div class="hud">
+        <div class="pill">Player: <b>dcop</b></div>
+        <div class="pill">Score: <b id="score">0</b>/11</div>
+        <div class="pill" id="statusPill">Goal: reach score 11</div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <canvas id="game" width="520" height="360"></canvas>
+      </div>
+
+      <div style="margin-top:12px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+        <button class="btn" id="start">Start</button>
+        <button class="btn" id="muteMusic">Music: On</button>
+      </div>
+
+      <p class="note" id="gameMsg" style="margin-top:10px;">Tap the screen to jump.</p>
+    </section>
+
+    <!-- S3: Coin -->
+    <section id="s3" class="hidden">
+      <div class="big">YOU WON 🏆</div>
+      <p class="note">Damn, you’re an 11/10 indeed.</p>
+      <div class="divider"></div>
+      <div class="big">🪙 +1 Coin</div>
+      <p class="note">Insert your coin to spin.</p>
+
+      <div class="coinSlot">
+        <span class="coin" id="coin" title="Insert coin">🪙</span>
+        <span class="slot" title="coin slot"></span>
+      </div>
+
+      <p class="note" id="coinMsg" style="margin-top:8px;"></p>
+    </section>
+
+    <!-- S4: Wheel -->
+    <section id="s4" class="hidden">
+      <div class="big">Spin to win 🎡</div>
+      <p class="note">Whatever you land on… you’re losing 😌</p>
+
+      <div class="wheelBox">
+        <div class="pointer">🔻</div>
+        <canvas id="wheel" width="280" height="280"></canvas>
+      </div>
+
+      <div style="margin-top:12px;">
+        <button class="btn" id="spin">SPIN</button>
+      </div>
+
+      <p class="result" id="wheelResult"></p>
+      <button class="btn hidden" id="toBook" style="margin-top:10px;">Click to check your luck stats</button>
+    </section>
+
+    <!-- S5: Swipe book -->
+    <section id="s5" class="hidden">
+      <div class="big">📊 Luck Stats Report</div>
+      <p class="note">Swipe left/right.</p>
+      <div class="book" id="book"></div>
+      <p class="note" style="margin-top:10px;">(Last page is your Valentine’s card.)</p>
+    </section>
+
+  </div>
+</div>
+
+<div class="confetti hidden" id="confetti"></div>
+
+<script>
+  // ---------- Screen router ----------
+  const show = (id) => {
+    ["s1","s2","s3","s4","s5"].forEach(x => document.getElementById(x).classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+  };
+
+  // ---------- Audio ----------
+  const voice = document.getElementById("voice");
+  const bgm = document.getElementById("bgm");
+  const spinSfx = document.getElementById("spinSfx");
+  const yay = document.getElementById("yay");
+  let musicOn = true;
+
+  async function safePlay(audioEl){
+    try { await audioEl.play(); } catch(e) {}
+  }
+
+  // Envelope click -> play voice -> game
+  document.getElementById("env").addEventListener("click", async () => {
+    await safePlay(voice);
+    let moved = false;
+    const go = () => { if(moved) return; moved = true; show("s2"); };
+    const t = setTimeout(go, 2200);
+    voice.onended = () => { clearTimeout(t); go(); };
+  });
+
+  // ---------- Game: pixel boy runner vs spikes ----------
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+
+  const scoreEl = document.getElementById("score");
+  const statusPill = document.getElementById("statusPill");
+  const gameMsg = document.getElementById("gameMsg");
+
+  let running = false;
+  let last = 0;
+  let score = 0;
+
+  const groundY = 300;
+  const gravity = 1200;
+  const jumpV = -520;
+  const speed = 260;
+  const targetScore = 11;
+
+  const p = { x: 120, y: groundY, vy: 0, w: 34, h: 46, onGround: true };
+
+  let spikes = [];
+  let spawnTimer = 0;
+
+  // Hearts burst on win
+  let hearts = [];
+  function spawnHearts(){
+    hearts = [];
+    for(let i=0;i<18;i++){
+      hearts.push({
+        x: p.x + 10 + Math.random()*20,
+        y: (p.y - p.h) - 10 + Math.random()*10,
+        vx: -80 + Math.random()*160,
+        vy: -220 - Math.random()*180,
+        life: 0.9 + Math.random()*0.6,
+        t: 0
+      });
+    }
+  }
+
+  function resetGame(){
+    running = false;
+    last = performance.now();
+    score = 0;
+    scoreEl.textContent = "0";
+    p.y = groundY; p.vy = 0; p.onGround = true;
+    spikes = [];
+    spawnTimer = 0;
+    hearts = [];
+    statusPill.textContent = "Goal: reach score 11";
+    gameMsg.textContent = "Tap the screen to jump.";
+    draw(0);
+  }
+
+  function jump(){
+    if(!running) return;
+    if(p.onGround){
+      p.vy = jumpV;
+      p.onGround = false;
+    }
+  }
+
+  function spawnSpike(){
+    spikes.push({ x: 560, w: 26, h: 34, passed: false });
+  }
+
+  function collideRect(ax,ay,aw,ah, bx,by,bw,bh){
+    return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+  }
+
+  function lose(){
+    running = false;
+    statusPill.textContent = "Try again 😭";
+    gameMsg.textContent = "You touched a spike. Press Start and try again.";
+    // stop music only if you want; I’ll keep it playing to keep vibe
+  }
+
+  function win(){
+    running = false;
+    statusPill.textContent = "WIN ✅";
+    gameMsg.textContent = "Damn, you’re an 11/10 indeed.";
+    spawnHearts();
+    // keep hearts animating briefly then go next
+    setTimeout(() => show("s3"), 900);
+  }
+
+  function update(dt){
+    p.vy += gravity * dt;
+    p.y += p.vy * dt;
+
+    if(p.y >= groundY){
+      p.y = groundY;
+      p.vy = 0;
+      p.onGround = true;
+    }
+
+    spawnTimer -= dt;
+    if(spawnTimer <= 0){
+      spawnSpike();
+      spawnTimer = 0.8 + Math.random() * 0.65;
+    }
+
+    spikes.forEach(s => s.x -= speed * dt);
+    spikes = spikes.filter(s => s.x > -80);
+
+    for(const s of spikes){
+      if(!s.passed && s.x + s.w < p.x){
+        s.passed = true;
+        score++;
+        scoreEl.textContent = String(score);
+        if(score >= targetScore){
+          win();
+          return;
+        }
+      }
+    }
+
+    for(const s of spikes){
+      const spikeX = s.x;
+      const spikeY = groundY - s.h;
+      const hit = collideRect(p.x, p.y - p.h, p.w, p.h, spikeX+3, spikeY+6, s.w-6, s.h-6);
+      if(hit){ lose(); return; }
+    }
+
+    // update hearts (if any)
+    hearts.forEach(h => {
+      h.t += dt;
+      h.life -= dt;
+      h.vy += 600 * dt;
+      h.x += h.vx * dt;
+      h.y += h.vy * dt;
+    });
+    hearts = hearts.filter(h => h.life > 0);
+
+    draw(dt);
+  }
+
+  function drawPixelBoy(){
+    const x = p.x, y = p.y;
+    const top = y - p.h;
+
+    ctx.fillStyle = "rgba(0,0,0,.35)";
+    ctx.fillRect(x+4, y+6, 26, 6);
+
+    ctx.fillStyle = "#1d1d33";
+    ctx.fillRect(x+2, top+22, 30, 22);
+
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+7, top+6, 20, 16);
+
+    ctx.fillStyle = "#111";
+    ctx.fillRect(x+6, top+2, 22, 8);
+    ctx.fillRect(x+7, top+10, 4, 6);
+    ctx.fillRect(x+12, top+10, 4, 8);
+    ctx.fillRect(x+17, top+10, 4, 6);
+    ctx.fillRect(x+22, top+10, 4, 8);
+
+    ctx.fillStyle = "#000";
+    ctx.fillRect(x+12, top+12, 2, 2);
+    ctx.fillRect(x+20, top+12, 2, 2);
+
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+9, top+44, 6, 2);
+    ctx.fillRect(x+19, top+44, 6, 2);
+
+    ctx.font = "12px system-ui";
+    ctx.fillStyle = "rgba(255,255,255,.92)";
+    ctx.fillText("dcop", x+2, top-6);
+  }
+
+  function drawSpike(s){
+    const spikeX = s.x, baseY = groundY, h = s.h, w = s.w;
+    ctx.fillStyle = "#2a2a44";
+    ctx.beginPath();
+    ctx.moveTo(spikeX, baseY);
+    ctx.lineTo(spikeX + w/2, baseY - h);
+    ctx.lineTo(spikeX + w, baseY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "#3a3a66";
+    ctx.stroke();
+  }
+
+  function drawHeart(x,y){
+    // tiny heart in simple pixel-ish blocks
+    ctx.fillStyle = "rgba(255,214,231,.95)";
+    ctx.fillRect(x, y, 3, 3);
+    ctx.fillRect(x+6, y, 3, 3);
+    ctx.fillRect(x-3, y+3, 3, 3);
+    ctx.fillRect(x+3, y+3, 3, 3);
+    ctx.fillRect(x+9, y+3, 3, 3);
+    ctx.fillRect(x, y+6, 3, 3);
+    ctx.fillRect(x+6, y+6, 3, 3);
+    ctx.fillRect(x+3, y+9, 3, 3);
+  }
+
+  function draw(dt){
+    ctx.clearRect(0,0,520,360);
+    ctx.fillStyle = "#0f0f1a";
+    ctx.fillRect(0,0,520,360);
+
+    ctx.fillStyle = "rgba(255,255,255,.08)";
+    for(let i=0;i<30;i++) ctx.fillRect((i*73)%520, (i*41)%260, 2, 2);
+
+    ctx.fillStyle = "#141423";
+    ctx.fillRect(0, groundY, 520, 60);
+    ctx.fillStyle = "#2a2a44";
+    ctx.fillRect(0, groundY, 520, 2);
+
+    spikes.forEach(drawSpike);
+    drawPixelBoy();
+
+    // hearts (on win)
+    hearts.forEach(h => drawHeart(h.x, h.y));
+
+    ctx.fillStyle = "rgba(255,255,255,.75)";
+    ctx.font = "14px system-ui";
+    ctx.fillText("Tap to jump • Avoid spikes • Goal: score 11", 14, 24);
+  }
+
+  function loop(now){
+    const dt = Math.min(0.033, (now - last)/1000);
+    last = now;
+    if(running) update(dt);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  document.getElementById("start").onclick = async () => {
+    resetGame();
+    running = true;
+    statusPill.textContent = "Goal: reach score 11";
+    // Start music only after user click (iPhone-safe)
+    if(musicOn) await safePlay(bgm);
+  };
+
+  // iPhone: tap on canvas to jump (no keyboard)
+  canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
+
+  document.getElementById("muteMusic").onclick = () => {
+    musicOn = !musicOn;
+    const btn = document.getElementById("muteMusic");
+    btn.textContent = musicOn ? "Music: On" : "Music: Off";
+    if(!musicOn){
+      bgm.pause(); bgm.currentTime = 0;
+    } else {
+      // only resume if already in game view; user click qualifies as gesture
+      safePlay(bgm);
+    }
+  };
+
+  resetGame();
+
+  // ---------- Coin insert -> wheel ----------
+  document.getElementById("coin").onclick = () => {
+    document.getElementById("coinMsg").textContent = "Coin inserted 😏";
+    setTimeout(() => show("s4"), 450);
+  };
+
+  // ---------- Wheel (forced WILD CARD) + spin sound + yay recording ----------
+  const prizes = [
+    "5 mins Onyx",
+    "tomyum ramen on you!",
+    "free massage for your girlfriend",
+    "date night planning on you!",
+    "WILD CARD"
+  ];
+  const forcedText = "WILD CARD";
+
+  const wheel = document.getElementById("wheel");
+  const wctx = wheel.getContext("2d");
+  const cx=140, cy=140, r=130;
+
+  function drawWheel(){
+    wctx.clearRect(0,0,280,280);
+    const slice = (Math.PI*2)/prizes.length;
+    for(let i=0;i<prizes.length;i++){
+      const a0=i*slice, a1=a0+slice;
+      wctx.beginPath();
+      wctx.moveTo(cx,cy);
+      wctx.arc(cx,cy,r,a0,a1);
+      wctx.closePath();
+      wctx.fillStyle = (i%2===0) ? "#1d1d33" : "#141423";
+      wctx.fill();
+      wctx.strokeStyle="#3a3a66";
+      wctx.stroke();
+
+      wctx.save();
+      wctx.translate(cx,cy);
+      wctx.rotate(a0 + slice/2);
+      wctx.fillStyle="rgba(255,255,255,.9)";
+      wctx.font="12px system-ui";
+      wctx.fillText(prizes[i].toUpperCase().slice(0,18), 18, 4);
+      wctx.restore();
+    }
+    wctx.beginPath();
+    wctx.arc(cx,cy,26,0,Math.PI*2);
+    wctx.fillStyle="#0b0b10"; wctx.fill();
+    wctx.strokeStyle="#3a3a66"; wctx.stroke();
+  }
+  drawWheel();
+
+  function confetti(){
+    const c = document.getElementById("confetti");
+    c.innerHTML="";
+    c.classList.remove("hidden");
+    for(let i=0;i<60;i++){
+      const p=document.createElement("i");
+      p.style.left = Math.random()*100+"vw";
+      p.style.background = (i%3===0) ? "#fff" : (i%3===1 ? "#b9b9ff" : "#ffd6e7");
+      p.style.animationDelay = (Math.random()*0.2)+"s";
+      c.appendChild(p);
+    }
+    setTimeout(()=>c.classList.add("hidden"), 1800);
+  }
+
+  const spinBtn = document.getElementById("spin");
+  const wheelResult = document.getElementById("wheelResult");
+  const toBook = document.getElementById("toBook");
+  let spinning=false;
+
+  spinBtn.onclick = async () => {
+    if(spinning) return;
+    spinning=true;
+    wheelResult.textContent = "";
+    toBook.classList.add("hidden");
+
+    // spin sound (user click -> iPhone safe)
+    spinSfx.currentTime = 0;
+    await safePlay(spinSfx);
+
+    const slice = (Math.PI*2)/prizes.length;
+    const targetIndex = prizes.indexOf(forcedText) >= 0 ? prizes.indexOf(forcedText) : 0;
+    const targetAngle = (Math.PI*2)*6 + (Math.PI*1.5) - (targetIndex*slice + slice/2);
+
+    const start = performance.now();
+    const dur = 2200;
+
+    const anim = (now) => {
+      const p = Math.min(1,(now-start)/dur);
+      const ease = 1 - Math.pow(1-p, 3);
+      const rot = ease * targetAngle;
+      wheel.style.transform = `rotate(${rot}rad)`;
+      if(p<1) requestAnimationFrame(anim);
+      else{
+        spinning=false;
+        confetti();
+        // yay yay yay recording when it hits wild card
+        yay.currentTime = 0;
+        safePlay(yay);
+
+        wheelResult.textContent = "WILD CARD. Ha! Thought you were lucky? I’m the luckier one.";
+        toBook.classList.remove("hidden");
+      }
+    };
+    requestAnimationFrame(anim);
+  };
+
+  // ---------- Swipe Book ----------
+  const pages = [
+    "photos/page1.jpg",
+    "photos/page2.jpg",
+    "photos/page3.jpg",
+    "photos/page4.jpg",
+    "photos/page5.jpg"
+  ];
+
+  const captions = [
+    "Luck stat: 1",
+    "Luck stat increasing… 2",
+    "Luck stat increasing more… 3",
+    "luck stat increasing morer… 4",
+    "luck stat increased to moresterest… 5!"
+  ];
+
+  const book = document.getElementById("book");
+  let idx = 0;
+
+  function renderBook(){
+    book.innerHTML="";
+    const p = document.createElement("div");
+    p.className="page";
+    p.innerHTML = `
+      <img src="${pages[idx]}" alt="page"/>
+      <div class="caption">${captions[idx]}</div>
+      <div class="pageNumber">${idx+1} / ${pages.length}</div>
+    `;
+    book.appendChild(p);
+  }
+  renderBook();
+
+  let startX=null;
+  book.addEventListener("touchstart", (e)=>{ startX = e.touches[0].clientX; }, {passive:true});
+  book.addEventListener("touchend", (e)=>{
+    if(startX==null) return;
+    const endX = e.changedTouches[0].clientX;
+    const dx = endX - startX;
+    startX=null;
+    if(Math.abs(dx) < 35) return;
+    if(dx < 0 && idx < pages.length-1) idx++;
+    if(dx > 0 && idx > 0) idx--;
+    renderBook();
+  });
+
+  // Desktop swipe (mouse)
+  let mouseDown=false, mX=0;
+  book.addEventListener("mousedown",(e)=>{mouseDown=true;mX=e.clientX;});
+  window.addEventListener("mouseup",(e)=>{
+    if(!mouseDown) return;
+    mouseDown=false;
+    const dx=e.clientX-mX;
+    if(Math.abs(dx) < 50) return;
+    if(dx < 0 && idx < pages.length-1) idx++;
+    if(dx > 0 && idx > 0) idx--;
+    renderBook();
+  });
+
+  toBook.onclick = () => { show("s5"); };
+</script>
+</body>
+</html>
