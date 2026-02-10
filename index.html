@@ -1,377 +1,232 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>duangor-mail</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>You’ve got mail 💌</title>
   <style>
-    :root{
-      --bg1:#1a1c24;
-      --bg2:#2a2f3c;
-      --card: rgba(255,255,255,.08);
-      --card2: rgba(255,255,255,.06);
-      --stroke: rgba(255,255,255,.18);
-      --text:#e9ecf3;
-      --muted: rgba(233,236,243,.70);
-      --gold:#d8b36a;
-      --btn: rgba(255,255,255,.10);
-      --btn2: rgba(255,255,255,.14);
-      --shadow: 0 20px 60px rgba(0,0,0,.35);
-      --radius: 26px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      color:var(--text);
-      background: radial-gradient(1200px 900px at 30% 20%, #3a3450 0%, transparent 60%),
-                  radial-gradient(1000px 700px at 80% 30%, #2b4a59 0%, transparent 60%),
-                  linear-gradient(180deg, var(--bg2), var(--bg1));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 24px 16px;
-    }
-    .wrap{
-      width:min(520px, 96vw);
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
-      border: 1px solid var(--stroke);
-      box-shadow: var(--shadow);
-      padding: 26px 18px 22px;
-      position: relative;
-      overflow:hidden;
-    }
-    .wrap:before{
-      content:"";
-      position:absolute; inset:-40px;
-      background: radial-gradient(600px 240px at 40% 15%, rgba(255,255,255,.08), transparent 60%);
-      pointer-events:none;
-      filter: blur(2px);
-    }
-    h1{
-      margin: 6px 0 8px;
-      font-weight: 800;
-      letter-spacing: .2px;
-      text-align:center;
-      font-size: 44px;
-      line-height: 1.05;
-    }
-    .sub{
-      text-align:center;
-      color: var(--gold);
-      font-size: 18px;
-      line-height:1.35;
-      margin-bottom: 14px;
-    }
-    .center{display:flex; align-items:center; justify-content:center;}
-    .panel{
-      margin: 16px auto 0;
-      width: min(420px, 92%);
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 22px;
-      padding: 18px;
-    }
-    .btn{
-      appearance:none; border:1px solid rgba(255,255,255,.18);
-      background: var(--btn);
-      color: var(--text);
-      padding: 14px 20px;
-      border-radius: 18px;
-      font-weight: 700;
-      letter-spacing:.2px;
-      cursor:pointer;
-      transition: transform .08s ease, background .15s ease, border-color .15s ease;
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
-    }
-    .btn:hover{ background: var(--btn2); border-color: rgba(255,255,255,.26); }
-    .btn:active{ transform: translateY(1px) scale(.99); }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#0b0b10;color:#fff}
+    .wrap{max-width:760px;margin:0 auto;padding:18px;text-align:center}
+    .card{background:#141423;border:1px solid #2a2a44;border-radius:16px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+    .hidden{display:none}
+    .big{font-size:28px}
+    .note{opacity:.85;font-size:14px;line-height:1.35}
+    .btn{padding:12px 16px;border-radius:12px;border:1px solid #3a3a66;background:#1d1d33;color:#fff;cursor:pointer}
+    .btn:active{transform:scale(.98)}
+    .divider{height:1px;background:#2a2a44;margin:16px 0}
 
-    .pillRow{
-      display:flex; gap: 12px; justify-content:center; flex-wrap:wrap;
-      margin: 12px 0 10px;
-    }
-    .pill{
-      background: rgba(0,0,0,.18);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius: 999px;
-      padding: 10px 14px;
-      color: rgba(233,236,243,.88);
-      min-width: 150px;
-      text-align:center;
-      font-weight:700;
-    }
-    .hint{
-      text-align:center;
-      color: rgba(233,236,243,.55);
-      margin-top: 10px;
-      font-size: 14px;
-    }
-
-    /* Envelope */
-    .mailBox{
-      width:min(360px, 86%);
-      aspect-ratio: 1/1;
-      border-radius: 22px;
-      background: rgba(0,0,0,.14);
-      border: 1px solid rgba(255,255,255,.12);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 18px;
-      margin: 10px auto 0;
-      position:relative;
-    }
-    .mailClick{
-      cursor:pointer;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-      transform: translateZ(0);
-      transition: transform .15s ease;
-    }
-    .mailClick:active{ transform: scale(.99); }
-    .mailText{
-      text-align:center;
-      margin-top: 12px;
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: .2px;
-      opacity:0;
-      transform: translateY(6px);
-      transition: opacity .25s ease, transform .25s ease;
-    }
-    .mailText.show{ opacity:1; transform: translateY(0); }
-
-    /* Canvas areas */
-    .gameWrap{
-      width:min(420px, 92%);
-      margin: 10px auto 0;
-      border-radius: 22px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      position:relative;
-    }
-    canvas{ display:block; width:100%; height:auto; }
+    /* Landing envelope */
+    .envelope{font-size:140px;cursor:pointer;user-select:none;display:inline-block;line-height:1}
+    .envelope:active{transform:scale(.98)}
+    .envelopeWrap{margin-top:14px}
+    .mailText{margin-top:10px;font-size:18px;opacity:.92}
 
     /* Confetti */
-    .confetti{
-      position:absolute; inset:0;
-      pointer-events:none;
-      overflow:hidden;
+    .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+    .confetti i{position:absolute;top:-10px;width:8px;height:10px;opacity:.9;animation:fall 1.8s linear forwards}
+    @keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:0.1}}
+
+    /* Game */
+    canvas{max-width:520px;width:100%;background:#0f0f1a;border:1px solid #2a2a44;border-radius:14px;touch-action:manipulation}
+    .hud{display:flex;justify-content:space-between;gap:10px;max-width:520px;margin:10px auto 0 auto;flex-wrap:wrap}
+    .pill{font-size:12px;opacity:.9;border:1px solid #2a2a44;background:rgba(0,0,0,.25);padding:7px 10px;border-radius:999px}
+
+    /* Coin insert */
+    .coinSlot{display:inline-flex;align-items:center;gap:12px;margin-top:10px;justify-content:center}
+    .coin{font-size:44px;cursor:pointer;user-select:none;display:inline-block}
+    .coin.inserted{animation:coinIn .55s ease forwards}
+    @keyframes coinIn{
+      0%{transform:translateX(0) translateY(0) scale(1)}
+      70%{transform:translateX(46px) translateY(-4px) scale(.92)}
+      100%{transform:translateX(62px) translateY(-2px) scale(.55);opacity:.15}
     }
-    .confetti i{
-      position:absolute;
-      width:10px; height:16px;
-      opacity:.9;
-      transform: translateY(-60px) rotate(0deg);
-      animation: fall 900ms linear forwards;
-      border-radius: 2px;
-    }
-    @keyframes fall{
-      to{ transform: translateY(110vh) rotate(540deg); opacity:1;}
-    }
+    .slot{width:90px;height:22px;border:1px solid #3a3a66;border-radius:12px;position:relative;background:#0b0b10}
+    .slot:before{content:"";position:absolute;left:12px;right:12px;top:9px;height:4px;background:#2a2a44;border-radius:10px}
 
     /* Wheel */
-    .wheelWrap{
-      width:min(420px, 92%);
-      margin: 10px auto 0;
-      position:relative;
-      border-radius: 22px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      padding: 14px 14px 18px;
-    }
+    .wheelBox{position:relative;width:300px;height:300px;margin:0 auto}
+    #wheel{width:300px;height:300px;border-radius:50%;border:2px solid #3a3a66;transform:rotate(0deg)}
     .pointer{
       position:absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0; height: 0;
-      border-left: 14px solid transparent;
-      border-right: 14px solid transparent;
-      border-bottom: 22px solid #ff4d7d;
-      filter: drop-shadow(0 6px 16px rgba(0,0,0,.35));
-      z-index: 5;
+      top:-6px;
+      left:50%;
+      transform:translateX(-50%);
+      width:0;height:0;
+      border-left:14px solid transparent;
+      border-right:14px solid transparent;
+      border-bottom:22px solid #ff4d7d; /* points DOWN into the wheel */
+      filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
     }
+    .subtitle{opacity:.9;margin-top:6px}
+    .result{margin-top:14px;font-size:16px;min-height:22px}
 
-    /* Swipe pages */
-    .pages{
-      width:min(420px, 92%);
-      margin: 10px auto 0;
-      border-radius: 22px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-    }
-    .pageInner{
-      display:flex;
-      width: 600%;
-      transform: translateX(0%);
-      transition: transform .28s ease;
-    }
-    .page{
-      width: 100%;
-      min-height: 420px;
-      padding: 18px;
-      position:relative;
-    }
-    .pageTitle{
-      font-size: 34px;
-      font-weight: 900;
-      text-align:center;
-      margin: 6px 0 0;
-    }
-    .pageSub{
-      text-align:center;
-      color: rgba(233,236,243,.70);
-      margin: 8px 0 12px;
-      font-weight:700;
-    }
-    .bigStat{
-      margin: 18px auto 0;
-      width: 92%;
-      border-radius: 18px;
+    /* “After spin” page */
+    .bigWinMsg{font-size:34px;line-height:1.15;margin:8px 0 10px 0}
+    .hint{opacity:.92;margin-top:6px}
+
+    /* Swipe Book */
+    .book{position:relative;max-width:420px;margin:0 auto;height:560px;border-radius:16px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
+    .page{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+    .page img{width:100%;height:100%;object-fit:cover}
+    .pageNumber{position:absolute;bottom:10px;right:12px;font-size:12px;opacity:.7;background:rgba(0,0,0,.35);padding:6px 8px;border-radius:10px}
+    .caption{
+      position:absolute;top:10px;left:10px;right:10px;
+      font-size:18px;font-weight:800;letter-spacing:.2px;
+      background:rgba(0,0,0,.35);
       border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.05);
-      padding: 18px;
-      font-size: 24px;
-      font-weight: 900;
+      padding:12px 14px;border-radius:14px;
       text-align:left;
-    }
-    .pager{
-      text-align:center;
-      color: rgba(233,236,243,.50);
-      padding: 10px 0 0;
-      font-weight:700;
+      backdrop-filter: blur(6px);
     }
   </style>
 </head>
 <body>
-  <div class="wrap" id="app"></div>
+<div class="wrap">
+  <div class="card">
 
-  <script>
-    // ---------- Audio (file names MUST match your repo exactly) ----------
-    const audio = {
-      hmmmm: new Audio("hmmmm.mp3"),
-      bgm:   new Audio("bgm.mp3"),
-      happy: new Audio("happy.mp3"),
-      spin:  new Audio("spin.mp3"),
-      yay:   new Audio("yay-yay-yay.mp3"),
-      yay2:  new Audio("yay.mp3")
-    };
+    <!-- S1: Landing -->
+    <section id="s1">
+      <div class="big">Dear Mr Wong Duan Chiang,</div>
+      <p class="note">Have you turned your audio on? Click on the envelope.</p>
+      <div class="divider"></div>
 
-    // Set loops
-    audio.bgm.loop = true;
-    audio.happy.loop = true;
+      <div class="envelopeWrap">
+        <div class="envelope" id="env" title="Click me">💌</div>
+        <div class="mailText hidden" id="mailText">You’ve got a mail!</div>
+      </div>
 
-    // Safe play helper (prevents iOS errors)
-    async function safePlay(a, {volume=1, restart=false}={}){
-      try{
-        if(restart) a.currentTime = 0;
-        a.volume = Math.max(0, Math.min(1, volume));
-        await a.play();
-        return true;
-      }catch(e){
-        return false;
-      }
-    }
-    function safePause(a){
-      try{ a.pause(); }catch(e){}
-    }
+      <!-- Audio (DO NOT change hmmm timing) -->
+      <audio id="voice" preload="auto" src="hmmmm.mp3"></audio>
+      <audio id="bgm" preload="auto" src="happy.mp3" loop></audio>
+      <audio id="spinSfx" preload="auto" src="spin.mp3"></audio>
+      <audio id="yay" preload="auto" src="yay.mp3"></audio>
+    </section>
 
-    // Choose yay file gracefully
-    async function playYay(){
-      // try yay-yay-yay first, if missing, fallback to yay.mp3
-      const ok = await safePlay(audio.yay, {volume:1, restart:true});
-      if(!ok) await safePlay(audio.yay2, {volume:1, restart:true});
-    }
+    <!-- S2: Game -->
+    <section id="s2" class="hidden">
+      <div class="big">How OP are you? 🎮</div>
+      <p class="note">Reach 11 to win the game.</p>
 
-    // Global state
-    const app = document.getElementById("app");
-    let current = "mail"; // mail -> game -> wheel -> aha -> luck
-    let gameWon = false;
+      <div class="hud">
+        <div class="pill">Player: <b>dcop</b></div>
+        <div class="pill">Score: <b id="score">0</b>/11</div>
+        <div class="pill" id="statusPill">Goal: 11</div>
+      </div>
 
-    // ---------- UI RENDER ----------
-    function renderMail(){
-      current = "mail";
-      app.innerHTML = `
-        <h1>Dear Mr Wong<br/>Duan Chiang,</h1>
-        <div class="sub">Have you turned your audio on? Click on the envelope.</div>
+      <div style="margin-top:10px;">
+        <canvas id="game" width="520" height="360"></canvas>
+      </div>
 
-        <div class="mailBox">
-          <div class="mailClick" id="mailBtn" aria-label="Open mail">
-            ${niceEnvelopeSVG()}
-          </div>
-        </div>
+      <div style="margin-top:12px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+        <button class="btn" id="start">Start</button>
+        <button class="btn" id="muteMusic">Music: On</button>
+      </div>
 
-        <div class="mailText" id="mailText">You’ve got a mail!</div>
-      `;
+      <!-- ONLY instruction block you want -->
+      <p class="note" id="gameMsg" style="margin-top:10px;">Tap the screen to jump.</p>
+    </section>
 
-      const btn = document.getElementById("mailBtn");
-      const mailText = document.getElementById("mailText");
+    <!-- S3: Coin -->
+    <section id="s3" class="hidden">
+      <div class="big">YOU WON 🏆</div>
+      <div class="bigWinMsg">Damn, you’re an 11/10 indeed!</div>
+      <div class="divider"></div>
+      <div class="big">🪙 +1 Coin</div>
+      <p class="note">Insert your coin to spin.</p>
 
-      btn.addEventListener("click", async () => {
-        // Start happy background at A (must be user gesture to satisfy iOS autoplay)
-        await safePlay(audio.happy, {volume: 0.55, restart:false});
+      <div class="coinSlot">
+        <span class="coin" id="coin" title="Insert coin">🪙</span>
+        <span class="slot" id="slot" title="coin slot"></span>
+      </div>
 
-        // Play hmmmm exactly on click
-        await safePlay(audio.hmmmm, {volume: 1, restart:true});
+      <p class="note" id="coinMsg" style="margin-top:8px;"></p>
+    </section>
 
-        // Open envelope (CSS/attribute toggle)
-        btn.querySelector("svg").setAttribute("data-open", "1");
-        mailText.classList.add("show");
+    <!-- S4: Wheel -->
+    <section id="s4" class="hidden">
+      <div class="big">Spin to win 🎡</div>
+      <p class="subtitle" id="wheelSubtitle"></p>
 
-        // Move to game after 1.5s
-        setTimeout(() => renderGame(), 1500);
-      });
-    }
+      <div class="wheelBox">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="300" height="300"></canvas>
+      </div>
 
-    // ---------- GAME (Flappy-ish, boy jersey 27 + "dcop" above) ----------
-    let game = null;
+      <div style="margin-top:12px;">
+        <button class="btn" id="spin">SPIN</button>
+      </div>
 
-    function renderGame(){
-  current = "game";
+      <!-- shows only after it lands on Wild Card -->
+      <div style="margin-top:12px;">
+        <button class="btn hidden" id="wildBtn">Wild card? Hmmmm</button>
+      </div>
 
-  // stop happy while playing
-  safePause(audio.happy);
+      <p class="result" id="wheelResult"></p>
+    </section>
 
-  app.innerHTML = `
-    <h1>How OP are you? <span style="font-size:.7em">🎮</span></h1>
-    <div class="sub" style="color:rgba(233,236,243,.78)">
-      <div><span style="color:var(--gold)">Reach 11</span> to win the game.</div>
-      <div>Tap <b>Start</b> to start the game.</div>
-      <div>Tap screen to <b>jump</b>.</div>
-    </div>
+    <!-- S4B: After wheel (next page) -->
+    <section id="s4b" class="hidden">
+      <div class="bigWinMsg">Ha! Thought you were lucky? I’m the luckier one.</div>
+      <button class="btn" id="toBook" style="margin-top:10px;">Click to check your luck stats</button>
+    </section>
 
-    <div class="pillRow">
-      <div class="pill">Player: <b>dcop</b></div>
-      <div class="pill">Score: <b id="scoreTxt">0</b>/11</div>
-      <div class="pill" id="statusPill">Goal: <b>11</b></div>
-    </div>
+    <!-- S5: Swipe book -->
+    <section id="s5" class="hidden">
+      <div class="big">📊 Luck Stats Report</div>
+      <p class="note">Swipe left/right.</p>
+      <div class="book" id="book"></div>
+      <p class="note" style="margin-top:10px;">(Last page is your Valentine’s card.)</p>
+    </section>
 
-    <div class="gameWrap">
-      <canvas id="gameCanvas" width="520" height="360"></canvas>
-    </div>
+  </div>
+</div>
 
-    <div class="center" style="margin-top:14px;">
-      <button class="btn" id="startBtn">Start</button>
-    </div>
-    <div class="hint" id="gameMsg">Tap the screen to jump.</div>
-  `;
+<div class="confetti hidden" id="confetti"></div>
 
-  const canvas = document.getElementById("gameCanvas");
+<script>
+  // ---------- Screen router ----------
+  const show = (id) => {
+    ["s1","s2","s3","s4","s4b","s5"].forEach(x => document.getElementById(x).classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+  };
+
+  // ---------- Audio ----------
+  const voice = document.getElementById("voice");
+  const bgm = document.getElementById("bgm");
+  const spinSfx = document.getElementById("spinSfx");
+  const yay = document.getElementById("yay");
+  let musicOn = true;
+
+  async function safePlay(audioEl){
+    try { await audioEl.play(); } catch(e) {}
+  }
+
+  // Landing: envelope click -> play hmmmm -> show "you've got mail" -> go game
+  const env = document.getElementById("env");
+  const mailText = document.getElementById("mailText");
+  env.addEventListener("click", async () => {
+    // swap envelope emoji + reveal text
+    env.textContent = "📨";
+    mailText.classList.remove("hidden");
+
+    await safePlay(voice); // keep current timing/behavior
+
+    let moved = false;
+    const go = () => { if(moved) return; moved = true; show("s2"); };
+    const t = setTimeout(go, 2200);
+    voice.onended = () => { clearTimeout(t); go(); };
+  });
+
+  // ---------- Game: runner vs spikes ----------
+  const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
-  const scoreTxt = document.getElementById("scoreTxt");
+
+  const scoreEl = document.getElementById("score");
   const statusPill = document.getElementById("statusPill");
   const gameMsg = document.getElementById("gameMsg");
-  const startBtn = document.getElementById("startBtn");
 
   let running = false;
-  let last = performance.now();
+  let last = 0;
   let score = 0;
 
   const groundY = 300;
@@ -380,12 +235,11 @@
   const speed = 260;
   const targetScore = 11;
 
-  // boy proportions (your non-nego)
   const p = { x: 120, y: groundY, vy: 0, w: 28, h: 44, onGround: true };
+
   let spikes = [];
   let spawnTimer = 0;
 
-  // hearts burst on win
   let hearts = [];
   function spawnHearts(){
     hearts = [];
@@ -404,13 +258,13 @@
     running = false;
     last = performance.now();
     score = 0;
-    scoreTxt.textContent = "0";
-    statusPill.textContent = "Goal: 11";
-    gameMsg.textContent = "Tap the screen to jump.";
+    scoreEl.textContent = "0";
     p.y = groundY; p.vy = 0; p.onGround = true;
     spikes = [];
     spawnTimer = 0;
     hearts = [];
+    statusPill.textContent = "Goal: 11";
+    gameMsg.textContent = "Tap the screen to jump.";
     draw();
   }
 
@@ -436,17 +290,25 @@
     gameMsg.textContent = "You touched a spike. Press Start and try again.";
   }
 
+  // coin state (must be reset on every win)
+  const coinEl = document.getElementById("coin");
+  let coinUsed = false;
+
   function win(){
     running = false;
     statusPill.textContent = "WIN ✅";
     gameMsg.textContent = "Damn, you’re an 11/10 indeed!";
     spawnHearts();
 
-    // LOWER BGM by 50% AFTER game ends (your requirement)
-    audio.bgm.volume = 0.5;
+    // lower bgm volume after game ends (50%)
+    bgm.volume = 0.5;
 
-    // continue to wheel after a short beat
-    setTimeout(() => renderWheel(), 900);
+    setTimeout(() => {
+      coinUsed = false;
+      coinEl.classList.remove("inserted");
+      document.getElementById("coinMsg").textContent = "";
+      show("s3");
+    }, 900);
   }
 
   function update(dt){
@@ -472,7 +334,7 @@
       if(!s.passed && s.x + s.w < p.x){
         s.passed = true;
         score++;
-        scoreTxt.textContent = String(score);
+        scoreEl.textContent = String(score);
         if(score >= targetScore){
           win();
           return;
@@ -487,7 +349,6 @@
       if(hit){ lose(); return; }
     }
 
-    // hearts
     hearts.forEach(h => {
       h.life -= dt;
       h.vy += 600 * dt;
@@ -511,39 +372,32 @@
     ctx.fillRect(x+3, y+9, 3, 3);
   }
 
-  // Non-nego pixel boy: black fringe + white shirt “27” + "dcop"
+  // Pixel boy: black fringe + white shirt “27” + dcop above
   function drawPixelBoy(){
     const x = p.x, y = p.y;
     const top = y - p.h;
 
-    // shadow
     ctx.fillStyle = "rgba(0,0,0,.35)";
     ctx.fillRect(x+3, y+6, 22, 6);
 
-    // legs/pants
     ctx.fillStyle = "#1d1d33";
     ctx.fillRect(x+6, top+28, 7, 14);
     ctx.fillRect(x+15, top+28, 7, 14);
 
-    // shoes
     ctx.fillStyle = "#0b0b10";
     ctx.fillRect(x+5, top+42, 9, 2);
     ctx.fillRect(x+14, top+42, 9, 2);
 
-    // shirt (white)
     ctx.fillStyle = "#f6f6ff";
     ctx.fillRect(x+5, top+18, 18, 12);
 
-    // arms (skin)
     ctx.fillStyle = "#f1d0b5";
     ctx.fillRect(x+3, top+20, 3, 8);
     ctx.fillRect(x+23, top+20, 3, 8);
 
-    // head (skin)
     ctx.fillStyle = "#f1d0b5";
     ctx.fillRect(x+7, top+4, 14, 14);
 
-    // hair (black fringe)
     ctx.fillStyle = "#0b0b10";
     ctx.fillRect(x+6, top+2, 16, 6);
     ctx.fillRect(x+6, top+7, 4, 4);
@@ -551,17 +405,14 @@
     ctx.fillRect(x+14, top+7, 4, 4);
     ctx.fillRect(x+18, top+7, 4, 3);
 
-    // eyes
     ctx.fillStyle = "#000";
     ctx.fillRect(x+11, top+10, 2, 2);
     ctx.fillRect(x+17, top+10, 2, 2);
 
-    // “27”
     ctx.fillStyle = "#0b0b10";
     ctx.font = "10px system-ui";
     ctx.fillText("27", x+10, top+27);
 
-    // name tag
     ctx.font = "12px system-ui";
     ctx.fillStyle = "rgba(255,255,255,.92)";
     ctx.fillText("dcop", x+1, top-6);
@@ -569,32 +420,28 @@
 
   function drawSpike(s){
     const spikeX = s.x, baseY = groundY, h = s.h, w = s.w;
-    ctx.fillStyle = "rgba(255,255,255,0.10)";
+    ctx.fillStyle = "#2a2a44";
     ctx.beginPath();
     ctx.moveTo(spikeX, baseY);
     ctx.lineTo(spikeX + w/2, baseY - h);
     ctx.lineTo(spikeX + w, baseY);
     ctx.closePath();
     ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,0.16)";
+    ctx.strokeStyle = "#3a3a66";
     ctx.stroke();
   }
 
   function draw(){
     ctx.clearRect(0,0,520,360);
-
-    // bg
-    ctx.fillStyle = "rgba(0,0,0,.18)";
+    ctx.fillStyle = "#0f0f1a";
     ctx.fillRect(0,0,520,360);
 
-    // subtle stars
     ctx.fillStyle = "rgba(255,255,255,.08)";
     for(let i=0;i<30;i++) ctx.fillRect((i*73)%520, (i*41)%260, 2, 2);
 
-    // ground
-    ctx.fillStyle = "rgba(0,0,0,.22)";
+    ctx.fillStyle = "#141423";
     ctx.fillRect(0, groundY, 520, 60);
-    ctx.fillStyle = "rgba(255,255,255,.10)";
+    ctx.fillStyle = "#2a2a44";
     ctx.fillRect(0, groundY, 520, 2);
 
     spikes.forEach(drawSpike);
@@ -610,398 +457,239 @@
   }
   requestAnimationFrame(loop);
 
-  startBtn.addEventListener("click", async () => {
+  document.getElementById("start").onclick = async () => {
     resetGame();
     running = true;
     statusPill.textContent = "Goal: 11";
 
-    // Start bgm only after Start (user gesture)
-    await safePlay(audio.bgm, {volume: 1, restart:false});
-  });
+    // restore bgm volume when starting the game
+    bgm.volume = 1.0;
+
+    if(musicOn) await safePlay(bgm);
+  };
 
   canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
-  canvas.addEventListener("touchstart", (e) => { e.preventDefault(); jump(); }, {passive:false});
+
+  document.getElementById("muteMusic").onclick = () => {
+    musicOn = !musicOn;
+    const btn = document.getElementById("muteMusic");
+    btn.textContent = musicOn ? "Music: On" : "Music: Off";
+    if(!musicOn){
+      bgm.pause(); bgm.currentTime = 0;
+    } else {
+      safePlay(bgm);
+    }
+  };
 
   resetGame();
-}
 
+  // ---------- Coin insert animation -> wheel ----------
+  coinEl.onclick = () => {
+    if(coinUsed) return;
+    coinUsed = true;
+    document.getElementById("coinMsg").textContent = "Coin inserted 😏";
+    coinEl.classList.add("inserted");
+    setTimeout(() => show("s4"), 620);
+  };
 
-    // ---------- WHEEL ----------
-    function renderWheel(){
-      current = "wheel";
+  // ---------- Wheel (MUST land on Wild Card) ----------
+  const wheelSubtitle = document.getElementById("wheelSubtitle");
+  wheelSubtitle.textContent = "";
 
-      app.innerHTML = `
-        <h1>Spin to win <span style="font-size:.7em">🎡</span></h1>
-        <div class="sub" style="color:rgba(233,236,243,.75)">No backing out now.</div>
+  const segments = [
+    { label: "FREE MASSAGE FOR YOUR GIRLFRIEND", weight: 0.2375 },
+    { label: "YOU PLAN THE NEXT DATE", weight: 0.2375 },
+    { label: "5 MINS ONYX", weight: 0.2375 },
+    { label: "TOMYUM RAMEN ON YOU", weight: 0.2375 },
+    { label: "WILD CARD", weight: 0.05 }
+  ];
+  const forcedIndex = 4; // ALWAYS Wild card (5th)
 
-        <div class="wheelWrap">
-          <div class="pointer"></div>
-          <canvas id="wheelCanvas" width="420" height="420"></canvas>
-        </div>
+  const wheel = document.getElementById("wheel");
+  const wctx = wheel.getContext("2d");
+  const cx=150, cy=150, r=138;
 
-        <div class="center" style="margin-top:14px;">
-          <button class="btn" id="spinBtn">SPIN</button>
-        </div>
-      `;
+  const totalW = segments.reduce((a,s)=>a+s.weight,0);
+  segments.forEach(s => s.weight = s.weight/totalW);
 
-      const canvas = document.getElementById("wheelCanvas");
-      const ctx = canvas.getContext("2d");
-      const spinBtn = document.getElementById("spinBtn");
+  function drawWheel(){
+    wctx.clearRect(0,0,300,300);
+    let a = 0;
+    for(let i=0;i<segments.length;i++){
+      const s = segments[i];
+      const slice = (Math.PI*2) * s.weight;
+      const a0 = a;
+      const a1 = a + slice;
 
-      const segments = [
-        "WILD CARD",
-        "DATE NIGHT PLANNING",
-        "FREE MASSAGE FOR GF",
-        "OMYUM RAMEN ON",
-        "X MINS ONYX"
-      ];
+      wctx.beginPath();
+      wctx.moveTo(cx,cy);
+      wctx.arc(cx,cy,r,a0,a1);
+      wctx.closePath();
+      wctx.fillStyle = (i%2===0) ? "#1d1d33" : "#141423";
+      wctx.fill();
+      wctx.strokeStyle="#3a3a66";
+      wctx.stroke();
 
-      // We will FORCE land on WILD CARD to guarantee
-      const forcedIndex = 0;
+      const mid = a0 + slice/2;
+      wctx.save();
+      wctx.translate(cx,cy);
+      wctx.rotate(mid);
 
-      let angle = 0;
-      let spinning = false;
+      const upsideDown = (mid > Math.PI/2 && mid < (Math.PI*3)/2);
+      if(upsideDown) wctx.rotate(Math.PI);
 
-      function drawWheel(){
-        const W = canvas.width, H = canvas.height;
-        const cx = W/2, cy = H/2;
-        const rOuter = 190;
-        const rInner = 46;
-        const n = segments.length;
-        const slice = (Math.PI*2)/n;
+      wctx.fillStyle="rgba(255,255,255,.92)";
+      wctx.font="11px system-ui";
+      wctx.textAlign="center";
+      wctx.textBaseline="middle";
+      wctx.fillText(s.label, 86, 0);
 
-        ctx.clearRect(0,0,W,H);
+      wctx.restore();
+      a = a1;
+    }
 
-        // Outer ring
-        ctx.beginPath();
-        ctx.arc(cx,cy,rOuter+8,0,Math.PI*2);
-        ctx.strokeStyle="rgba(255,255,255,.14)";
-        ctx.lineWidth=2;
-        ctx.stroke();
+    wctx.beginPath();
+    wctx.arc(cx,cy,28,0,Math.PI*2);
+    wctx.fillStyle="#0b0b10"; wctx.fill();
+    wctx.strokeStyle="#3a3a66"; wctx.stroke();
+  }
+  drawWheel();
 
-        for(let i=0;i<n;i++){
-          const a0 = angle + i*slice;
-          const a1 = a0 + slice;
+  function confetti(){
+    const c = document.getElementById("confetti");
+    c.innerHTML="";
+    c.classList.remove("hidden");
+    for(let i=0;i<70;i++){
+      const p=document.createElement("i");
+      p.style.left = Math.random()*100+"vw";
+      p.style.background = (i%3===0) ? "#fff" : (i%3===1 ? "#b9b9ff" : "#ffd6e7");
+      p.style.animationDelay = (Math.random()*0.2)+"s";
+      c.appendChild(p);
+    }
+    setTimeout(()=>c.classList.add("hidden"), 1800);
+  }
 
-          // Segment fill
-          ctx.beginPath();
-          ctx.moveTo(cx,cy);
-          ctx.arc(cx,cy,rOuter,a0,a1);
-          ctx.closePath();
+  const spinBtn = document.getElementById("spin");
+  const wheelResult = document.getElementById("wheelResult");
+  const wildBtn = document.getElementById("wildBtn");
+  let spinning=false;
 
-          ctx.fillStyle = (i%2===0) ? "rgba(255,255,255,.08)" : "rgba(255,255,255,.05)";
-          ctx.fill();
-          ctx.strokeStyle="rgba(255,255,255,.12)";
-          ctx.lineWidth=2;
-          ctx.stroke();
+  function forcedTarget(){
+    let a = 0;
+    for(let i=0;i<segments.length;i++){
+      const s = segments[i];
+      const slice = (Math.PI*2)*s.weight;
+      const mid = a + slice/2;
+      if(i === forcedIndex) return { mid, aStart: a, aEnd: a+slice };
+      a += slice;
+    }
+    return { mid: 0, aStart: 0, aEnd: 0 };
+  }
 
-          // Text
-          const mid = (a0+a1)/2;
-          ctx.save();
-          ctx.translate(cx,cy);
-          ctx.rotate(mid);
+  spinBtn.onclick = async () => {
+    if(spinning) return;
+    spinning=true;
 
-          // We draw text centered along radial direction, keeping it readable
-          const label = segments[i];
-          const lines = wrapLabel(label, 14); // auto-wrap
-          ctx.textAlign="center";
-          ctx.fillStyle="rgba(233,236,243,.90)";
-          ctx.font="900 16px ui-sans-serif, system-ui";
-          const ty = -120;
+    wheelResult.textContent = "";
+    wheelSubtitle.textContent = "";
+    wildBtn.classList.add("hidden");
 
-          if(lines.length === 1){
-            ctx.fillText(lines[0], 0, ty);
-          }else{
-            ctx.fillText(lines[0], 0, ty-10);
-            ctx.fillText(lines[1], 0, ty+10);
-          }
+    spinSfx.currentTime = 0;
+    await safePlay(spinSfx);
 
-          ctx.restore();
-        }
+    const target = forcedTarget();
 
-        // center hub
-        ctx.beginPath();
-        ctx.arc(cx,cy,rInner,0,Math.PI*2);
-        ctx.fillStyle="rgba(0,0,0,.30)";
-        ctx.fill();
-        ctx.strokeStyle="rgba(255,255,255,.12)";
-        ctx.lineWidth=2;
-        ctx.stroke();
+    // pointer at top
+    const pointerAngle = Math.PI * 1.5;
+    const turns = 5;
+    const targetRot = (Math.PI*2)*turns + (pointerAngle - target.mid);
+
+    const start = performance.now();
+    const dur = 3600;
+
+    const anim = (now) => {
+      const p = Math.min(1,(now-start)/dur);
+      const ease = 1 - Math.pow(1-p, 3);
+      const rot = ease * targetRot;
+      wheel.style.transform = `rotate(${rot}rad)`;
+
+      if(p<1) requestAnimationFrame(anim);
+      else{
+        spinning=false;
+
+        // land on wild card moment
+        confetti();
+        yay.currentTime = 0;
+        safePlay(yay);
+
+        // show button to go next
+        wildBtn.classList.remove("hidden");
+        wildBtn.onclick = () => show("s4b");
       }
+    };
+    requestAnimationFrame(anim);
+  };
 
-      drawWheel();
+  // ---------- Book ----------
+  const pages = [
+    "photos/page1.jpg",
+    "photos/page2.jpg",
+    "photos/page3.jpg",
+    "photos/page4.jpg",
+    "photos/page5.jpg"
+  ];
 
-      function angleForIndex(i){
-        const n = segments.length;
-        const slice = (Math.PI*2)/n;
+  // EXACT captions you want
+  const captions = [
+    "Luck stat: 1",
+    "Luck stat increasing to…2",
+    "Luck stat increasing more…3",
+    "Luck stat increasing morer…4",
+    "Luck stat increasing morerest…5"
+  ];
 
-        // Pointer is at top. We want chosen segment centered at top.
-        const targetMid = -Math.PI/2; // top
-        const segMid = i*slice + slice/2;
-        return targetMid - segMid;
-      }
+  const book = document.getElementById("book");
+  let idx = 0;
 
-      spinBtn.addEventListener("click", async () => {
-        if(spinning) return;
-        spinning = true;
-        spinBtn.disabled = true;
+  function renderBook(){
+    book.innerHTML="";
+    const p = document.createElement("div");
+    p.className="page";
+    p.innerHTML = `
+      <img src="${pages[idx]}" alt="page"/>
+      <div class="caption">${captions[idx]}</div>
+      <div class="pageNumber">${idx+1} / ${pages.length}</div>
+    `;
+    book.appendChild(p);
+  }
+  renderBook();
 
-        // wheel sound
-        await safePlay(audio.spin, {volume: 1, restart:true});
+  let startX=null;
+  book.addEventListener("touchstart", (e)=>{ startX = e.touches[0].clientX; }, {passive:true});
+  book.addEventListener("touchend", (e)=>{
+    if(startX==null) return;
+    const endX = e.changedTouches[0].clientX;
+    const dx = endX - startX;
+    startX=null;
+    if(Math.abs(dx) < 35) return;
+    if(dx < 0 && idx < pages.length-1) idx++;
+    if(dx > 0 && idx > 0) idx--;
+    renderBook();
+  });
 
-        // animate spin and land on forcedIndex
-        const base = angleForIndex(forcedIndex);
-        const extraTurns = 6; // for drama
-        const startA = angle;
-        const endA = base + extraTurns*Math.PI*2;
+  let mouseDown=false, mX=0;
+  book.addEventListener("mousedown",(e)=>{mouseDown=true;mX=e.clientX;});
+  window.addEventListener("mouseup",(e)=>{
+    if(!mouseDown) return;
+    mouseDown=false;
+    const dx=e.clientX-mX;
+    if(Math.abs(dx) < 50) return;
+    if(dx < 0 && idx < pages.length-1) idx++;
+    if(dx > 0 && idx > 0) idx--;
+    renderBook();
+  });
 
-        const dur = 3200;
-        const t0 = performance.now();
-
-        function easeOutCubic(x){ return 1 - Math.pow(1-x, 3); }
-
-        function anim(t){
-          const p = Math.min(1, (t - t0)/dur);
-          angle = startA + (endA - startA) * easeOutCubic(p);
-          drawWheel();
-          if(p < 1){
-            requestAnimationFrame(anim);
-          }else{
-            spinning = false;
-            spinBtn.disabled = false;
-
-            // stop spin sound
-            safePause(audio.spin);
-
-            // Confetti + button “Wild card? Hmmmm”
-            doConfetti(document.querySelector(".wheelWrap"));
-
-            setTimeout(async () => {
-              await playYay();
-              showWildCardButton();
-            }, 250);
-          }
-        }
-        requestAnimationFrame(anim);
-      });
-
-      function showWildCardButton(){
-        const c = document.querySelector(".wheelWrap");
-        const holder = document.createElement("div");
-        holder.className="center";
-        holder.style.marginTop="14px";
-        holder.innerHTML = `<button class="btn" id="wildBtn">Wild card? Hmmmm</button>`;
-        c.insertAdjacentElement("afterend", holder);
-
-        holder.querySelector("#wildBtn").addEventListener("click", () => {
-          holder.remove();
-          renderAha();
-        });
-      }
-    }
-
-    // ---------- AHA PAGE ----------
-    function renderAha(){
-      current = "aha";
-
-      app.innerHTML = `
-        <h1 style="font-size:40px">Aha! Thought you were lucky? I’m the luckier one.</h1>
-        <div class="sub" style="color:rgba(233,236,243,.72)">Click to check your luck stats</div>
-
-        <div class="center" style="margin-top:18px;">
-          <button class="btn" id="luckBtn">Click to check your luck stats</button>
-        </div>
-      `;
-
-      document.getElementById("luckBtn").addEventListener("click", () => {
-        renderLuckPages();
-      });
-    }
-
-    // ---------- LUCK PAGES (1-5) ----------
-    function renderLuckPages(){
-      current = "luck";
-
-      // At this point: stop bgm completely, happy only
-      safePause(audio.bgm);
-      safePlay(audio.happy, {volume: 0.80, restart:false});
-
-      app.innerHTML = `
-        <h1 style="font-size:40px">📊 Luck Stats Report</h1>
-        <div class="sub" style="color:rgba(233,236,243,.72)">Swipe left/right.</div>
-
-        <div class="pages" id="pages">
-          <div class="pageInner" id="pageInner">
-            ${luckPage("Luck stat: 1", "1 / 5")}
-            ${luckPage("Luck stat increasing… 2", "2 / 5")}
-            ${luckPage("Luck stat increasing more… 3", "3 / 5")}
-            ${luckPage("Luck stat increasing morer… 4", "4 / 5")}
-            ${luckPage("Luck stat increasing morerest… 5", "5 / 5")}
-          </div>
-        </div>
-
-        <div class="pager" id="pager">1 / 5</div>
-      `;
-
-      const inner = document.getElementById("pageInner");
-      const pager = document.getElementById("pager");
-      let idx = 0;
-
-      function update(){
-        inner.style.transform = `translateX(${-idx*100}%)`;
-        pager.textContent = `${idx+1} / 5`;
-      }
-
-      // Swipe handling
-      let startX = null;
-      const pages = document.getElementById("pages");
-
-      pages.addEventListener("touchstart", (e) => {
-        startX = e.touches[0].clientX;
-      }, {passive:true});
-
-      pages.addEventListener("touchend", (e) => {
-        if(startX === null) return;
-        const endX = (e.changedTouches[0] || {}).clientX;
-        const dx = endX - startX;
-        startX = null;
-        if(Math.abs(dx) < 40) return;
-        if(dx < 0 && idx < 4) idx++;
-        if(dx > 0 && idx > 0) idx--;
-        update();
-      }, {passive:true});
-
-      // Desktop fallback
-      pages.addEventListener("click", () => {
-        if(idx < 4) idx++;
-        else idx = 0;
-        update();
-      });
-
-      update();
-    }
-
-    function luckPage(text, footer){
-      return `
-        <div class="page">
-          <div class="bigStat">${text}</div>
-        </div>
-      `;
-    }
-
-    // ---------- Helpers ----------
-    function roundRect(ctx, x, y, w, h, r){
-      const rr = Math.min(r, w/2, h/2);
-      ctx.moveTo(x+rr, y);
-      ctx.arcTo(x+w, y, x+w, y+h, rr);
-      ctx.arcTo(x+w, y+h, x, y+h, rr);
-      ctx.arcTo(x, y+h, x, y, rr);
-      ctx.arcTo(x, y, x+w, y, rr);
-    }
-
-    function wrapLabel(label, maxLen){
-      // Return up to 2 lines, tries to break on spaces
-      const words = label.split(" ");
-      let line1 = "";
-      let line2 = "";
-
-      for(const w of words){
-        const test = (line1 ? line1 + " " : "") + w;
-        if(test.length <= maxLen){
-          line1 = test;
-        }else{
-          line2 = (line2 ? line2 + " " : "") + w;
-        }
-      }
-
-      if(!line2) return [line1];
-      // If line2 still too long, hard cut (rare)
-      if(line2.length > maxLen) line2 = line2.slice(0, maxLen-1) + "…";
-      return [line1, line2];
-    }
-
-    function doConfetti(container){
-      const layer = document.createElement("div");
-      layer.className = "confetti";
-      container.appendChild(layer);
-
-      const colors = ["#ff4d7d","#ffd166","#7bdff2","#b8f2a6","#cdb4ff"];
-      for(let i=0;i<32;i++){
-        const p = document.createElement("i");
-        p.style.left = (Math.random()*100)+"%";
-        p.style.top = (-20 - Math.random()*120)+"px";
-        p.style.background = colors[i%colors.length];
-        p.style.animationDelay = (Math.random()*120)+"ms";
-        p.style.transform = `translateY(-60px) rotate(${Math.random()*90}deg)`;
-        layer.appendChild(p);
-      }
-      setTimeout(()=> layer.remove(), 1100);
-    }
-
-    function niceEnvelopeSVG(){
-      // A nicer envelope with subtle gradients + clean flap open animation.
-      return `
-      <svg width="300" height="300" viewBox="0 0 300 300" role="img" aria-label="Envelope"
-           style="overflow:visible" data-open="0">
-        <defs>
-          <linearGradient id="g1" x1="0" x2="1">
-            <stop offset="0" stop-color="rgba(255,255,255,.18)"/>
-            <stop offset="1" stop-color="rgba(255,255,255,.08)"/>
-          </linearGradient>
-          <linearGradient id="g2" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stop-color="rgba(0,0,0,.10)"/>
-            <stop offset="1" stop-color="rgba(0,0,0,.28)"/>
-          </linearGradient>
-          <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="rgba(0,0,0,.35)"/>
-          </filter>
-        </defs>
-
-        <!-- Back plate -->
-        <rect x="30" y="70" width="240" height="170" rx="26"
-              fill="rgba(0,0,0,.18)" stroke="rgba(255,255,255,.14)" filter="url(#sh)"/>
-
-        <!-- Envelope body -->
-        <g transform="translate(0,0)">
-          <rect x="55" y="110" width="190" height="120" rx="18"
-                fill="url(#g2)" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
-
-          <!-- X lines -->
-          <path d="M65 120 L150 185 L235 120" fill="none" stroke="rgba(255,255,255,.20)" stroke-width="2"/>
-          <path d="M65 220 L150 155 L235 220" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="2"/>
-
-          <!-- Flap (animated) -->
-          <g id="flap" transform-origin="150px 122px"
-             style="transition: transform 320ms cubic-bezier(.2,.9,.2,1)">
-            <path d="M65 120 L150 70 L235 120 Z"
-                  fill="url(#g1)" stroke="rgba(255,255,255,.22)" stroke-width="2"/>
-          </g>
-
-          <!-- Heart seal -->
-          <g transform="translate(150,205)">
-            <path d="M0 18
-                     C-18 6 -26 -8 -12 -18
-                     C-4 -24 0 -18 0 -14
-                     C0 -18 4 -24 12 -18
-                     C26 -8 18 6 0 18 Z"
-                  fill="#ff4d7d" opacity=".95"/>
-            <path d="M0 18
-                     C-18 6 -26 -8 -12 -18
-                     C-4 -24 0 -18 0 -14
-                     C0 -18 4 -24 12 -18
-                     C26 -8 18 6 0 18 Z"
-                  fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2"/>
-          </g>
-        </g>
-
-        <style>
-          svg[data-open="1"] #flap { transform: rotateX(65deg) translateY(-6px); }
-        </style>
-      </svg>`;
-    }
-
-    // ---------- Start ----------
-    renderMail();
-  </script>
+  document.getElementById("toBook").onclick = () => show("s5");
+</script>
 </body>
 </html>
