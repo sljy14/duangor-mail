@@ -543,7 +543,7 @@
   // ✅ Your request: bgm stays quiet (0.25) throughout
   function startBgm(){
     stopHappy();
-    bgm.volume = 0.25;
+    bgm.volume = 0.15;
     safePlay(bgm);
   }
   function duckBgm(){ fadeBgmTo(0.25, 180); } // harmless now
@@ -1175,21 +1175,27 @@ function layoutFinalChars(){
 // If final sequence already started, keep sljy at FINAL position (prevents bounce back)
   sljy.style.left = (finalSeqStarted ? sljyFinalLeft : sljyStartLeft) + "px";
 
-/ after applying positions:
+// apply positions (keep these)
 dcop.style.left = dcopFinalLeft + "px";
 sljy.style.left = sljyFinalLeft + "px";
 
-// snap sljy to be exactly 1px from dcop
+// snap sljy to be exactly 1px from dcop (run after layout paints)
 requestAnimationFrame(() => {
-  const desiredGap = 1; // <-- change to 0 if you want touching
+  // guard: elements must exist
+  if (!dcop || !sljy) return;
+
+  const desiredGap = 1; // 0 = touching
 
   const dcopRect = dcop.getBoundingClientRect();
   const sljyRect = sljy.getBoundingClientRect();
 
-  const currentGap = dcopRect.left - sljyRect.right; // + = space between
+  // positive = space between them
+  const currentGap = dcopRect.left - sljyRect.right;
+
+  // if currentGap > desiredGap, move sljy right
+  // if currentGap < desiredGap, move sljy left
   const delta = currentGap - desiredGap;
 
-  // move sljy right by delta (reduce the gap)
   const curLeft = parseFloat(sljy.style.left) || 0;
   sljy.style.left = (curLeft + delta) + "px";
 });
