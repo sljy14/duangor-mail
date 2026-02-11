@@ -391,29 +391,29 @@
 
               <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
                 <!-- hair -->
-                <div style="position:absolute;left:24px;top:18px;width:44px;height:12px;background:#3b2418"></div>
-                <div style="position:absolute;left:22px;top:30px;width:48px;height:34px;background:#3b2418"></div>
-                <div style="position:absolute;left:22px;top:64px;width:12px;height:14px;background:#3b2418"></div>
-                <div style="position:absolute;left:58px;top:64px;width:12px;height:14px;background:#3b2418"></div>
+                <div style="position:absolute;left:24px;top:17px;width:44px;height:12px;background:#3b2418"></div>
+                <div style="position:absolute;left:22px;top:29px;width:48px;height:34px;background:#3b2418"></div>
+                <div style="position:absolute;left:22px;top:63px;width:12px;height:14px;background:#3b2418"></div>
+                <div style="position:absolute;left:58px;top:63px;width:12px;height:14px;background:#3b2418"></div>
 
                 <!-- head -->
-                <div class="sljyHead" style="position:absolute;left:34px;top:38px;width:28px;height:26px;background:#f1d0b5"></div>
+                <div class="sljyHead" style="position:absolute;left:34px;top:37px;width:28px;height:26px;background:#f1d0b5"></div>
 
                 <!-- top -->
-                <div style="position:absolute;left:28px;top:64px;width:36px;height:22px;background:#0b0b10">
+                <div style="position:absolute;left:28px;top:63px;width:36px;height:22px;background:#0b0b10">
                   <div class="sljyTeeText">street<br>cat's<br>club</div>
                 </div>
 
                 <!-- skirt -->
-                <div style="position:absolute;left:30px;top:86px;width:32px;height:14px;background:#111"></div>
+                <div style="position:absolute;left:30px;top:85px;width:32px;height:14px;background:#111"></div>
 
                 <!-- legs -->
-                <div style="position:absolute;left:34px;top:98px;width:10px;height:28px;background:#f1d0b5"></div>
-                <div style="position:absolute;left:48px;top:98px;width:10px;height:28px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:34px;top:97px;width:10px;height:28px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:48px;top:97px;width:10px;height:28px;background:#f1d0b5"></div>
 
                 <!-- shoes -->
-                <div style="position:absolute;left:32px;top:126px;width:14px;height:6px;background:#d31f2a"></div>
-                <div style="position:absolute;left:46px;top:126px;width:14px;height:6px;background:#d31f2a"></div>
+                <div style="position:absolute;left:32px;top:125px;width:14px;height:6px;background:#d31f2a"></div>
+                <div style="position:absolute;left:46px;top:125px;width:14px;height:6px;background:#d31f2a"></div>
               </div>
             </div>
 
@@ -1175,7 +1175,25 @@ function layoutFinalChars(){
 // If final sequence already started, keep sljy at FINAL position (prevents bounce back)
   sljy.style.left = (finalSeqStarted ? sljyFinalLeft : sljyStartLeft) + "px";
 
+/ after applying positions:
+dcop.style.left = dcopFinalLeft + "px";
+sljy.style.left = sljyFinalLeft + "px";
 
+// snap sljy to be exactly 1px from dcop
+requestAnimationFrame(() => {
+  const desiredGap = 1; // <-- change to 0 if you want touching
+
+  const dcopRect = dcop.getBoundingClientRect();
+  const sljyRect = sljy.getBoundingClientRect();
+
+  const currentGap = dcopRect.left - sljyRect.right; // + = space between
+  const delta = currentGap - desiredGap;
+
+  // move sljy right by delta (reduce the gap)
+  const curLeft = parseFloat(sljy.style.left) || 0;
+  sljy.style.left = (curLeft + delta) + "px";
+});
+  
   // store for the walk animation
   finalLayout = {
     sljyStartLeft,
