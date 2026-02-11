@@ -1184,7 +1184,7 @@ requestAnimationFrame(() => {
   // guard: elements must exist
   if (!dcop || !sljy) return;
 
-  const desiredGap = 1; // 0 = touching
+  const desiredGap = -10; // 0 = touching
 
   const dcopRect = dcop.getBoundingClientRect();
   const sljyRect = sljy.getBoundingClientRect();
