@@ -350,9 +350,21 @@
             <div class="char" id="sljyFinal" style="left:46px;">
               <div class="nameTag" id="sljyTag">sljy</div>
               <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
-                <!-- hair (dark brown, loose-ish) -->
-                <div style="position:absolute;left:28px;top:16px;width:38px;height:38px;background:#3b2418;border-radius:8px"></div>
-                <div style="position:absolute;left:24px;top:26px;width:46px;height:46px;background:#3b2418;border-radius:10px;opacity:.95"></div>
+               
+                <!-- hair (dark brown, centre-parting, wavy-ish) -->
+<div style="position:absolute;left:24px;top:14px;width:46px;height:50px;background:#3b2418;border-radius:10px;opacity:.96"></div>
+
+<!-- center part line -->
+<div style="position:absolute;left:46px;top:18px;width:4px;height:22px;background:#2a170f;border-radius:3px;opacity:.55"></div>
+
+<!-- wavy sides -->
+<div style="position:absolute;left:18px;top:28px;width:16px;height:22px;background:#3b2418;border-radius:10px;opacity:.96"></div>
+<div style="position:absolute;left:60px;top:28px;width:16px;height:22px;background:#3b2418;border-radius:10px;opacity:.96"></div>
+
+<!-- small wave bumps -->
+<div style="position:absolute;left:20px;top:44px;width:14px;height:14px;background:#3b2418;border-radius:9px;opacity:.96"></div>
+<div style="position:absolute;left:62px;top:44px;width:14px;height:14px;background:#3b2418;border-radius:9px;opacity:.96"></div>
+
 
                 <!-- head -->
                 <div style="position:absolute;left:34px;top:34px;width:28px;height:26px;background:#f1d0b5"></div>
@@ -373,30 +385,44 @@
               </div>
             </div>
 
+    
             <!-- dcop -->
-            <div class="char" id="dcopFinal" style="left:292px;">
-              <div class="nameTag" id="dcopTag">dcop</div>
-              <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
-                <!-- head -->
-                <div style="position:absolute;left:34px;top:28px;width:28px;height:28px;background:#f1d0b5"></div>
-                <!-- hair (same as game vibe) -->
-                <div style="position:absolute;left:30px;top:24px;width:36px;height:12px;background:#0b0b10"></div>
-                <div style="position:absolute;left:38px;top:34px;width:8px;height:6px;background:#0b0b10"></div>
-                <div style="position:absolute;left:54px;top:34px;width:8px;height:6px;background:#0b0b10"></div>
+<div class="char" id="dcopFinal" style="left:292px;">
+  <div class="nameTag" id="dcopTag">dcop</div>
 
-                <!-- shirt -->
-                <div style="position:absolute;left:28px;top:56px;width:36px;height:26px;background:#f6f6ff"></div>
-                <div style="position:absolute;left:44px;top:70px;color:#0b0b10;font-size:14px;font-weight:800;">27</div>
+  <!-- Use SAME sprite logic as S6, just scaled for S7 -->
+  <svg width="92" height="132" viewBox="0 0 160 200" style="position:absolute;left:0;top:0;display:block;">
+    <rect x="0" y="0" width="160" height="200" fill="transparent"/>
 
-                <!-- legs -->
-                <div style="position:absolute;left:32px;top:82px;width:12px;height:36px;background:#1d1d33"></div>
-                <div style="position:absolute;left:48px;top:82px;width:12px;height:36px;background:#1d1d33"></div>
+    <!-- head -->
+    <rect x="62" y="38" width="36" height="36" fill="#f1d0b5"/>
 
-                <!-- shoes -->
-                <div style="position:absolute;left:30px;top:118px;width:16px;height:6px;background:#0b0b10"></div>
-                <div style="position:absolute;left:46px;top:118px;width:16px;height:6px;background:#0b0b10"></div>
-              </div>
-            </div>
+    <!-- hair -->
+    <rect x="58" y="34" width="44" height="14" fill="#0b0b10"/>
+    <rect x="66" y="46" width="10" height="8" fill="#0b0b10"/>
+    <rect x="84" y="46" width="10" height="8" fill="#0b0b10"/>
+
+    <!-- body -->
+    <rect x="54" y="74" width="52" height="36" fill="#f6f6ff"/>
+
+    <!-- "27" perfectly centered -->
+    <text x="80" y="92" text-anchor="middle" dominant-baseline="middle"
+          fill="#0b0b10" font-size="18" font-weight="800">27</text>
+
+    <!-- arms -->
+    <rect x="46" y="78" width="8" height="30" fill="#f1d0b5"/>
+    <rect x="106" y="78" width="8" height="30" fill="#f1d0b5"/>
+
+    <!-- legs -->
+    <rect x="58" y="110" width="18" height="52" fill="#1d1d33"/>
+    <rect x="84" y="110" width="18" height="52" fill="#1d1d33"/>
+
+    <!-- shoes -->
+    <rect x="56" y="162" width="24" height="7" fill="#0b0b10"/>
+    <rect x="82" y="162" width="24" height="7" fill="#0b0b10"/>
+  </svg>
+</div>
+
           </div>
 
           <div class="petals" id="petals"></div>
@@ -1233,7 +1259,7 @@ function positionKissBetweenHeads(){
   bonusMsg.textContent = "";
   congratsMsg.classList.remove("hidden");
 
-  // Keep congrats on-screen 2s
+  // Keep congrats on-screen 2.2s
   setTimeout(()=>{
     show("s7");
 
@@ -1248,7 +1274,7 @@ function positionKissBetweenHeads(){
 
     // Start walk+kissing immediately after entering S7
     setTimeout(()=>startFinalSequence(), 50);
-  }, 2000);
+  }, 2200);
 }
 
   };
