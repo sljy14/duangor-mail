@@ -1209,28 +1209,17 @@ function layoutFinalChars(){
   }
 
   function positionKissBetweenHeads(){
-  const kiss = document.getElementById("kissIcon");
-  const sljy = document.getElementById("sljyFinal");
-  const dcop = document.getElementById("dcopFinal");
-  const sky  = document.getElementById("sky");
+    const kiss = document.getElementById("kissIcon");
+    const a = document.getElementById("sljyFinal").getBoundingClientRect();
+    const b = document.getElementById("dcopFinal").getBoundingClientRect();
+    const sky = document.getElementById("sky").getBoundingClientRect();
 
-  if(!kiss  !sljy  !dcop || !sky) return;
+    const midX = ((a.left + a.right)/2 + (b.left + b.right)/2) / 2;
+    const topY = Math.min(a.top, b.top) - 55;
 
-  const a = sljy.getBoundingClientRect();
-  const b = dcop.getBoundingClientRect();
-  const skyRect = sky.getBoundingClientRect();
-
-  // midpoint between head centers
-  const midX = ((a.left + a.right)/2 + (b.left + b.right)/2) / 2;
-  const topY = Math.min(a.top, b.top) - 55;
-
-  // 👇 micro-adjustments
-  const offsetX = -3; // move left
-  const offsetY =  2; // move down
-
-  kiss.style.left = (midX - skyRect.left + offsetX) + "px";
-  kiss.style.top  = (topY - skyRect.top + offsetY) + "px";
-}
+    kiss.style.left = (midX - sky.left - 3) + "px";
+    kiss.style.top  = (topY - sky.top + 2) + "px";
+  }
 
   let finalSeqStarted = false;
   let loveTimer = null;
