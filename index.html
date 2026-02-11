@@ -1154,7 +1154,7 @@ function layoutFinalChars(){
   const charW = 92;
   const visualW = 72;
 
-  const gap = 0;          // 👈 how close they stand (0 = touching)
+  const gap = 18;          // 👈 how close they stand (0 = touching)
   const walkOffset = 40;  // how far sljy starts left so she “walks in”
 
   // keep dcop on the right
@@ -1175,30 +1175,6 @@ function layoutFinalChars(){
 // If final sequence already started, keep sljy at FINAL position (prevents bounce back)
   sljy.style.left = (finalSeqStarted ? sljyFinalLeft : sljyStartLeft) + "px";
 
-// apply positions (keep these)
-dcop.style.left = dcopFinalLeft + "px";
-sljy.style.left = sljyFinalLeft + "px";
-
-// snap sljy to be exactly 1px from dcop (run after layout paints)
-requestAnimationFrame(() => {
-  // guard: elements must exist
-  if (!dcop || !sljy) return;
-
-  const desiredGap = -10; // 0 = touching
-
-  const dcopRect = dcop.getBoundingClientRect();
-  const sljyRect = sljy.getBoundingClientRect();
-
-  // positive = space between them
-  const currentGap = dcopRect.left - sljyRect.right;
-
-  // if currentGap > desiredGap, move sljy right
-  // if currentGap < desiredGap, move sljy left
-  const delta = currentGap - desiredGap;
-
-  const curLeft = parseFloat(sljy.style.left) || 0;
-  sljy.style.left = (curLeft + delta) + "px";
-});
   
   // store for the walk animation
   finalLayout = {
