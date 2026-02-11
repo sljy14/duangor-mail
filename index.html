@@ -445,27 +445,25 @@
   // iOS unlock: muted play/pause (never audible)
   let audioUnlocked = false;
   async function unlockAudio(){
-    if(audioUnlocked) return;
-    audioUnlocked = true;
-    try{
-      kissAudio.muted = true;
-      loveAudio.muted = true;
+  // iOS unlock: ALWAYS silent
+  try{
+    kissAudio.muted = true;
+    loveAudio.muted = true;
 
-      kissAudio.currentTime = 0;
-      await safePlay(kissAudio);
-      kissAudio.pause();
+    kissAudio.currentTime = 0;
+    await safePlay(kissAudio);
+    kissAudio.pause();
 
-      loveAudio.currentTime = 0;
-      await safePlay(loveAudio);
-      loveAudio.pause();
+    loveAudio.currentTime = 0;
+    await safePlay(loveAudio);
+    loveAudio.pause();
 
-      kissAudio.currentTime = 0;
-      loveAudio.currentTime = 0;
+    kissAudio.currentTime = 0;
+    loveAudio.currentTime = 0;
+  }catch(e){}
+}
 
-      kissAudio.muted = false;
-      loveAudio.muted = false;
-    }catch(e){}
-  }
+
 
   function clamp01(v){ return Math.max(0, Math.min(1, v)); }
 
@@ -1080,19 +1078,28 @@
 
   // ---------- S7 helpers ----------
   function layoutFinalChars(){
-    const sky = document.getElementById("sky");
-    const sljy = document.getElementById("sljyFinal");
-    const dcop = document.getElementById("dcopFinal");
-    const w = sky.clientWidth;
+  const sky  = document.getElementById("sky");
+  const sljy = document.getElementById("sljyFinal");
+  const dcop = document.getElementById("dcopFinal");
 
-    const gap = 0;              // ✅ requested
-    const charW = 92;
-    const total = (charW * 2) + gap;
-    const leftStart = Math.max(8, Math.floor((w - total) / 2));
+  const w = sky.clientWidth;
 
-    sljy.style.left = leftStart + "px";
-    dcop.style.left = (leftStart + charW + gap) + "px";
-  }
+  const charW = 92;
+  const gap = 0; // ✅ change this: 0 = touching, -2 = tiny overlap, 2 = small gap
+
+  // center both characters together as a pair
+  const totalW = (charW * 2) + gap;
+  let sljyLeft = Math.round((w - totalW) / 2);
+  let dcopLeft = sljyLeft + charW + gap;
+
+  // safety clamp so they never go off-screen
+  sljyLeft = Math.max(8, Math.min(sljyLeft, w - totalW - 8));
+  dcopLeft = sljyLeft + charW + gap;
+
+  sljy.style.left = sljyLeft + "px";
+  dcop.style.left = dcopLeft + "px";
+}
+
 
   let petalsStarted = false;
   function startPetals(){
@@ -1150,17 +1157,23 @@
       positionKissBetweenHeads();
       kiss.style.opacity = 1;
 
-      kissAudio.currentTime = 0;
-      kissAudio.volume = 1;
-      await safePlay(kissAudio);
+  kissAudio.pause();
+kissAudio.currentTime = 0;
+kissAudio.muted = false;   // ✅ unmute ONLY here
+kissAudio.volume = 1;
+await safePlay(kissAudio);
+
 
       startPetals();
 
       if(loveTimer) clearTimeout(loveTimer);
       loveTimer = setTimeout(async ()=>{
-        loveAudio.currentTime = 0;
-        loveAudio.volume = 1;
-        await safePlay(loveAudio);
+        loveAudio.pause();
+loveAudio.currentTime = 0;
+loveAudio.muted = false;   // ✅ unmute ONLY here
+loveAudio.volume = 1;
+await safePlay(loveAudio);
+
 
         if(musicOn) happy.volume = 0.25;
       }, 500);
