@@ -100,7 +100,9 @@
       text-align:center;
     }
 
-    /* S7 Final scene (fit iPhone, no scroll) */
+    /* =========================
+       S7 Final scene (clean)
+       ========================= */
     .finalWrap{
       max-width:520px;
       margin:0 auto;
@@ -131,12 +133,13 @@
       height:220px;
     }
     .char{
-  position:absolute;bottom:0;
-  width:92px;height:132px;
-  transform-origin:bottom center;
-  transform:scale(1);            /* ✅ lock same scale */
-}
-
+      position:absolute;
+      bottom:0;
+      width:92px;height:132px;       /* fixed size = no weird scaling */
+      transform:translateX(0);       /* used for walking */
+      transform-origin:bottom center;
+      will-change:transform;
+    }
 
     /* MapleStory-ish name: plain text hovering */
     .nameTag{
@@ -152,20 +155,18 @@
       pointer-events:none;
     }
 
-   
-    
-/* Kiss icon positioned dynamically via JS */
-.kissIcon{
-
+    /* Kiss icon positioned dynamically via JS */
+    .kissIcon{
       position:absolute;
-      top:20px;
       left:50%;
+      top:20px;
       transform:translateX(-50%);
       font-size:32px;
       opacity:0;
       transition:opacity .25s ease;
       pointer-events:none;
       text-shadow:0 2px 10px rgba(0,0,0,.35);
+      will-change:left,top,opacity;
     }
 
     /* Petals */
@@ -195,30 +196,24 @@
       line-height:1.35;
     }
 
-    
+    /* S7: walk via translateX (duration = 2.0s) */
+    .sljyWalk{
+      animation:walkTo 2.0s ease-out forwards;
+    }
+    @keyframes walkTo{
+      to{ transform: translateX(var(--walkX, 0px)); }
+    }
 
-/* ===== S7 FIXES ===== */
-
-/* slower walk (clean, single source of truth) */
-.sljyWalk {
-  animation: walkTo 2.0s ease-out forwards;
-}
-
-/* single, correct walk animation */
-@keyframes walkTo {
-  to {
-    left: 210px;      /* ends next to dcop */
-    transform: none; /* absolutely no body tilt */
-  }
-}
-
-/* gentle head tilt ONLY */
-.sljyHeadTilt .sljyHead {
-  transform: rotate(12deg);
-  transform-origin: 60% 70%;
-}
-
-
+    /* S7: gentle head tilt ONLY (not body) */
+    .sljyHead{
+      position:absolute;left:34px;top:38px;width:28px;height:26px;background:#f1d0b5;
+      transform:rotate(0deg);
+      transform-origin:60% 70%;
+      will-change:transform;
+    }
+    .sljyHeadTilt .sljyHead{
+      transform:rotate(12deg);
+    }
   </style>
 </head>
 <body>
@@ -243,7 +238,7 @@
       <audio id="spinSfx" preload="auto" src="spin.mp3"></audio>
       <audio id="yay" preload="auto" src="yay.mp3"></audio>
 
-      <!-- NEW: kiss + love (root files) -->
+      <!-- kiss + love (root files) -->
       <audio id="kissAudio" preload="auto" src="kiss.mp3"></audio>
       <audio id="loveAudio" preload="auto" src="love.mp3"></audio>
     </section>
@@ -318,7 +313,6 @@
       <p class="note">Swipe left/right.</p>
       <div class="book" id="book"></div>
 
-      <!-- NEW: button holder (only appears on page 5/5) -->
       <div class="bonusBtnWrap">
         <button class="btn hidden" id="bonusBtn">Bonus luck here!</button>
       </div>
@@ -331,7 +325,6 @@
 
       <div class="centerStack">
         <div class="dcopWrap" id="dcopTap" aria-label="dcop">
-          <!-- dcop: keep the SAME vibe as game sprite, just bigger -->
           <svg id="dcopSvg" width="180" height="240" viewBox="0 0 160 200" style="display:block;">
             <rect x="0" y="0" width="160" height="200" fill="transparent"/>
             <!-- head -->
@@ -361,102 +354,90 @@
       </div>
     </section>
 
-   <!-- S7: Final -->
-<section id="s7" class="hidden">
-  <div class="finalWrap">
-    <div class="sky" id="sky">
-      <div class="sun"></div>
-      <div class="cloud c1"></div>
-      <div class="cloud c2"></div>
+    <!-- S7: Final -->
+    <section id="s7" class="hidden">
+      <div class="finalWrap">
+        <div class="sky" id="sky">
+          <div class="sun"></div>
+          <div class="cloud c1"></div>
+          <div class="cloud c2"></div>
 
-      <!-- kiss icon -->
-      <div class="kissIcon" id="kissIcon">😘</div>
+          <div class="kissIcon" id="kissIcon">😘</div>
 
-      <div class="charRow" id="charRow">
+          <div class="charRow" id="charRow">
+            <!-- sljy -->
+            <div class="char" id="sljyFinal">
+              <div class="nameTag" id="sljyTag">sljy</div>
 
-        <!-- sljy -->
-        <div class="char" id="sljyFinal" style="left:160px;">
-          <div class="nameTag" id="sljyTag">sljy</div>
+              <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
+                <!-- hair (straight blocks, NO border-radius) -->
+                <div style="position:absolute;left:24px;top:18px;width:44px;height:12px;background:#3b2418"></div>
+                <div style="position:absolute;left:22px;top:30px;width:48px;height:34px;background:#3b2418"></div>
+                <div style="position:absolute;left:22px;top:64px;width:12px;height:14px;background:#3b2418"></div>
+                <div style="position:absolute;left:58px;top:64px;width:12px;height:14px;background:#3b2418"></div>
 
-          <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
-            <!-- hair (straight blocks, no radius) -->
-            <div style="position:absolute;left:24px;top:18px;width:44px;height:12px;background:#3b2418"></div>
-            <div style="position:absolute;left:22px;top:30px;width:48px;height:34px;background:#3b2418"></div>
-            <div style="position:absolute;left:22px;top:64px;width:12px;height:14px;background:#3b2418"></div>
-            <div style="position:absolute;left:58px;top:64px;width:12px;height:14px;background:#3b2418"></div>
+                <!-- head (NO eyes) -->
+                <div class="sljyHead"></div>
 
-            <!-- head -->
-            <div class="sljyHead" style="position:absolute;left:34px;top:38px;width:28px;height:26px;background:#f1d0b5">
-              <!-- eyes -->
-              <div style="position:absolute;left:7px;top:10px;width:2px;height:2px;background:#0b0b10"></div>
-              <div style="position:absolute;left:18px;top:10px;width:2px;height:2px;background:#0b0b10"></div>
+                <!-- black tee -->
+                <div style="position:absolute;left:28px;top:64px;width:36px;height:22px;background:#0b0b10"></div>
+
+                <!-- black mini skirt -->
+                <div style="position:absolute;left:30px;top:86px;width:32px;height:14px;background:#111"></div>
+
+                <!-- legs -->
+                <div style="position:absolute;left:34px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:48px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
+
+                <!-- red shoes -->
+                <div style="position:absolute;left:32px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
+                <div style="position:absolute;left:46px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
+              </div>
             </div>
 
-            <!-- black tee -->
-            <div style="position:absolute;left:28px;top:64px;width:36px;height:22px;background:#0b0b10"></div>
+            <!-- dcop -->
+            <div class="char" id="dcopFinal">
+              <div class="nameTag" id="dcopTag">dcop</div>
 
-            <!-- black mini skirt -->
-            <div style="position:absolute;left:30px;top:86px;width:32px;height:14px;background:#111"></div>
+              <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
+                <!-- head (NO eyes) -->
+                <div style="position:absolute;left:34px;top:30px;width:28px;height:28px;background:#f1d0b5"></div>
 
-            <!-- legs -->
-            <div style="position:absolute;left:34px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
-            <div style="position:absolute;left:48px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
+                <!-- hair -->
+                <div style="position:absolute;left:30px;top:26px;width:36px;height:12px;background:#0b0b10"></div>
+                <div style="position:absolute;left:38px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
+                <div style="position:absolute;left:54px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
 
-            <!-- red shoes -->
-            <div style="position:absolute;left:32px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
-            <div style="position:absolute;left:46px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
-          </div>
-        </div>
+                <!-- shirt -->
+                <div style="position:absolute;left:28px;top:58px;width:36px;height:26px;background:#f6f6ff"></div>
 
-        <!-- dcop -->
-        <div class="char" id="dcopFinal" style="left:250px;">
-          <div class="nameTag" id="dcopTag">dcop</div>
+                <!-- 27 (centered & stable) -->
+                <div style="position:absolute;left:46px;top:71px;transform:translateX(-50%);color:#0b0b10;font-size:14px;font-weight:800;">27</div>
 
-          <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
-            <!-- head -->
-            <div style="position:absolute;left:34px;top:30px;width:28px;height:28px;background:#f1d0b5">
-              <!-- eyes -->
-              <div style="position:absolute;left:7px;top:11px;width:2px;height:2px;background:#0b0b10"></div>
-              <div style="position:absolute;left:18px;top:11px;width:2px;height:2px;background:#0b0b10"></div>
+                <!-- arms -->
+                <div style="position:absolute;left:22px;top:60px;width:8px;height:26px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:62px;top:60px;width:8px;height:26px;background:#f1d0b5"></div>
+
+                <!-- legs -->
+                <div style="position:absolute;left:32px;top:86px;width:12px;height:38px;background:#1d1d33"></div>
+                <div style="position:absolute;left:48px;top:86px;width:12px;height:38px;background:#1d1d33"></div>
+
+                <!-- shoes -->
+                <div style="position:absolute;left:30px;top:124px;width:16px;height:6px;background:#0b0b10"></div>
+                <div style="position:absolute;left:46px;top:124px;width:16px;height:6px;background:#0b0b10"></div>
+              </div>
             </div>
-
-            <!-- hair -->
-            <div style="position:absolute;left:30px;top:26px;width:36px;height:12px;background:#0b0b10"></div>
-            <div style="position:absolute;left:38px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
-            <div style="position:absolute;left:54px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
-
-            <!-- shirt -->
-            <div style="position:absolute;left:28px;top:58px;width:36px;height:26px;background:#f6f6ff"></div>
-
-            <!-- 27 (centered & stable) -->
-            <div style="position:absolute;left:46px;top:71px;transform:translateX(-50%);color:#0b0b10;font-size:14px;font-weight:800;">27</div>
-
-            <!-- arms -->
-            <div style="position:absolute;left:22px;top:60px;width:8px;height:26px;background:#f1d0b5"></div>
-            <div style="position:absolute;left:62px;top:60px;width:8px;height:26px;background:#f1d0b5"></div>
-
-            <!-- legs -->
-            <div style="position:absolute;left:32px;top:86px;width:12px;height:38px;background:#1d1d33"></div>
-            <div style="position:absolute;left:48px;top:86px;width:12px;height:38px;background:#1d1d33"></div>
-
-            <!-- shoes -->
-            <div style="position:absolute;left:30px;top:124px;width:16px;height:6px;background:#0b0b10"></div>
-            <div style="position:absolute;left:46px;top:124px;width:16px;height:6px;background:#0b0b10"></div>
           </div>
-        </div>
 
+          <div class="petals" id="petals"></div>
+        </div>
       </div>
 
-      <div class="petals" id="petals"></div>
-    </div>
-  </div>
-
-  <div class="finalMsg" id="finalText">
-    Happy Valentines mi baby! I’m the luckiest to have you.
-    <small>With lots of love,<br/>Sandra</small>
-  </div>
-</section>
-
+      <div class="finalMsg" id="finalText">
+        Happy Valentines mi baby! I’m the luckiest to have you.
+        <small>With lots of love,<br/>Sandra</small>
+      </div>
+    </section>
 
   </div>
 </div>
@@ -473,10 +454,16 @@
     const target = document.getElementById(id);
     if(target) target.classList.remove("hidden");
 
-    // Keep your audio behavior: when entering s4b -> happy starts
+    // When entering s4b -> happy starts
     if(id === "s4b" && musicOn){
       stopBgm();
       startHappy();
+    }
+
+    // When entering s7 -> clean/reset final state so it never "drifts"
+    if(id === "s7"){
+      resetFinalState();
+      layoutFinalChars();
     }
   };
 
@@ -531,7 +518,7 @@
 
   function startHappy(){
     stopBgm();
-    happy.volume = 0.25;   // ✅ your requirement: loop at 0.25
+    happy.volume = 0.25;   // ✅ loop at 0.25
     safePlay(happy);
   }
 
@@ -1067,7 +1054,6 @@
     `;
     book.appendChild(p);
 
-    // ✅ Bonus button ONLY on last page
     if(bonusTimer) clearTimeout(bonusTimer);
     bonusBtn.classList.add("hidden");
     bonusBtn.classList.remove("bonusPop");
@@ -1075,8 +1061,6 @@
 
     if(idx === pages.length - 1){
       bonusBtn.classList.remove("hidden");
-
-      // 1s later: shrink photo + pop button
       bonusTimer = setTimeout(()=>{
         p.classList.add("photoShrink");
         bonusBtn.classList.add("bonusPop");
@@ -1115,64 +1099,72 @@
 
   // ---------- S6 taps ----------
   const dcopTap = document.getElementById("dcopTap");
-  const dcopSvg = document.getElementById("dcopSvg");
   const bonusMsg = document.getElementById("bonusMsg");
   const congratsMsg = document.getElementById("congratsMsg");
   let tapCount = 0;
 
- function doDcopJump(){
-  dcopTap.classList.remove("dcopJump");
-  void dcopTap.offsetWidth; // reflow
-  dcopTap.classList.add("dcopJump");
-}
+  function doDcopJump(){
+    dcopTap.classList.remove("dcopJump");
+    void dcopTap.offsetWidth;
+    dcopTap.classList.add("dcopJump");
+  }
 
   // iOS audio unlock (must be inside user gesture)
   async function unlockAudio(){
-  // iOS: must be inside a user gesture.
-  // Use muted play/pause so it NEVER becomes audible and doesn't "pre-fire" later.
-  try{
-    kissAudio.muted = true;
-    loveAudio.muted = true;
+    try{
+      kissAudio.muted = true;
+      loveAudio.muted = true;
 
-    kissAudio.currentTime = 0;
-    await safePlay(kissAudio);
-    kissAudio.pause();
+      kissAudio.currentTime = 0;
+      await safePlay(kissAudio);
+      kissAudio.pause();
 
-    loveAudio.currentTime = 0;
-    await safePlay(loveAudio);
-    loveAudio.pause();
+      loveAudio.currentTime = 0;
+      await safePlay(loveAudio);
+      loveAudio.pause();
 
-    kissAudio.currentTime = 0;
-    loveAudio.currentTime = 0;
+      kissAudio.currentTime = 0;
+      loveAudio.currentTime = 0;
 
-    kissAudio.muted = false;
-    loveAudio.muted = false;
-  }catch(e){}
-}
+      kissAudio.muted = false;
+      loveAudio.muted = false;
+    }catch(e){}
+  }
 
+  // ---------- S7 helpers (clean single-source) ----------
+  const WALK_MS = 2000; // 2.0s walk
+  const LOVE_DELAY_MS = 500;
 
-
-  // ---------- S7 helpers ----------
-  function layoutFinalChars(){
-  const sky = document.getElementById("sky");
-  const sljy = document.getElementById("sljyFinal");
-  const dcop = document.getElementById("dcopFinal");
-
-  const w = sky.clientWidth;
-
-  const leftPad = Math.max(18, w * 0.08);
-  const rightPad = Math.max(18, w * 0.08);
-
-  const charW = 92;
-
-  const sljyLeft = leftPad;
-  const dcopLeft = Math.max(sljyLeft + 100, w - rightPad - charW);
-
-  sljy.style.left = sljyLeft + "px";
-  dcop.style.left = dcopLeft + "px";
-}
-  
   let petalsStarted = false;
+  let finalSeqStarted = false;
+  let kissTimer = null;
+  let loveTimer = null;
+
+  function resetFinalState(){
+    finalSeqStarted = false;
+    petalsStarted = false;
+
+    if(kissTimer) clearTimeout(kissTimer);
+    if(loveTimer) clearTimeout(loveTimer);
+    kissTimer = null; loveTimer = null;
+
+    const kiss = document.getElementById("kissIcon");
+    if(kiss){ kiss.style.opacity = 0; }
+
+    const sljy = document.getElementById("sljyFinal");
+    if(sljy){
+      sljy.classList.remove("sljyWalk");
+      sljy.classList.remove("sljyHeadTilt");
+      sljy.style.setProperty("--walkX", "0px");
+      sljy.style.transform = "translateX(0px)";
+    }
+
+    try{
+      kissAudio.pause(); kissAudio.currentTime = 0;
+      loveAudio.pause(); loveAudio.currentTime = 0;
+    }catch(e){}
+  }
+
   function startPetals(){
     if(petalsStarted) return;
     petalsStarted = true;
@@ -1187,99 +1179,119 @@
     }, 180);
   }
 
-function positionKissBetweenHeads(){
-  const kiss = document.getElementById("kissIcon");
-  const a = document.getElementById("sljyFinal").getBoundingClientRect();
-  const b = document.getElementById("dcopFinal").getBoundingClientRect();
-  const sky = document.getElementById("sky").getBoundingClientRect();
+  function layoutFinalChars(){
+    const sky = document.getElementById("sky");
+    const sljy = document.getElementById("sljyFinal");
+    const dcop = document.getElementById("dcopFinal");
+    if(!sky || !sljy || !dcop) return;
 
-  // center X between the two chars
-  const midX = ((a.left + a.right)/2 + (b.left + b.right)/2) / 2;
+    const w = sky.clientWidth;
+    const pad = Math.max(16, w * 0.08);
+    const charW = 92;
+    const gap = 12;
 
-  // place ABOVE the name tags (higher than before)
-  const topY = Math.min(a.top, b.top) - 55;
+    // Put dcop on right, always visible
+    const dcopLeft = Math.max(pad, w - pad - charW);
+    // Put sljy near dcop, but never off-screen
+    const sljyLeft = Math.max(pad, dcopLeft - gap - charW);
 
-  // convert to sky-local coords
-  const x = midX - sky.left;
-  const y = topY - sky.top;
+    sljy.style.left = sljyLeft + "px";
+    dcop.style.left = dcopLeft + "px";
 
-  kiss.style.left = x + "px";
-  kiss.style.top = y + "px";
-}
-
-
-  let finalSeqStarted = false;
-let loveTimer = null;
-
-async function startFinalSequence(){
-  if(finalSeqStarted) return;       // ✅ prevents double-trigger
-  finalSeqStarted = true;
-
-  const sljy = document.getElementById("sljyFinal");
-  const kiss = document.getElementById("kissIcon");
-
-  // stop any stray love that might have started
-  try{
-    loveAudio.pause();
-    loveAudio.currentTime = 0;
-  }catch(e){}
-
-  // ensure happy is low so kiss/love can be heard
-  if(musicOn){
-    happy.volume = 0.18;
+    // reset any previous walk transform
+    sljy.style.setProperty("--walkX", "0px");
+    sljy.style.transform = "translateX(0px)";
   }
 
-  // walk + lean in
-  sljy.classList.add("sljyWalk");
-  sljy.classList.add("sljyHeadTilt");
+  function positionKissBetweenTags(){
+    const kiss = document.getElementById("kissIcon");
+    const aTag = document.getElementById("sljyTag").getBoundingClientRect();
+    const bTag = document.getElementById("dcopTag").getBoundingClientRect();
+    const sky = document.getElementById("sky").getBoundingClientRect();
 
+    // Midpoint between tag centers
+    const midX = ((aTag.left + aTag.right)/2 + (bTag.left + bTag.right)/2) / 2;
+    // Higher than tags
+    const topY = Math.min(aTag.top, bTag.top) - 28;
 
-  // after walk: show kiss, play kiss, then love once
-  setTimeout(async ()=>{
-    document.getElementById("sljyHead")?.classList.add("sljyHeadTilt");
-    
-positionKissBetweenHeads();
-kiss.style.opacity = 1;
+    kiss.style.left = (midX - sky.left) + "px";
+    kiss.style.top  = (topY - sky.top) + "px";
+  }
 
+  function prepareWalkToDcop(){
+    const sljy = document.getElementById("sljyFinal");
+    const dcop = document.getElementById("dcopFinal");
+    if(!sljy || !dcop) return;
 
-    kissAudio.pause();
-    kissAudio.currentTime = 0;
-    kissAudio.volume = 1;
-    await safePlay(kissAudio);
+    // Walk so sljy ends right next to dcop (gap 8px)
+    const gap = 8;
+    const sLeft = parseFloat(getComputedStyle(sljy).left) || 0;
+    const dLeft = parseFloat(getComputedStyle(dcop).left) || 0;
+    const targetLeft = (dLeft - gap - 92);   // where sljy *would be* if we used left
+    const dx = Math.max(0, targetLeft - sLeft); // translateX amount (only rightwards)
+    sljy.style.setProperty("--walkX", dx + "px");
+  }
 
-    startPetals();
+  async function startFinalSequence(){
+    if(finalSeqStarted) return;
+    finalSeqStarted = true;
 
-    if(loveTimer) clearTimeout(loveTimer);
-    loveTimer = setTimeout(async ()=>{
-      loveAudio.pause();
-      loveAudio.currentTime = 0;
-      loveAudio.volume = 1;
-      await safePlay(loveAudio);
+    const sljy = document.getElementById("sljyFinal");
+    const kiss = document.getElementById("kissIcon");
 
-      // restore happy to 0.25 after love starts
-      if(musicOn){
-        happy.volume = 0.25;
-      }
-    }, 500);
+    // duck happy slightly so kiss/love pops, but keep happy looping
+    if(musicOn) happy.volume = 0.18;
 
-  }, 1650);
-}
+    // compute walk distance, then walk + head tilt
+    prepareWalkToDcop();
+    sljy.classList.add("sljyHeadTilt");
+    sljy.classList.add("sljyWalk");
 
+    // After walk completes: show kiss + play kiss, then love after 0.5s
+    kissTimer = setTimeout(async () => {
+      positionKissBetweenTags();
+      kiss.style.opacity = 1;
 
+      try{
+        kissAudio.pause();
+        kissAudio.currentTime = 0;
+        kissAudio.volume = 1;
+      }catch(e){}
+      await safePlay(kissAudio);
+
+      startPetals();
+
+      loveTimer = setTimeout(async () => {
+        try{
+          loveAudio.pause();
+          loveAudio.currentTime = 0;
+          loveAudio.volume = 1;
+        }catch(e){}
+        await safePlay(loveAudio);
+
+        // restore happy to 0.25 after love starts
+        if(musicOn) happy.volume = 0.25;
+      }, LOVE_DELAY_MS);
+
+    }, WALK_MS);
+  }
 
   window.addEventListener("resize", ()=>{
-  layoutFinalChars();
-  const kiss = document.getElementById("kissIcon");
-  if(kiss && kiss.style.opacity === "1") positionKissBetweenHeads();
-});
+    const s7Visible = !document.getElementById("s7").classList.contains("hidden");
+    if(s7Visible){
+      layoutFinalChars();
+      if(document.getElementById("kissIcon").style.opacity === "1"){
+        positionKissBetweenTags();
+      }
+    }
+  });
 
-
+  // ---------- S6 click logic ----------
   dcopTap.onclick = async () => {
     doDcopJump();
-
     tapCount++;
 
-    // unlock audio early so iOS allows later playback
+    // unlock audio early (iOS) inside a user gesture
     if(tapCount === 1) await unlockAudio();
 
     congratsMsg.classList.add("hidden");
@@ -1289,30 +1301,26 @@ kiss.style.opacity = 1;
     } else if(tapCount === 2){
       bonusMsg.textContent = "Ohhhhh mans…. Try again!";
     } else {
-  // 3rd tap -> unlock audio INSIDE this user gesture (iOS-safe)
-  await unlockAudio();
+      // 3rd tap -> show congrats for 2.4s, then go S7 and start sequence
+      await unlockAudio();
 
-  bonusMsg.textContent = "";
-  congratsMsg.classList.remove("hidden");
+      bonusMsg.textContent = "";
+      congratsMsg.classList.remove("hidden");
 
-  // Keep congrats on-screen 2.2s
-  setTimeout(()=>{
-  show("s7");
+      setTimeout(()=>{
+        show("s7");
 
-    // S7 happy loop at 0.25 volume
-    if(musicOn){
-      startHappy();
-      happy.volume = 0.25;
+        // S7 happy loop at 0.25 volume
+        if(musicOn){
+          startHappy();
+          happy.volume = 0.25;
+        }
+
+        // Start the final sequence (walk -> kiss -> love)
+        setTimeout(()=>startFinalSequence(), 60);
+
+      }, 2400); // ✅ congrats duration = 2.4s
     }
-
-    // Ensure chars fit screen before sequence
-    layoutFinalChars();
-
-    // Start walk+kissing immediately after entering S7
-    setTimeout(()=>startFinalSequence(), 50);
-  }, 2400);
-}
-
   };
 </script>
 </body>
