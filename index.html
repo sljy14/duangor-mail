@@ -133,19 +133,18 @@
       height:220px;
     }
     .char{
-      position:absolute;bottom:0;
+      position:absolute;
+      bottom:0;
       width:92px;height:132px;
       transform-origin:bottom center;
+      will-change:left;
     }
 
-    /* sljy: shorter (height only) + supports walking without breaking size */
+    /* sljy = slightly shorter (and STAYS shorter, even when walking) */
     #sljyFinal{
-      --sljyScaleY: 0.92;
-      --walkTo: 0px;
-      transform: translateX(0px) scaleY(var(--sljyScaleY));
+      transform: scaleY(0.92);
       transform-origin: bottom center;
     }
-    .char.dcop{ transform: translateX(0) scale(1); }
 
     .nameTag{
       position:absolute;
@@ -198,33 +197,28 @@
       line-height:1.35;
     }
 
-    /* S7: walk in (2.0s) — keeps sljy height scale */
-    .sljyWalk{ animation: sljyWalkIn 2.0s ease-out forwards; }
-    @keyframes sljyWalkIn{
-      to { transform: translateX(var(--walkTo)) scaleY(var(--sljyScaleY)); }
-    }
-
     /* S7: head tilt only (gentle) */
     .sljyHeadTilt .sljyHead{
       transform: rotate(10deg);
       transform-origin: 60% 70%;
     }
 
-    /* Rainbow tee text */
-    .teeText{
+    /* rainbow tee text */
+    .sljyTeeText{
       position:absolute;
-      left:50%;
-      top:70px; /* sits on the black "shirt" */
-      transform:translateX(-50%);
+      left:2px;
+      top:5px;
+      width:32px;
       font-size:6px;
+      line-height:1.05;
       font-weight:900;
-      letter-spacing:.2px;
-      white-space:nowrap;
-      background: linear-gradient(90deg,#ff4d4d,#ffb84d,#fff04d,#55ff79,#55a7ff,#b055ff);
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-      text-shadow:0 1px 0 rgba(0,0,0,.35);
+      text-align:center;
+      letter-spacing:.1px;
+      background: linear-gradient(90deg,#ff4d4d,#ffa94d,#ffe44d,#62e06a,#4d9cff,#a04dff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 6px rgba(0,0,0,.35);
       pointer-events:none;
       user-select:none;
     }
@@ -375,6 +369,7 @@
             <!-- sljy -->
             <div class="char sljy" id="sljyFinal">
               <div class="nameTag" id="sljyTag">sljy</div>
+
               <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
                 <!-- hair -->
                 <div style="position:absolute;left:24px;top:18px;width:44px;height:12px;background:#3b2418"></div>
@@ -385,24 +380,32 @@
                 <!-- head -->
                 <div class="sljyHead" style="position:absolute;left:34px;top:38px;width:28px;height:26px;background:#f1d0b5"></div>
 
-                <!-- shirt -->
-                <div style="position:absolute;left:28px;top:64px;width:36px;height:22px;background:#0b0b10"></div>
-                <div class="teeText">streets cats club</div>
+                <!-- top -->
+                <div style="position:absolute;left:28px;top:64px;width:36px;height:22px;background:#0b0b10">
+                  <div class="sljyTeeText">streets<br>cats<br>club</div>
+                </div>
 
+                <!-- skirt -->
                 <div style="position:absolute;left:30px;top:86px;width:32px;height:14px;background:#111"></div>
+
+                <!-- legs -->
                 <div style="position:absolute;left:34px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
                 <div style="position:absolute;left:48px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
+
+                <!-- shoes -->
                 <div style="position:absolute;left:32px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
                 <div style="position:absolute;left:46px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
               </div>
             </div>
 
-            <!-- dcop (NO eyes in S7) -->
+            <!-- dcop -->
             <div class="char dcop" id="dcopFinal">
               <div class="nameTag" id="dcopTag">dcop</div>
               <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
                 <div style="position:absolute;left:34px;top:30px;width:28px;height:28px;background:#f1d0b5"></div>
                 <div style="position:absolute;left:30px;top:26px;width:36px;height:12px;background:#0b0b10"></div>
+                <div style="position:absolute;left:38px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
+                <div style="position:absolute;left:54px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
 
                 <div style="position:absolute;left:28px;top:58px;width:36px;height:26px;background:#f6f6ff"></div>
                 <div style="position:absolute;left:46px;top:71px;transform:translateX(-50%);color:#0b0b10;font-size:14px;font-weight:800;">27</div>
@@ -441,7 +444,7 @@
     const target = document.getElementById(id);
     if(target) target.classList.remove("hidden");
 
-    // entering s4b -> happy starts (replaces bgm)
+    // entering s4b -> happy starts
     if(id === "s4b" && musicOn){
       stopBgm();
       startHappy();
@@ -463,58 +466,71 @@
     try { await audioEl.play(); } catch(e) {}
   }
 
-  // iOS unlock (ONLY uses bgm silently; never touches kiss/love)
-  let audioUnlocked = false;
+  // iOS unlock: ALWAYS silent (so it doesn't "misfire")
   async function unlockAudio(){
-    if(audioUnlocked) return;
-    audioUnlocked = true;
     try{
-      const prevMuted = bgm.muted;
-      const prevVol = bgm.volume;
+      kissAudio.muted = true;
+      loveAudio.muted = true;
 
-      bgm.muted = true;
-      bgm.volume = 0;
-      bgm.currentTime = 0;
-      await safePlay(bgm);
-      bgm.pause();
-      bgm.currentTime = 0;
+      kissAudio.currentTime = 0;
+      await safePlay(kissAudio);
+      kissAudio.pause();
 
-      bgm.muted = prevMuted;
-      bgm.volume = prevVol;
+      loveAudio.currentTime = 0;
+      await safePlay(loveAudio);
+      loveAudio.pause();
+
+      kissAudio.currentTime = 0;
+      loveAudio.currentTime = 0;
     }catch(e){}
   }
 
-  function startBgm(){
-    stopHappy();
-    bgm.volume = 0.25;              // ✅ always quiet throughout
-    bgm.muted = false;
-    safePlay(bgm);
+  function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+
+  let fadeRAF = null;
+  function fadeBgmTo(target, ms=320){
+    if(!musicOn) return;
+    target = clamp01(target);
+    const startV = (typeof bgm.volume === "number") ? bgm.volume : 1;
+    const startT = performance.now();
+
+    if(fadeRAF) cancelAnimationFrame(fadeRAF);
+
+    const step = (now) => {
+      const p = Math.min(1, (now - startT)/ms);
+      const eased = 1 - Math.pow(1-p, 3);
+      bgm.volume = clamp01(startV + (target - startV) * eased);
+      if(p < 1) fadeRAF = requestAnimationFrame(step);
+    };
+    fadeRAF = requestAnimationFrame(step);
   }
 
+  // ✅ Your request: bgm stays quiet (0.25) throughout
+  function startBgm(){
+    stopHappy();
+    bgm.volume = 0.25;
+    safePlay(bgm);
+  }
+  function duckBgm(){ fadeBgmTo(0.25, 180); } // harmless now
   function stopBgm(){
+    if(fadeRAF) cancelAnimationFrame(fadeRAF);
+    fadeRAF = null;
     bgm.pause();
     bgm.currentTime = 0;
   }
 
   function startHappy(){
     stopBgm();
-    happy.volume = 0.25;            // ✅ also quiet
-    happy.muted = false;
+    happy.volume = 0.25;
     safePlay(happy);
   }
-
   function stopHappy(){
     happy.pause();
     happy.currentTime = 0;
   }
-
   function stopAllMusic(){
     stopBgm();
     stopHappy();
-  }
-
-  function hardResetSfx(a){
-    try{ a.pause(); a.currentTime = 0; }catch(e){}
   }
 
   // ---------- S1: Envelope ----------
@@ -611,6 +627,7 @@
     running = false;
     statusPill.textContent = "WIN ✅";
     gameMsg.textContent = "Damn, you’re an 11/10 indeed!";
+    if(musicOn) duckBgm();
     spawnHearts();
     setTimeout(() => show("s3"), 900);
   }
@@ -795,9 +812,6 @@
     document.getElementById("coinMsg").textContent = "Coin inserted 😏";
     coinEl.classList.add("inserted");
     setTimeout(() => show("s4"), 620);
-
-    // wheel scene uses bgm (quiet)
-    if(musicOn) startBgm();
   };
 
   // ---------- Wheel ----------
@@ -959,11 +973,12 @@
     if(spinning) return;
     spinning=true;
 
+    if(musicOn) duckBgm();
+
     wheelSubtitle.textContent = "";
     wildBtn.classList.add("hidden");
 
-    spinSfx.volume = 1;
-    hardResetSfx(spinSfx);
+    spinSfx.currentTime = 0;
     await safePlay(spinSfx);
 
     const target = angleForSegmentLabel(forcedLabel);
@@ -984,11 +999,8 @@
       else{
         spinning=false;
         confetti();
-
-        yay.volume = 1;
-        hardResetSfx(yay);
+        yay.currentTime = 0;
         safePlay(yay);
-
         wheelSubtitle.textContent = "Wild card? Hmmmm";
         wildBtn.classList.remove("hidden");
       }
@@ -1086,31 +1098,47 @@
   }
 
   // ---------- S7 helpers ----------
+  let finalLayout = {
+    sljyStartLeft: 0,
+    sljyFinalLeft: 0,
+    dcopLeft: 0,
+    gap: 0
+  };
+
   function layoutFinalChars(){
     const sky = document.getElementById("sky");
     const sljy = document.getElementById("sljyFinal");
     const dcop = document.getElementById("dcopFinal");
 
     const w = sky.clientWidth;
+    const leftPad  = Math.max(18, w * 0.08);
+    const rightPad = Math.max(18, w * 0.08);
 
     const charW = 92;
-    const gap = 2;                 // ✅ VERY close
-    const walkExtra = 60;          // ✅ sljy starts left, then walks in
+    const gap = 0;           // ✅ REALLY next to each other (change to 1-2 if you want a hairline gap)
+    const walkOffset = 26;   // ✅ sljy starts a bit left, then walks in
 
-    // final (after-walk) pair is centered
-    const totalPair = (charW * 2) + gap;
-    const finalStart = Math.max(10, (w - totalPair) / 2);
+    // place dcop so both fit on screen
+    const dcopLeft = Math.min(w - rightPad - charW, leftPad + charW + gap + 80);
 
-    const dcopLeft = finalStart + charW + gap;
-    let sljyStart = finalStart - walkExtra;
-    sljyStart = Math.max(10, sljyStart);
+    // final sljy position: right beside dcop (on the left side)
+    const sljyFinalLeft = Math.max(leftPad, dcopLeft - charW - gap);
 
-    sljy.style.left = sljyStart + "px";
+    // start sljy slightly left (so walk is visible)
+    const sljyStartLeft = Math.max(leftPad, sljyFinalLeft - walkOffset);
+
+    // apply positions
+    sljy.style.transition = "none";
+    dcop.style.transition = "none";
+
+    sljy.style.left = sljyStartLeft + "px";
     dcop.style.left = dcopLeft + "px";
 
-    // how far sljy needs to walk to become "next to" dcop
-    const walkTo = (finalStart - sljyStart);
-    sljy.style.setProperty("--walkTo", walkTo + "px");
+    finalLayout = { sljyStartLeft, sljyFinalLeft, dcopLeft, gap };
+
+    // ensure kiss recalcs if visible
+    const kiss = document.getElementById("kissIcon");
+    if(kiss && kiss.style.opacity === "1") positionKissBetweenHeads();
   }
 
   let petalsStarted = false;
@@ -1135,7 +1163,7 @@
     const sky = document.getElementById("sky").getBoundingClientRect();
 
     const midX = ((a.left + a.right)/2 + (b.left + b.right)/2) / 2;
-    const topY = Math.min(a.top, b.top) - 55;  // above name tags
+    const topY = Math.min(a.top, b.top) - 55;
 
     kiss.style.left = (midX - sky.left) + "px";
     kiss.style.top  = (topY - sky.top) + "px";
@@ -1151,31 +1179,39 @@
     const sljy = document.getElementById("sljyFinal");
     const kiss = document.getElementById("kissIcon");
 
-    // clean, predictable audio
-    hardResetSfx(kissAudio);
-    hardResetSfx(loveAudio);
-    kissAudio.muted = false;
-    loveAudio.muted = false;
-    kissAudio.volume = 1;
-    loveAudio.volume = 1;
+    // hard reset audio so it NEVER "misfires"
+    try{
+      kissAudio.pause(); kissAudio.currentTime = 0;
+      loveAudio.pause(); loveAudio.currentTime = 0;
+    }catch(e){}
 
-    // walk + head tilt
-    sljy.classList.add("sljyWalk");
+    // head tilt
     sljy.classList.add("sljyHeadTilt");
 
-    // after walk ends (~2.0s): show kiss + play kiss, then love
+    // ✅ walk in by moving LEFT property (keeps scaleY intact)
+    sljy.style.transition = "left 2.0s ease-out";
+    requestAnimationFrame(()=>{ sljy.style.left = finalLayout.sljyFinalLeft + "px"; });
+
+    // after walk ends (~2.0s) show kiss + play kiss, then love
     setTimeout(async ()=>{
       positionKissBetweenHeads();
       kiss.style.opacity = 1;
 
-      hardResetSfx(kissAudio);
+      // play kiss (audible now)
+      kissAudio.pause();
+      kissAudio.currentTime = 0;
+      kissAudio.muted = false;
+      kissAudio.volume = 1;
       await safePlay(kissAudio);
 
       startPetals();
 
       if(loveTimer) clearTimeout(loveTimer);
       loveTimer = setTimeout(async ()=>{
-        hardResetSfx(loveAudio);
+        loveAudio.pause();
+        loveAudio.currentTime = 0;
+        loveAudio.muted = false;
+        loveAudio.volume = 1;
         await safePlay(loveAudio);
       }, 500);
 
@@ -1184,8 +1220,6 @@
 
   window.addEventListener("resize", ()=>{
     layoutFinalChars();
-    const kiss = document.getElementById("kissIcon");
-    if(kiss && kiss.style.opacity === "1") positionKissBetweenHeads();
   });
 
   dcopTap.onclick = async () => {
@@ -1206,14 +1240,13 @@
 
       setTimeout(()=>{
         show("s7");
-
-        // S7 uses happy (quiet) as bg loop
-        if(musicOn) startHappy();
+        if(musicOn){
+          startHappy();
+          happy.volume = 0.25;
+        }
 
         layoutFinalChars();
-
-        // ensure sljy is at start position before anim
-        setTimeout(()=>startFinalSequence(), 50);
+        setTimeout(()=>startFinalSequence(), 60);
       }, 2400);
     }
   };
