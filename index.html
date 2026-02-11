@@ -153,10 +153,6 @@
     }
 
    
-    /* sljy head tilt (ONLY head, not body) */
-.sljyHeadTilt{
-  transform: rotate(-12deg) !important;
-}
     
 /* Kiss icon positioned dynamically via JS */
 .kissIcon{
@@ -199,13 +195,27 @@
       line-height:1.35;
     }
 
-    /* Walk sljy 5-ish steps */
-    .sljyWalk{animation:walkTo 1.6s ease-out forwards}
-@keyframes walkTo{
-  to{
-    left:210px;                 /* ✅ ends next to dcop */
-    transform:scale(1);         /* ✅ NO body tilt */
+    
+
+/* ===== S7 FIXES ===== */
+
+/* slower walk (clean, single source of truth) */
+.sljyWalk {
+  animation: walkTo 2.0s ease-out forwards;
+}
+
+/* single, correct walk animation */
+@keyframes walkTo {
+  to {
+    left: 210px;      /* ends next to dcop */
+    transform: none; /* absolutely no body tilt */
   }
+}
+
+/* gentle head tilt ONLY */
+.sljyHeadTilt .sljyHead {
+  transform: rotate(12deg);
+  transform-origin: 60% 70%;
 }
 
 
@@ -351,104 +361,102 @@
       </div>
     </section>
 
-    <!-- S7: Final -->
-    <section id="s7" class="hidden">
-      <div class="finalWrap">
-        <div class="sky" id="sky">
-          <div class="sun"></div>
-          <div class="cloud c1"></div>
-          <div class="cloud c2"></div>
+   <!-- S7: Final -->
+<section id="s7" class="hidden">
+  <div class="finalWrap">
+    <div class="sky" id="sky">
+      <div class="sun"></div>
+      <div class="cloud c1"></div>
+      <div class="cloud c2"></div>
 
-          <div class="kissIcon" id="kissIcon">😘</div>
+      <!-- kiss icon -->
+      <div class="kissIcon" id="kissIcon">😘</div>
 
-          <div class="charRow" id="charRow">
-            <!-- sljy -->
-            <div class="char" id="sljyFinal" style="left:170px;">
-              <div class="nameTag" id="sljyTag">sljy</div>
-              <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
-  <!-- sljy head wrapper -->
-  <div id="sljyHead" style="position:absolute;left:0;top:0;width:92px;height:74px;transform-origin:50% 70%;">
+      <div class="charRow" id="charRow">
 
-               
-                
-<!-- hair (straight block, no curves) -->
-<div style="position:absolute;left:24px;top:14px;width:44px;height:14px;background:#3b2418"></div>
-<div style="position:absolute;left:22px;top:28px;width:48px;height:26px;background:#3b2418"></div>
-<div style="position:absolute;left:22px;top:54px;width:10px;height:18px;background:#3b2418"></div>
-<div style="position:absolute;left:60px;top:54px;width:10px;height:18px;background:#3b2418"></div>
+        <!-- sljy -->
+        <div class="char" id="sljyFinal" style="left:160px;">
+          <div class="nameTag" id="sljyTag">sljy</div>
 
+          <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
+            <!-- hair (straight blocks, no radius) -->
+            <div style="position:absolute;left:24px;top:18px;width:44px;height:12px;background:#3b2418"></div>
+            <div style="position:absolute;left:22px;top:30px;width:48px;height:34px;background:#3b2418"></div>
+            <div style="position:absolute;left:22px;top:64px;width:12px;height:14px;background:#3b2418"></div>
+            <div style="position:absolute;left:58px;top:64px;width:12px;height:14px;background:#3b2418"></div>
 
-
-
-
-                <!-- head -->
-                <div style="position:absolute;left:34px;top:34px;width:28px;height:26px;background:#f1d0b5"></div>
-
-                <!-- black tee -->
-                <div style="position:absolute;left:28px;top:58px;width:36px;height:22px;background:#0b0b10"></div>
-
-                <!-- black mini skirt -->
-                <div style="position:absolute;left:30px;top:80px;width:32px;height:14px;background:#111"></div>
-
-                <!-- legs -->
-                <div style="position:absolute;left:34px;top:94px;width:10px;height:28px;background:#f1d0b5"></div>
-                <div style="position:absolute;left:48px;top:94px;width:10px;height:28px;background:#f1d0b5"></div>
-
-                <!-- red shoes -->
-                <div style="position:absolute;left:32px;top:122px;width:14px;height:6px;background:#d31f2a"></div>
-                <div style="position:absolute;left:46px;top:122px;width:14px;height:6px;background:#d31f2a"></div>
-              </div>
+            <!-- head -->
+            <div class="sljyHead" style="position:absolute;left:34px;top:38px;width:28px;height:26px;background:#f1d0b5">
+              <!-- eyes -->
+              <div style="position:absolute;left:7px;top:10px;width:2px;height:2px;background:#0b0b10"></div>
+              <div style="position:absolute;left:18px;top:10px;width:2px;height:2px;background:#0b0b10"></div>
             </div>
 
-    
-            <!-- dcop -->
-<div class="char" id="dcopFinal" style="left:245px;">
-  <div class="nameTag" id="dcopTag">dcop</div>
+            <!-- black tee -->
+            <div style="position:absolute;left:28px;top:64px;width:36px;height:22px;background:#0b0b10"></div>
 
-  <!-- Use SAME sprite logic as S6, just scaled for S7 -->
-  <svg width="92" height="132" viewBox="0 0 160 200" style="position:absolute;left:0;top:0;display:block;">
-    <rect x="0" y="0" width="160" height="200" fill="transparent"/>
+            <!-- black mini skirt -->
+            <div style="position:absolute;left:30px;top:86px;width:32px;height:14px;background:#111"></div>
 
-    <!-- head -->
-    <rect x="62" y="38" width="36" height="36" fill="#f1d0b5"/>
+            <!-- legs -->
+            <div style="position:absolute;left:34px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
+            <div style="position:absolute;left:48px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
 
-    <!-- hair -->
-    <rect x="58" y="34" width="44" height="14" fill="#0b0b10"/>
-    <rect x="66" y="46" width="10" height="8" fill="#0b0b10"/>
-    <rect x="84" y="46" width="10" height="8" fill="#0b0b10"/>
-
-    <!-- body -->
-    <rect x="54" y="74" width="52" height="36" fill="#f6f6ff"/>
-
-    <!-- "27" perfectly centered -->
-    <text x="80" y="92" text-anchor="middle" dominant-baseline="middle"
-          fill="#0b0b10" font-size="18" font-weight="800">27</text>
-
-    <!-- arms -->
-    <rect x="46" y="78" width="8" height="30" fill="#f1d0b5"/>
-    <rect x="106" y="78" width="8" height="30" fill="#f1d0b5"/>
-
-    <!-- legs -->
-    <rect x="58" y="110" width="18" height="52" fill="#1d1d33"/>
-    <rect x="84" y="110" width="18" height="52" fill="#1d1d33"/>
-
-    <!-- shoes -->
-    <rect x="56" y="162" width="24" height="7" fill="#0b0b10"/>
-    <rect x="82" y="162" width="24" height="7" fill="#0b0b10"/>
-  </svg>
-</div>
-
+            <!-- red shoes -->
+            <div style="position:absolute;left:32px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
+            <div style="position:absolute;left:46px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
           </div>
-
-          <div class="petals" id="petals"></div>
         </div>
+
+        <!-- dcop -->
+        <div class="char" id="dcopFinal" style="left:250px;">
+          <div class="nameTag" id="dcopTag">dcop</div>
+
+          <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
+            <!-- head -->
+            <div style="position:absolute;left:34px;top:30px;width:28px;height:28px;background:#f1d0b5">
+              <!-- eyes -->
+              <div style="position:absolute;left:7px;top:11px;width:2px;height:2px;background:#0b0b10"></div>
+              <div style="position:absolute;left:18px;top:11px;width:2px;height:2px;background:#0b0b10"></div>
+            </div>
+
+            <!-- hair -->
+            <div style="position:absolute;left:30px;top:26px;width:36px;height:12px;background:#0b0b10"></div>
+            <div style="position:absolute;left:38px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
+            <div style="position:absolute;left:54px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
+
+            <!-- shirt -->
+            <div style="position:absolute;left:28px;top:58px;width:36px;height:26px;background:#f6f6ff"></div>
+
+            <!-- 27 (centered & stable) -->
+            <div style="position:absolute;left:46px;top:71px;transform:translateX(-50%);color:#0b0b10;font-size:14px;font-weight:800;">27</div>
+
+            <!-- arms -->
+            <div style="position:absolute;left:22px;top:60px;width:8px;height:26px;background:#f1d0b5"></div>
+            <div style="position:absolute;left:62px;top:60px;width:8px;height:26px;background:#f1d0b5"></div>
+
+            <!-- legs -->
+            <div style="position:absolute;left:32px;top:86px;width:12px;height:38px;background:#1d1d33"></div>
+            <div style="position:absolute;left:48px;top:86px;width:12px;height:38px;background:#1d1d33"></div>
+
+            <!-- shoes -->
+            <div style="position:absolute;left:30px;top:124px;width:16px;height:6px;background:#0b0b10"></div>
+            <div style="position:absolute;left:46px;top:124px;width:16px;height:6px;background:#0b0b10"></div>
+          </div>
+        </div>
+
       </div>
 
-      <div class="finalMsg" id="finalText">
-        Happy Valentines mi baby! I’m the luckiest to have you.
-        <small>With lots of love,<br/>Sandra</small>
-      </div>
-    </section>
+      <div class="petals" id="petals"></div>
+    </div>
+  </div>
+
+  <div class="finalMsg" id="finalText">
+    Happy Valentines mi baby! I’m the luckiest to have you.
+    <small>With lots of love,<br/>Sandra</small>
+  </div>
+</section>
+
 
   </div>
 </div>
@@ -1223,6 +1231,8 @@ async function startFinalSequence(){
 
   // walk + lean in
   sljy.classList.add("sljyWalk");
+  sljy.classList.add("sljyHeadTilt");
+
 
   // after walk: show kiss, play kiss, then love once
   setTimeout(async ()=>{
@@ -1287,7 +1297,7 @@ kiss.style.opacity = 1;
 
   // Keep congrats on-screen 2.2s
   setTimeout(()=>{
-    show("s7");
+  show("s7");
 
     // S7 happy loop at 0.25 volume
     if(musicOn){
@@ -1300,7 +1310,7 @@ kiss.style.opacity = 1;
 
     // Start walk+kissing immediately after entering S7
     setTimeout(()=>startFinalSequence(), 50);
-  }, 2200);
+  }, 2400);
 }
 
   };
