@@ -1,120 +1,1209 @@
-// ---------- S7 helpers ----------
-function layoutFinalChars(){
-  const sky = document.getElementById("sky");
-  const sljy = document.getElementById("sljyFinal");
-  const dcop = document.getElementById("dcopFinal");
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>You’ve got mail 💌</title>
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#0b0b10;color:#fff}
+    .wrap{max-width:760px;margin:0 auto;padding:18px;text-align:center}
+    .card{background:#141423;border:1px solid #2a2a44;border-radius:16px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+    .hidden{display:none}
+    .big{font-size:28px}
+    .note{opacity:.85;font-size:14px;line-height:1.35}
+    .btn{padding:12px 16px;border-radius:12px;border:1px solid #3a3a66;background:#1d1d33;color:#fff;cursor:pointer}
+    .btn:active{transform:scale(.98)}
+    .divider{height:1px;background:#2a2a44;margin:16px 0}
 
-  const w = sky.clientWidth;
+    /* Landing envelope */
+    .envelope{font-size:140px;cursor:pointer;user-select:none;display:inline-block;line-height:1}
+    .envelope:active{transform:scale(.98)}
+    .envelopeWrap{margin-top:14px}
+    .mailText{margin-top:10px;font-weight:700;opacity:.92}
 
-  const leftPad = Math.max(18, w * 0.10);
-  const rightPad = Math.max(18, w * 0.10);
+    /* Confetti */
+    .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+    .confetti i{position:absolute;top:-10px;width:8px;height:10px;opacity:.9;animation:fall 1.8s linear forwards}
+    @keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:0.1}}
 
-  const charW = 92;
-  const gap = 2; // ✅ closer together
+    /* Game */
+    canvas{max-width:520px;width:100%;background:#0f0f1a;border:1px solid #2a2a44;border-radius:14px;touch-action:manipulation}
+    .hud{display:flex;justify-content:space-between;gap:10px;max-width:520px;margin:10px auto 0 auto;flex-wrap:wrap}
+    .pill{font-size:12px;opacity:.9;border:1px solid #2a2a44;background:rgba(0,0,0,.25);padding:7px 10px;border-radius:999px}
 
-  // dcop stays near the right, sljy is placed just to his left
-  const dcopLeft = Math.max(leftPad + charW + gap, w - rightPad - charW);
-  const sljyLeft = dcopLeft - charW - gap;
+    /* Coin insert */
+    .coinSlot{display:inline-flex;align-items:center;gap:12px;margin-top:10px;justify-content:center}
+    .coin{font-size:44px;cursor:pointer;user-select:none;display:inline-block}
+    .coin.inserted{animation:coinIn .55s ease forwards}
+    @keyframes coinIn{
+      0%{transform:translateX(0) translateY(0) scale(1)}
+      70%{transform:translateX(46px) translateY(-4px) scale(.92)}
+      100%{transform:translateX(62px) translateY(-2px) scale(.55);opacity:.15}
+    }
+    .slot{width:90px;height:22px;border:1px solid #3a3a66;border-radius:12px;position:relative;background:#0b0b10}
+    .slot:before{content:"";position:absolute;left:12px;right:12px;top:9px;height:4px;background:#2a2a44;border-radius:10px}
 
-  sljy.style.left = sljyLeft + "px";
-  dcop.style.left = dcopLeft + "px";
+    /* Wheel */
+    .wheelBox{position:relative;width:300px;height:300px;margin:0 auto}
+    #wheel{width:300px;height:300px;border-radius:50%;border:2px solid #3a3a66;transform:rotate(0deg)}
+    .pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:28px}
+    .subtitle{opacity:.9;margin-top:6px}
 
-  // give sljyWalk an exact target (so walk ends correctly even on resize)
-  sljy.style.setProperty("--sljyEnd", sljyLeft + "px");
-}
+    /* “After spin” page */
+    .bigWinMsg{font-size:34px;line-height:1.15;margin:8px 0 10px 0}
 
-let petalsStarted = false;
-function startPetals(){
-  if(petalsStarted) return;
-  petalsStarted = true;
-  const petals = document.getElementById("petals");
-  setInterval(()=>{
-    const s=document.createElement("span");
-    s.style.left = (Math.random()*100) + "%";
-    s.style.animationDuration = (5.5 + Math.random()*2.5) + "s";
-    s.style.opacity = (0.65 + Math.random()*0.35);
-    petals.appendChild(s);
-    setTimeout(()=>s.remove(), 9000);
-  }, 180);
-}
+    /* Swipe Book */
+    .book{position:relative;max-width:420px;margin:0 auto;height:560px;border-radius:16px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
+    .page{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .25s ease}
+    .page img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+    .pageNumber{position:absolute;bottom:10px;right:12px;font-size:12px;opacity:.7;background:rgba(0,0,0,.35);padding:6px 8px;border-radius:10px}
+    .caption{
+      position:absolute;top:10px;left:10px;right:10px;
+      font-size:13px;opacity:.92;
+      background:rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.14);
+      padding:10px 12px;border-radius:14px;
+      text-align:left;
+      backdrop-filter: blur(6px);
+      font-weight:700;
+    }
 
-function positionKissBetweenHeads(){
-  const kiss = document.getElementById("kissIcon");
-  const a = document.getElementById("sljyFinal").getBoundingClientRect();
-  const b = document.getElementById("dcopFinal").getBoundingClientRect();
-  const sky = document.getElementById("sky").getBoundingClientRect();
+    /* S5: Bonus reveal effect */
+    .bonusBtnWrap{display:flex;justify-content:center;margin-top:14px;min-height:54px}
+    #bonusBtn{transform:scale(1);transition:transform .28s ease, opacity .28s ease}
+    #bonusBtn.hidden{display:none}
+    .bonusPop{transform:scale(1.18)}
+    .photoShrink img{transform:scale(.93)}
 
-  const midX = ((a.left + a.right)/2 + (b.left + b.right)/2) / 2;
+    /* S6 layout */
+    .centerStack{display:flex;flex-direction:column;align-items:center;gap:10px}
+    .tapMsg{
+      min-height:26px;
+      opacity:.92;
+      font-size:16px;
+      margin-top:6px;
+      text-align:center;
+    }
+    .dcopWrap{margin-top:8px}
+    .dcopJump{animation:dcopJump .18s ease-out}
+    @keyframes dcopJump{
+      0%{transform:translateY(0)}
+      60%{transform:translateY(-18px)}
+      100%{transform:translateY(0)}
+    }
+    .congrats{
+      font-size:20px;
+      font-weight:800;
+      line-height:1.25;
+      margin-top:8px;
+      opacity:.95;
+      text-align:center;
+    }
 
-  // higher than name tags
-  const topY = Math.min(a.top, b.top) - 68;
+    /* =========================
+       S7 Final scene
+       ========================= */
+    .finalWrap{
+      max-width:520px;
+      margin:0 auto;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid #2a2a44;
+      background:#0f0f1a;
+    }
+    .sky{
+      position:relative;
+      height:420px;
+      background:linear-gradient(#8fd3ff,#e9fbff 62%,#7fe07f 62%,#57c457);
+      overflow:hidden;
+    }
+    .sun{position:absolute;top:20px;right:20px;width:70px;height:70px;border-radius:50%;background:#ffd55b;box-shadow:0 0 22px rgba(255,213,91,.55)}
+    .cloud{position:absolute;top:64px;width:140px;height:42px;background:rgba(255,255,255,.92);border-radius:28px;opacity:.9}
+    .cloud:before,.cloud:after{content:"";position:absolute;background:rgba(255,255,255,.92);border-radius:50%}
+    .cloud:before{width:50px;height:50px;left:20px;top:-22px}
+    .cloud:after{width:64px;height:64px;left:58px;top:-34px}
+    .cloud.c1{left:-180px;animation:cloudMove 26s linear infinite}
+    .cloud.c2{top:118px;left:-220px;animation:cloudMove 32s linear infinite;opacity:.78}
+    @keyframes cloudMove{to{transform:translateX(980px)}}
 
-  const x = midX - sky.left;
-  const y = topY - sky.top;
+    .charRow{
+      position:absolute;
+      left:0;right:0;
+      bottom:92px;
+      height:220px;
+    }
+    .char{
+      position:absolute;bottom:0;
+      width:92px;height:132px;
+      transform-origin:bottom center;
+    }
+    /* sljy slightly shorter (realistic) */
+    .char.sljy{
+      --sljyScale: 0.92;
+      transform: translateX(0) scale(var(--sljyScale));
+    }
+    .char.dcop{
+      transform: translateX(0) scale(1);
+    }
 
-  kiss.style.left = x + "px";
-  kiss.style.top = y + "px";
-}
+    .nameTag{
+      position:absolute;
+      top:-22px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:12px;
+      font-weight:700;
+      color:rgba(255,255,255,.92);
+      text-shadow:0 2px 10px rgba(0,0,0,.55);
+      white-space:nowrap;
+      pointer-events:none;
+    }
 
-let finalSeqStarted = false;
-let loveTimer = null;
+    .kissIcon{
+      position:absolute;
+      top:20px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:32px;
+      opacity:0;
+      transition:opacity .25s ease;
+      pointer-events:none;
+      text-shadow:0 2px 10px rgba(0,0,0,.35);
+    }
 
-async function startFinalSequence(){
-  if(finalSeqStarted) return;
-  finalSeqStarted = true;
+    .petals{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .petals span{
+      position:absolute;top:-20px;width:12px;height:12px;
+      background:#ffb7c5;border-radius:60% 40% 60% 40%;
+      opacity:.92;
+      animation:petalFall 6.5s linear infinite;
+    }
+    @keyframes petalFall{
+      to{transform:translateY(520px) rotate(360deg);opacity:.2}
+    }
 
-  const sljy = document.getElementById("sljyFinal");
-  const kiss = document.getElementById("kissIcon");
+    .finalMsg{
+      margin-top:12px;
+      font-size:20px;
+      line-height:1.35;
+      font-weight:800;
+    }
+    .finalMsg small{
+      display:block;
+      font-weight:600;
+      opacity:.95;
+      margin-top:10px;
+      font-size:18px;
+      line-height:1.35;
+    }
 
-  // hard stop any stray audio
-  try{
-    kissAudio.pause(); kissAudio.currentTime = 0;
-    loveAudio.pause(); loveAudio.currentTime = 0;
-  }catch(e){}
+    /* S7: walk in (slower by +0.4s = 2.0s) */
+    .sljyWalk{ animation: sljyWalkIn 2.0s ease-out forwards; }
+    @keyframes sljyWalkIn{
+      to { transform: translateX(18px) scale(var(--sljyScale)); } /* small walk only */
+    }
 
-  // keep happy low so kiss/love can be heard
-  if(musicOn) happy.volume = 0.18;
+    /* S7: head tilt only (gentle) */
+    .sljyHeadTilt .sljyHead{
+      transform: rotate(10deg);
+      transform-origin: 60% 70%;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
 
-  // walk + gentle head tilt
-  sljy.classList.add("sljyWalk");
-  sljy.classList.add("sljyHeadTilt");
+    <!-- S1 -->
+    <section id="s1">
+      <div class="big">Dear Mr Wong Duan Chiang,</div>
+      <p class="note">Have you turned your audio on? Click on the envelope.</p>
+      <div class="divider"></div>
 
-  // when walk is done (~2.0s), show kiss and play kiss
-  setTimeout(async ()=>{
-    positionKissBetweenHeads();
-    kiss.style.opacity = 1;
+      <div class="envelopeWrap">
+        <div class="envelope" id="env" title="Click me">💌</div>
+        <div class="mailText hidden" id="mailText">You’ve got mail!</div>
+      </div>
 
-    // play kiss
-    kissAudio.pause();
-    kissAudio.currentTime = 0;
-    kissAudio.volume = 1;
-    await safePlay(kissAudio);
+      <!-- Audio -->
+      <audio id="voice" preload="auto" src="hmmmm.mp3"></audio>
+      <audio id="bgm" preload="auto" src="bgm.mp3" loop></audio>
+      <audio id="happy" preload="auto" src="happy.mp3" loop></audio>
+      <audio id="spinSfx" preload="auto" src="spin.mp3"></audio>
+      <audio id="yay" preload="auto" src="yay.mp3"></audio>
 
-    startPetals();
+      <!-- kiss + love -->
+      <audio id="kissAudio" preload="auto" src="kiss.mp3"></audio>
+      <audio id="loveAudio" preload="auto" src="love.mp3"></audio>
+    </section>
 
-    // ✅ LOVE PLAYS ONLY AFTER KISS ENDS (no more “misplaced halfway”)
-    // Use onended + a fallback timer.
-    if(loveTimer) clearTimeout(loveTimer);
-    loveTimer = null;
+    <!-- S2 -->
+    <section id="s2" class="hidden">
+      <div class="big">How OP are you? 🎮</div>
+      <p class="note">Reach 11 to win the game.</p>
 
-    const playLoveOnce = async () => {
-      try{
-        kissAudio.onended = null;
-      }catch(e){}
-      loveAudio.pause();
+      <div class="hud">
+        <div class="pill">Player: <b>dcop</b></div>
+        <div class="pill">Score: <b id="score">0</b>/11</div>
+        <div class="pill" id="statusPill">Goal: 11</div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <canvas id="game" width="520" height="360"></canvas>
+      </div>
+
+      <div style="margin-top:12px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+        <button class="btn" id="start">Start</button>
+        <button class="btn" id="muteMusic">Music: On</button>
+      </div>
+
+      <p class="note" id="gameMsg" style="margin-top:10px;">Tap the screen to jump.</p>
+    </section>
+
+    <!-- S3 -->
+    <section id="s3" class="hidden">
+      <div class="big">YOU WON 🏆</div>
+      <div class="bigWinMsg">Damn, you’re an 11/10 indeed!</div>
+      <div class="divider"></div>
+      <div class="big">🪙 +1 Coin</div>
+      <p class="note">Insert your coin to spin.</p>
+
+      <div class="coinSlot">
+        <span class="coin" id="coin" title="Insert coin">🪙</span>
+        <span class="slot" id="slot" title="coin slot"></span>
+      </div>
+
+      <p class="note" id="coinMsg" style="margin-top:8px;"></p>
+    </section>
+
+    <!-- S4 -->
+    <section id="s4" class="hidden">
+      <div class="big">Spin to win 🎡</div>
+      <p class="subtitle" id="wheelSubtitle"></p>
+
+      <div class="wheelBox">
+        <div class="pointer">🔻</div>
+        <canvas id="wheel" width="300" height="300"></canvas>
+      </div>
+
+      <div style="margin-top:12px;">
+        <button class="btn" id="spin">SPIN</button>
+      </div>
+
+      <div style="margin-top:12px;">
+        <button class="btn hidden" id="wildBtn">Wild card? Hmmmm</button>
+      </div>
+    </section>
+
+    <!-- S4B -->
+    <section id="s4b" class="hidden">
+      <div class="bigWinMsg">Ha! Thought you were lucky? I’m the luckier one.</div>
+      <button class="btn" id="toBook" style="margin-top:10px;">Click to check your luck stats</button>
+    </section>
+
+    <!-- S5 -->
+    <section id="s5" class="hidden">
+      <div class="big">📊 Luck Stats Report</div>
+      <p class="note">Swipe left/right.</p>
+      <div class="book" id="book"></div>
+
+      <div class="bonusBtnWrap">
+        <button class="btn hidden" id="bonusBtn">Bonus luck here!</button>
+      </div>
+    </section>
+
+    <!-- S6 -->
+    <section id="s6" class="hidden">
+      <div class="big">Will you get some bonus luck? 🍀</div>
+      <p class="note">click on dcop to try</p>
+
+      <div class="centerStack">
+        <div class="dcopWrap" id="dcopTap" aria-label="dcop">
+          <svg id="dcopSvg" width="180" height="240" viewBox="0 0 160 200" style="display:block;">
+            <rect x="0" y="0" width="160" height="200" fill="transparent"/>
+            <rect x="62" y="38" width="36" height="36" fill="#f1d0b5"/>
+            <rect x="58" y="34" width="44" height="14" fill="#0b0b10"/>
+            <rect x="66" y="46" width="10" height="8" fill="#0b0b10"/>
+            <rect x="84" y="46" width="10" height="8" fill="#0b0b10"/>
+            <rect x="54" y="74" width="52" height="36" fill="#f6f6ff"/>
+            <text x="80" y="100" text-anchor="middle" dominant-baseline="middle" fill="#0b0b10" font-size="16" font-weight="800">27</text>
+            <rect x="46" y="78" width="8" height="30" fill="#f1d0b5"/>
+            <rect x="106" y="78" width="8" height="30" fill="#f1d0b5"/>
+            <rect x="58" y="110" width="18" height="52" fill="#1d1d33"/>
+            <rect x="84" y="110" width="18" height="52" fill="#1d1d33"/>
+            <rect x="56" y="162" width="24" height="7" fill="#0b0b10"/>
+            <rect x="82" y="162" width="24" height="7" fill="#0b0b10"/>
+          </svg>
+        </div>
+
+        <div class="tapMsg" id="bonusMsg"></div>
+        <div class="congrats hidden" id="congratsMsg">Congrats! You have increased your girlfriend’s luck stat to mosterest!</div>
+      </div>
+    </section>
+
+    <!-- S7 -->
+    <section id="s7" class="hidden">
+      <div class="finalWrap">
+        <div class="sky" id="sky">
+          <div class="sun"></div>
+          <div class="cloud c1"></div>
+          <div class="cloud c2"></div>
+
+          <div class="kissIcon" id="kissIcon">😘</div>
+
+          <div class="charRow" id="charRow">
+            <!-- sljy -->
+            <div class="char sljy" id="sljyFinal">
+              <div class="nameTag" id="sljyTag">sljy</div>
+              <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
+                <!-- hair (straight blocks) -->
+                <div style="position:absolute;left:24px;top:18px;width:44px;height:12px;background:#3b2418"></div>
+                <div style="position:absolute;left:22px;top:30px;width:48px;height:34px;background:#3b2418"></div>
+                <div style="position:absolute;left:22px;top:64px;width:12px;height:14px;background:#3b2418"></div>
+                <div style="position:absolute;left:58px;top:64px;width:12px;height:14px;background:#3b2418"></div>
+
+                <!-- head -->
+                <div class="sljyHead" style="position:absolute;left:34px;top:38px;width:28px;height:26px;background:#f1d0b5"></div>
+
+                <div style="position:absolute;left:28px;top:64px;width:36px;height:22px;background:#0b0b10"></div>
+                <div style="position:absolute;left:30px;top:86px;width:32px;height:14px;background:#111"></div>
+                <div style="position:absolute;left:34px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:48px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:32px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
+                <div style="position:absolute;left:46px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
+              </div>
+            </div>
+
+            <!-- dcop -->
+            <div class="char dcop" id="dcopFinal">
+              <div class="nameTag" id="dcopTag">dcop</div>
+              <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
+                <div style="position:absolute;left:34px;top:30px;width:28px;height:28px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:30px;top:26px;width:36px;height:12px;background:#0b0b10"></div>
+                <div style="position:absolute;left:38px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
+                <div style="position:absolute;left:54px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
+
+                <div style="position:absolute;left:28px;top:58px;width:36px;height:26px;background:#f6f6ff"></div>
+                <div style="position:absolute;left:46px;top:71px;transform:translateX(-50%);color:#0b0b10;font-size:14px;font-weight:800;">27</div>
+                <div style="position:absolute;left:22px;top:60px;width:8px;height:26px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:62px;top:60px;width:8px;height:26px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:32px;top:86px;width:12px;height:38px;background:#1d1d33"></div>
+                <div style="position:absolute;left:48px;top:86px;width:12px;height:38px;background:#1d1d33"></div>
+                <div style="position:absolute;left:30px;top:124px;width:16px;height:6px;background:#0b0b10"></div>
+                <div style="position:absolute;left:46px;top:124px;width:16px;height:6px;background:#0b0b10"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="petals" id="petals"></div>
+        </div>
+      </div>
+
+      <div class="finalMsg" id="finalText">
+        Happy Valentines mi baby! I’m the luckiest to have you.
+        <small>With lots of love,<br/>Sandra</small>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="confetti hidden" id="confetti"></div>
+
+<script>
+  // ---------- Screen router ----------
+  const show = (id) => {
+    ["s1","s2","s3","s4","s4b","s5","s6","s7"].forEach(x => {
+      const el = document.getElementById(x);
+      if(el) el.classList.add("hidden");
+    });
+    const target = document.getElementById(id);
+    if(target) target.classList.remove("hidden");
+
+    // entering s4b -> happy starts
+    if(id === "s4b" && musicOn){
+      stopBgm();
+      startHappy();
+    }
+  };
+
+  // ---------- Audio ----------
+  const voice = document.getElementById("voice");
+  const bgm   = document.getElementById("bgm");
+  const happy = document.getElementById("happy");
+  const spinSfx = document.getElementById("spinSfx");
+  const yay = document.getElementById("yay");
+  const kissAudio = document.getElementById("kissAudio");
+  const loveAudio = document.getElementById("loveAudio");
+
+  let musicOn = true;
+
+  async function safePlay(audioEl){
+    try { await audioEl.play(); } catch(e) {}
+  }
+
+  // iOS unlock: muted play/pause (never audible)
+  let audioUnlocked = false;
+  async function unlockAudio(){
+    if(audioUnlocked) return;
+    audioUnlocked = true;
+    try{
+      kissAudio.muted = true;
+      loveAudio.muted = true;
+
+      kissAudio.currentTime = 0;
+      await safePlay(kissAudio);
+      kissAudio.pause();
+
       loveAudio.currentTime = 0;
-      loveAudio.volume = 1;
       await safePlay(loveAudio);
+      loveAudio.pause();
 
-      // restore happy to 0.25 after love starts
-      if(musicOn) happy.volume = 0.25;
+      kissAudio.currentTime = 0;
+      loveAudio.currentTime = 0;
+
+      kissAudio.muted = false;
+      loveAudio.muted = false;
+    }catch(e){}
+  }
+
+  function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+
+  let fadeRAF = null;
+  function fadeBgmTo(target, ms=320){
+    if(!musicOn) return;
+    target = clamp01(target);
+    const startV = (typeof bgm.volume === "number") ? bgm.volume : 1;
+    const startT = performance.now();
+
+    if(fadeRAF) cancelAnimationFrame(fadeRAF);
+
+    const step = (now) => {
+      const p = Math.min(1, (now - startT)/ms);
+      const eased = 1 - Math.pow(1-p, 3);
+      bgm.volume = clamp01(startV + (target - startV) * eased);
+      if(p < 1) fadeRAF = requestAnimationFrame(step);
     };
+    fadeRAF = requestAnimationFrame(step);
+  }
 
-    // primary: after kiss ends
-    kissAudio.onended = () => { playLoveOnce(); };
+  function startBgm(){
+    stopHappy();
+    bgm.volume = 1;
+    safePlay(bgm);
+  }
+  function duckBgm(){ fadeBgmTo(0.25, 260); }
+  function stopBgm(){
+    if(fadeRAF) cancelAnimationFrame(fadeRAF);
+    fadeRAF = null;
+    bgm.pause();
+    bgm.currentTime = 0;
+  }
 
-    // fallback: if onended doesn’t fire reliably (rare), start love at 900ms
-    loveTimer = setTimeout(()=>{ playLoveOnce(); }, 900);
+  function startHappy(){
+    stopBgm();
+    happy.volume = 0.25;
+    safePlay(happy);
+  }
+  function stopHappy(){
+    happy.pause();
+    happy.currentTime = 0;
+  }
+  function stopAllMusic(){
+    stopBgm();
+    stopHappy();
+  }
 
-  }, 2000);
-}
+  // ---------- S1: Envelope ----------
+  document.getElementById("env").addEventListener("click", async () => {
+    await unlockAudio(); // ✅ unlock early inside a user gesture (safe)
+
+    const env = document.getElementById("env");
+    const mailText = document.getElementById("mailText");
+
+    env.textContent = "📨";
+    mailText.classList.remove("hidden");
+
+    await safePlay(voice);
+
+    let moved = false;
+    const go = () => { if(moved) return; moved = true; show("s2"); };
+    const t = setTimeout(go, 2200);
+    voice.onended = () => { clearTimeout(t); go(); };
+  });
+
+  // ---------- Game ----------
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+
+  const scoreEl = document.getElementById("score");
+  const statusPill = document.getElementById("statusPill");
+  const gameMsg = document.getElementById("gameMsg");
+
+  let running = false;
+  let last = 0;
+  let score = 0;
+
+  const groundY = 300;
+  const gravity = 1200;
+  const jumpV = -520;
+  const speed = 260;
+  const targetScore = 11;
+
+  const p = { x: 120, y: groundY, vy: 0, w: 28, h: 44, onGround: true };
+  let spikes = [];
+  let spawnTimer = 0;
+
+  let hearts = [];
+  function spawnHearts(){
+    hearts = [];
+    for(let i=0;i<18;i++){
+      hearts.push({
+        x: p.x + 4 + Math.random()*20,
+        y: (p.y - p.h) - 10 + Math.random()*10,
+        vx: -80 + Math.random()*160,
+        vy: -220 - Math.random()*180,
+        life: 0.9 + Math.random()*0.6
+      });
+    }
+  }
+
+  function resetGame(){
+    running = false;
+    last = performance.now();
+    score = 0;
+    scoreEl.textContent = "0";
+    p.y = groundY; p.vy = 0; p.onGround = true;
+    spikes = [];
+    spawnTimer = 0;
+    hearts = [];
+    statusPill.textContent = "Goal: 11";
+    gameMsg.textContent = "Tap the screen to jump.";
+    draw();
+  }
+
+  function jump(){
+    if(!running) return;
+    if(p.onGround){
+      p.vy = jumpV;
+      p.onGround = false;
+    }
+  }
+
+  function spawnSpike(){
+    spikes.push({ x: 560, w: 26, h: 34, passed: false });
+  }
+
+  function collideRect(ax,ay,aw,ah, bx,by,bw,bh){
+    return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+  }
+
+  function lose(){
+    running = false;
+    statusPill.textContent = "Try again 😭";
+    gameMsg.textContent = "You touched a spike. Press Start and try again.";
+  }
+
+  function win(){
+    running = false;
+    statusPill.textContent = "WIN ✅";
+    gameMsg.textContent = "Damn, you’re an 11/10 indeed!";
+    if(musicOn) duckBgm();
+    spawnHearts();
+    setTimeout(() => show("s3"), 900);
+  }
+
+  function update(dt){
+    p.vy += gravity * dt;
+    p.y += p.vy * dt;
+
+    if(p.y >= groundY){
+      p.y = groundY;
+      p.vy = 0;
+      p.onGround = true;
+    }
+
+    spawnTimer -= dt;
+    if(spawnTimer <= 0){
+      spawnSpike();
+      spawnTimer = 0.8 + Math.random() * 0.65;
+    }
+
+    spikes.forEach(s => s.x -= speed * dt);
+    spikes = spikes.filter(s => s.x > -80);
+
+    for(const s of spikes){
+      if(!s.passed && s.x + s.w < p.x){
+        s.passed = true;
+        score++;
+        scoreEl.textContent = String(score);
+        if(score >= targetScore){
+          win();
+          return;
+        }
+      }
+    }
+
+    for(const s of spikes){
+      const spikeX = s.x;
+      const spikeY = groundY - s.h;
+      const hit = collideRect(p.x, p.y - p.h, p.w, p.h, spikeX+3, spikeY+6, s.w-6, s.h-6);
+      if(hit){ lose(); return; }
+    }
+
+    hearts.forEach(h => {
+      h.life -= dt;
+      h.vy += 600 * dt;
+      h.x += h.vx * dt;
+      h.y += h.vy * dt;
+    });
+    hearts = hearts.filter(h => h.life > 0);
+
+    draw();
+  }
+
+  function drawHeart(x,y){
+    ctx.fillStyle = "rgba(255,214,231,.95)";
+    ctx.fillRect(x, y, 3, 3);
+    ctx.fillRect(x+6, y, 3, 3);
+    ctx.fillRect(x-3, y+3, 3, 3);
+    ctx.fillRect(x+3, y+3, 3, 3);
+    ctx.fillRect(x+9, y+3, 3, 3);
+    ctx.fillRect(x, y+6, 3, 3);
+    ctx.fillRect(x+6, y+6, 3, 3);
+    ctx.fillRect(x+3, y+9, 3, 3);
+  }
+
+  function drawPixelBoy(){
+    const x = p.x, y = p.y;
+    const top = y - p.h;
+
+    ctx.fillStyle = "rgba(0,0,0,.35)";
+    ctx.fillRect(x+3, y+6, 22, 6);
+
+    ctx.fillStyle = "#1d1d33";
+    ctx.fillRect(x+6, top+28, 7, 14);
+    ctx.fillRect(x+15, top+28, 7, 14);
+
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+5, top+42, 9, 2);
+    ctx.fillRect(x+14, top+42, 9, 2);
+
+    ctx.fillStyle = "#f6f6ff";
+    ctx.fillRect(x+5, top+18, 18, 12);
+
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+3, top+20, 3, 8);
+    ctx.fillRect(x+23, top+20, 3, 8);
+
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+7, top+4, 14, 14);
+
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+6, top+2, 16, 6);
+    ctx.fillRect(x+6, top+7, 4, 4);
+    ctx.fillRect(x+10, top+7, 4, 3);
+    ctx.fillRect(x+14, top+7, 4, 4);
+    ctx.fillRect(x+18, top+7, 4, 3);
+
+    ctx.fillStyle = "#000";
+    ctx.fillRect(x+11, top+10, 2, 2);
+    ctx.fillRect(x+17, top+10, 2, 2);
+
+    ctx.fillStyle = "#0b0b10";
+    ctx.font = "10px system-ui";
+    ctx.fillText("27", x+10, top+27);
+
+    ctx.font = "12px system-ui";
+    ctx.fillStyle = "rgba(255,255,255,.92)";
+    ctx.fillText("dcop", x+1, top-6);
+  }
+
+  function drawSpike(s){
+    const spikeX = s.x, baseY = groundY, h = s.h, w = s.w;
+    ctx.fillStyle = "#2a2a44";
+    ctx.beginPath();
+    ctx.moveTo(spikeX, baseY);
+    ctx.lineTo(spikeX + w/2, baseY - h);
+    ctx.lineTo(spikeX + w, baseY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "#3a3a66";
+    ctx.stroke();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,520,360);
+    ctx.fillStyle = "#0f0f1a";
+    ctx.fillRect(0,0,520,360);
+
+    ctx.fillStyle = "rgba(255,255,255,.08)";
+    for(let i=0;i<30;i++) ctx.fillRect((i*73)%520, (i*41)%260, 2, 2);
+
+    ctx.fillStyle = "#141423";
+    ctx.fillRect(0, groundY, 520, 60);
+    ctx.fillStyle = "#2a2a44";
+    ctx.fillRect(0, groundY, 520, 2);
+
+    spikes.forEach(drawSpike);
+    drawPixelBoy();
+    hearts.forEach(h => drawHeart(h.x, h.y));
+  }
+
+  function loop(now){
+    const dt = Math.min(0.033, (now - last)/1000);
+    last = now;
+    if(running) update(dt);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  document.getElementById("start").onclick = async () => {
+    resetGame();
+    running = true;
+    statusPill.textContent = "Goal: 11";
+    if(musicOn) startBgm();
+  };
+
+  canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
+
+  document.getElementById("muteMusic").onclick = () => {
+    musicOn = !musicOn;
+    const btn = document.getElementById("muteMusic");
+    btn.textContent = musicOn ? "Music: On" : "Music: Off";
+
+    if(!musicOn){
+      stopAllMusic();
+    } else {
+      const s4bVisible = !document.getElementById("s4b").classList.contains("hidden");
+      if(s4bVisible) startHappy();
+      else startBgm();
+    }
+  };
+
+  resetGame();
+
+  // ---------- Coin -> wheel ----------
+  const coinEl = document.getElementById("coin");
+  let coinUsed = false;
+
+  coinEl.onclick = () => {
+    if(coinUsed) return;
+    coinUsed = true;
+    document.getElementById("coinMsg").textContent = "Coin inserted 😏";
+    coinEl.classList.add("inserted");
+    setTimeout(() => show("s4"), 620);
+  };
+
+  // ---------- Wheel ----------
+  const wheelSubtitle = document.getElementById("wheelSubtitle");
+  const wildBtn = document.getElementById("wildBtn");
+
+  const segments = [
+    { label: "Free massage for girlfriend", weight: 0.225 },
+    { label: "You plan next date",          weight: 0.225 },
+    { label: "5 mins Onyx",                 weight: 0.225 },
+    { label: "Tomyum ramen on you",         weight: 0.225 },
+    { label: "Wild card",                   weight: 0.10  }
+  ];
+  const forcedLabel = "Wild card";
+
+  const wheel = document.getElementById("wheel");
+  const wctx = wheel.getContext("2d");
+  const cx=150, cy=150, r=138;
+  const innerR = 55;
+
+  const totalW = segments.reduce((a,s)=>a+s.weight,0);
+  segments.forEach(s => s.weight = s.weight/totalW);
+
+  function breakLongWord(ctx, word, maxWidth){
+    const parts = [];
+    let cur = "";
+    for(const ch of word){
+      const test = cur + ch;
+      if(ctx.measureText(test).width <= maxWidth) cur = test;
+      else { if(cur) parts.push(cur); cur = ch; }
+    }
+    if(cur) parts.push(cur);
+    return parts;
+  }
+
+  function wrapLines(ctx, text, maxWidth){
+    const rawWords = text.split(" ");
+    const words = [];
+    for(const w of rawWords){
+      if(ctx.measureText(w).width <= maxWidth) words.push(w);
+      else words.push(...breakLongWord(ctx, w, maxWidth));
+    }
+    const lines = [];
+    let line = "";
+    for(const w of words){
+      const test = line ? (line + " " + w) : w;
+      if(ctx.measureText(test).width <= maxWidth) line = test;
+      else { if(line) lines.push(line); line = w; }
+    }
+    if(line) lines.push(line);
+    return lines.slice(0, 5);
+  }
+
+  function linesFit(ctx, lines, maxWidth){
+    return lines.every(ln => ctx.measureText(ln).width <= maxWidth);
+  }
+
+  function drawWheel(){
+    wctx.clearRect(0,0,300,300);
+    let a = 0;
+
+    for(let i=0;i<segments.length;i++){
+      const s = segments[i];
+      const slice = (Math.PI*2) * s.weight;
+      const a0 = a;
+      const a1 = a + slice;
+
+      wctx.beginPath();
+      wctx.moveTo(cx,cy);
+      wctx.arc(cx,cy,r,a0,a1);
+      wctx.closePath();
+      wctx.fillStyle = (i%2===0) ? "#1d1d33" : "#141423";
+      wctx.fill();
+      wctx.strokeStyle="#3a3a66";
+      wctx.stroke();
+
+      wctx.save();
+      wctx.beginPath();
+      wctx.moveTo(cx,cy);
+      wctx.arc(cx,cy,r,a0,a1);
+      wctx.closePath();
+      wctx.clip();
+
+      const mid = a0 + slice/2;
+      wctx.translate(cx,cy);
+      wctx.rotate(mid);
+
+      const upsideDown = (mid > Math.PI/2 && mid < (Math.PI*3)/2);
+      if(upsideDown) wctx.rotate(Math.PI);
+
+      wctx.fillStyle="rgba(255,255,255,.92)";
+      wctx.textAlign="center";
+      wctx.textBaseline="middle";
+
+      const textRadius = (innerR + r) / 2;
+      const xPos = upsideDown ? -textRadius : textRadius;
+
+      const forcedWrapWidth = 64;
+      const arcLen = slice * textRadius;
+      const maxWidth = Math.min(forcedWrapWidth, Math.max(52, arcLen - 22));
+
+      let size = 11;
+      while(size >= 8){
+        wctx.font = `${size}px system-ui`;
+        const lines = wrapLines(wctx, s.label, maxWidth);
+
+        if(linesFit(wctx, lines, maxWidth)){
+          const lineH = size + 2;
+          const totalH = (lines.length - 1) * lineH;
+          lines.forEach((ln, idx) => {
+            const y = (idx * lineH) - totalH/2;
+            wctx.fillText(ln, xPos, y);
+          });
+          break;
+        }
+        size--;
+      }
+
+      wctx.restore();
+      a = a1;
+    }
+
+    wctx.beginPath();
+    wctx.arc(cx,cy,innerR,0,Math.PI*2);
+    wctx.fillStyle="#0b0b10"; wctx.fill();
+    wctx.strokeStyle="#3a3a66"; wctx.stroke();
+  }
+  drawWheel();
+
+  function confetti(){
+    const c = document.getElementById("confetti");
+    c.innerHTML="";
+    c.classList.remove("hidden");
+    for(let i=0;i<70;i++){
+      const p=document.createElement("i");
+      p.style.left = Math.random()*100+"vw";
+      p.style.background = (i%3===0) ? "#fff" : (i%3===1 ? "#b9b9ff" : "#ffd6e7");
+      p.style.animationDelay = (Math.random()*0.2)+"s";
+      c.appendChild(p);
+    }
+    setTimeout(()=>c.classList.add("hidden"), 1800);
+  }
+
+  const spinBtn = document.getElementById("spin");
+  let spinning=false;
+
+  function angleForSegmentLabel(label){
+    let a = 0;
+    for(const s of segments){
+      const slice = (Math.PI*2)*s.weight;
+      const mid = a + slice/2;
+      if(s.label === label) return { mid };
+      a += slice;
+    }
+    return { mid: 0 };
+  }
+
+  spinBtn.onclick = async () => {
+    if(spinning) return;
+    spinning=true;
+
+    if(musicOn) duckBgm();
+
+    wheelSubtitle.textContent = "";
+    wildBtn.classList.add("hidden");
+
+    spinSfx.currentTime = 0;
+    await safePlay(spinSfx);
+
+    const target = angleForSegmentLabel(forcedLabel);
+    const pointerAngle = Math.PI * 1.5;
+    const turns = 5;
+    const targetRot = (Math.PI*2)*turns + (pointerAngle - target.mid);
+
+    const start = performance.now();
+    const dur = 3600;
+
+    const anim = (now) => {
+      const p = Math.min(1,(now-start)/dur);
+      const ease = 1 - Math.pow(1-p, 3);
+      const rot = ease * targetRot;
+      wheel.style.transform = `rotate(${rot}rad)`;
+
+      if(p<1) requestAnimationFrame(anim);
+      else{
+        spinning=false;
+        confetti();
+        yay.currentTime = 0;
+        safePlay(yay);
+        wheelSubtitle.textContent = "Wild card? Hmmmm";
+        wildBtn.classList.remove("hidden");
+      }
+    };
+    requestAnimationFrame(anim);
+  };
+
+  wildBtn.onclick = () => show("s4b");
+  document.getElementById("toBook").onclick = () => show("s5");
+
+  // ---------- Book ----------
+  const pages = [
+    "photos/page1.jpg",
+    "photos/page2.jpg",
+    "photos/page3.jpg",
+    "photos/page4.jpg",
+    "photos/page5.jpg"
+  ];
+  const captions = [
+    "Luck stat: 1",
+    "Luck stat increasing to…2",
+    "Luck stat increasing more…3",
+    "Luck stat increasing morer…4",
+    "Luck stat increasing morerest…5"
+  ];
+
+  const book = document.getElementById("book");
+  const bonusBtn = document.getElementById("bonusBtn");
+  let idx = 0;
+  let bonusTimer = null;
+
+  function renderBook(){
+    book.innerHTML="";
+    const p = document.createElement("div");
+    p.className="page";
+    p.innerHTML = `
+      <img src="${pages[idx]}" alt="page"/>
+      <div class="caption">${captions[idx]}</div>
+      <div class="pageNumber">${idx+1} / ${pages.length}</div>
+    `;
+    book.appendChild(p);
+
+    if(bonusTimer) clearTimeout(bonusTimer);
+    bonusBtn.classList.add("hidden");
+    bonusBtn.classList.remove("bonusPop");
+    p.classList.remove("photoShrink");
+
+    if(idx === pages.length - 1){
+      bonusBtn.classList.remove("hidden");
+      bonusTimer = setTimeout(()=>{
+        p.classList.add("photoShrink");
+        bonusBtn.classList.add("bonusPop");
+      }, 1000);
+    }
+  }
+  renderBook();
+
+  let startX=null;
+  book.addEventListener("touchstart", (e)=>{ startX = e.touches[0].clientX; }, {passive:true});
+  book.addEventListener("touchend", (e)=>{
+    if(startX==null) return;
+    const endX = e.changedTouches[0].clientX;
+    const dx = endX - startX;
+    startX=null;
+    if(Math.abs(dx) < 35) return;
+    if(dx < 0 && idx < pages.length-1) idx++;
+    if(dx > 0 && idx > 0) idx--;
+    renderBook();
+  });
+
+  let mouseDown=false, mX=0;
+  book.addEventListener("mousedown",(e)=>{mouseDown=true;mX=e.clientX;});
+  window.addEventListener("mouseup",(e)=>{
+    if(!mouseDown) return;
+    mouseDown=false;
+    const dx=e.clientX-mX;
+    if(Math.abs(dx) < 50) return;
+    if(dx < 0 && idx < pages.length-1) idx++;
+    if(dx > 0 && idx > 0) idx--;
+    renderBook();
+  });
+
+  bonusBtn.onclick = () => show("s6");
+
+  // ---------- S6 taps ----------
+  const dcopTap = document.getElementById("dcopTap");
+  const bonusMsg = document.getElementById("bonusMsg");
+  const congratsMsg = document.getElementById("congratsMsg");
+  let tapCount = 0;
+
+  function doDcopJump(){
+    dcopTap.classList.remove("dcopJump");
+    void dcopTap.offsetWidth;
+    dcopTap.classList.add("dcopJump");
+  }
+
+  // ---------- S7 helpers ----------
+  function layoutFinalChars(){
+    const sky = document.getElementById("sky");
+    const sljy = document.getElementById("sljyFinal");
+    const dcop = document.getElementById("dcopFinal");
+    const w = sky.clientWidth;
+
+    const gap = 2;              // ✅ requested
+    const charW = 92;
+    const total = (charW * 2) + gap;
+    const leftStart = Math.max(8, Math.floor((w - total) / 2));
+
+    sljy.style.left = leftStart + "px";
+    dcop.style.left = (leftStart + charW + gap) + "px";
+  }
+
+  let petalsStarted = false;
+  function startPetals(){
+    if(petalsStarted) return;
+    petalsStarted = true;
+    const petals = document.getElementById("petals");
+    setInterval(()=>{
+      const s=document.createElement("span");
+      s.style.left = (Math.random()*100) + "%";
+      s.style.animationDuration = (5.5 + Math.random()*2.5) + "s";
+      s.style.opacity = (0.65 + Math.random()*0.35);
+      petals.appendChild(s);
+      setTimeout(()=>s.remove(), 9000);
+    }, 180);
+  }
+
+  function positionKissBetweenHeads(){
+    const kiss = document.getElementById("kissIcon");
+    const a = document.getElementById("sljyFinal").getBoundingClientRect();
+    const b = document.getElementById("dcopFinal").getBoundingClientRect();
+    const sky = document.getElementById("sky").getBoundingClientRect();
+
+    const midX = ((a.left + a.right)/2 + (b.left + b.right)/2) / 2;
+    const topY = Math.min(a.top, b.top) - 55;  // ✅ higher than name tags
+
+    kiss.style.left = (midX - sky.left) + "px";
+    kiss.style.top  = (topY - sky.top) + "px";
+  }
+
+  let finalSeqStarted = false;
+  let loveTimer = null;
+
+  async function startFinalSequence(){
+    if(finalSeqStarted) return;
+    finalSeqStarted = true;
+
+    const sljy = document.getElementById("sljyFinal");
+    const kiss = document.getElementById("kissIcon");
+
+    // hard reset audio so it NEVER "misfires"
+    try{
+      kissAudio.pause(); kissAudio.currentTime = 0;
+      loveAudio.pause(); loveAudio.currentTime = 0;
+    }catch(e){}
+
+    // duck happy slightly while kiss/love plays
+    if(musicOn) happy.volume = 0.18;
+
+    // small walk + head tilt
+    sljy.classList.add("sljyWalk");
+    sljy.classList.add("sljyHeadTilt");
+
+    // after walk ends (~2.0s) show kiss + play kiss, then love
+    setTimeout(async ()=>{
+      positionKissBetweenHeads();
+      kiss.style.opacity = 1;
+
+      kissAudio.currentTime = 0;
+      kissAudio.volume = 1;
+      await safePlay(kissAudio);
+
+      startPetals();
+
+      if(loveTimer) clearTimeout(loveTimer);
+      loveTimer = setTimeout(async ()=>{
+        loveAudio.currentTime = 0;
+        loveAudio.volume = 1;
+        await safePlay(loveAudio);
+
+        if(musicOn) happy.volume = 0.25;
+      }, 500);
+
+    }, 2000);
+  }
+
+  window.addEventListener("resize", ()=>{
+    layoutFinalChars();
+    const kiss = document.getElementById("kissIcon");
+    if(kiss && kiss.style.opacity === "1") positionKissBetweenHeads();
+  });
+
+  dcopTap.onclick = async () => {
+    doDcopJump();
+    tapCount++;
+
+    // keep unlocking inside user gestures
+    await unlockAudio();
+
+    congratsMsg.classList.add("hidden");
+
+    if(tapCount === 1){
+      bonusMsg.textContent = "Better luck next time! Try again";
+    } else if(tapCount === 2){
+      bonusMsg.textContent = "Ohhhhh mans…. Try again!";
+    } else {
+      bonusMsg.textContent = "";
+      congratsMsg.classList.remove("hidden");
+
+      // ✅ congrats hold 2.4s
+      setTimeout(()=>{
+        show("s7");
+        if(musicOn){
+          startHappy();
+          happy.volume = 0.25;
+        }
+
+        layoutFinalChars();
+        setTimeout(()=>startFinalSequence(), 50);
+      }, 2400);
+    }
+  };
+</script>
+</body>
+</html>
