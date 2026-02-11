@@ -52,7 +52,6 @@
 
     /* “After spin” page */
     .bigWinMsg{font-size:34px;line-height:1.15;margin:8px 0 10px 0}
-    .hint{opacity:.92;margin-top:6px}
 
     /* Swipe Book */
     .book{position:relative;max-width:420px;margin:0 auto;height:560px;border-radius:16px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
@@ -147,8 +146,6 @@
         <button class="btn" id="spin">SPIN</button>
       </div>
 
-      <p class="result" id="wheelResult"></p>
-
       <div style="margin-top:12px;">
         <button class="btn hidden" id="wildBtn">Wild card? Hmmmm</button>
       </div>
@@ -179,11 +176,9 @@
     document.getElementById(id).classList.remove("hidden");
 
     // When we hit Aha page: switch to happy.mp3
-    if(id === "s4b"){
-      if(musicOn){
-        stopBgm();
-        startHappy();
-      }
+    if(id === "s4b" && musicOn){
+      stopBgm();
+      startHappy();
     }
   };
 
@@ -200,22 +195,45 @@
     try { await audioEl.play(); } catch(e) {}
   }
 
-  function setBgmVolume(v){
-    bgm.volume = Math.max(0, Math.min(1, v));
+  function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+
+  // Smooth fade (more obvious on iOS than instant volume jump)
+  let fadeRAF = null;
+  function fadeBgmTo(target, ms=320){
+    if(!musicOn) return;
+    target = clamp01(target);
+    const startV = bgm.volume || 1;
+    const startT = performance.now();
+
+    if(fadeRAF) cancelAnimationFrame(fadeRAF);
+
+    const step = (now) => {
+      const p = Math.min(1, (now - startT)/ms);
+      const eased = 1 - Math.pow(1-p, 3);
+      bgm.volume = clamp01(startV + (target - startV) * eased);
+      if(p < 1) fadeRAF = requestAnimationFrame(step);
+    };
+    fadeRAF = requestAnimationFrame(step);
   }
 
   function startBgm(){
     stopHappy();
-    setBgmVolume(1);
+    bgm.volume = 1;
     safePlay(bgm);
   }
 
+  // Use 0.35 so it’s VERY clearly “ducked”
   function duckBgm(){
-    // 50% volume during win/spin so SFX is clear
-    setBgmVolume(0.5);
+    fadeBgmTo(0.35, 260);
+  }
+
+  function restoreBgm(){
+    fadeBgmTo(1, 260);
   }
 
   function stopBgm(){
+    if(fadeRAF) cancelAnimationFrame(fadeRAF);
+    fadeRAF = null;
     bgm.pause();
     bgm.currentTime = 0;
   }
@@ -241,11 +259,9 @@
     const env = document.getElementById("env");
     const mailText = document.getElementById("mailText");
 
-    // change envelope state
     env.textContent = "📨";
     mailText.classList.remove("hidden");
 
-    // play hmmmm (keep as-is)
     await safePlay(voice);
 
     let moved = false;
@@ -332,12 +348,10 @@
     statusPill.textContent = "WIN ✅";
     gameMsg.textContent = "Damn, you’re an 11/10 indeed!";
 
-    // duck bgm during win + SFX
+    // Duck bgm here (NO yay here anymore)
     if(musicOn) duckBgm();
 
     spawnHearts();
-    yay.currentTime = 0;
-    safePlay(yay);
 
     setTimeout(() => show("s3"), 900);
   }
@@ -403,7 +417,6 @@
     ctx.fillRect(x+3, y+9, 3, 3);
   }
 
-  // New “boy-like” pixel avatar: black fringe + white shirt “27”
   function drawPixelBoy(){
     const x = p.x, y = p.y;
     const top = y - p.h;
@@ -494,7 +507,6 @@
     statusPill.textContent = "Goal: 11";
 
     if(musicOn){
-      // game start = bgm.mp3
       startBgm();
     }
   };
@@ -505,10 +517,10 @@
     musicOn = !musicOn;
     const btn = document.getElementById("muteMusic");
     btn.textContent = musicOn ? "Music: On" : "Music: Off";
+
     if(!musicOn){
       stopAllMusic();
     } else {
-      // resume what fits current screen
       const s4bVisible = !document.getElementById("s4b").classList.contains("hidden");
       if(s4bVisible) startHappy();
       else startBgm();
@@ -546,6 +558,7 @@
   const wheel = document.getElementById("wheel");
   const wctx = wheel.getContext("2d");
   const cx=150, cy=150, r=138;
+  const innerR = 55;
 
   const totalW = segments.reduce((a,s)=>a+s.weight,0);
   segments.forEach(s => s.weight = s.weight/totalW);
@@ -554,7 +567,6 @@
     const words = text.split(" ");
     const lines = [];
     let line = "";
-
     for(const w of words){
       const test = line ? (line + " " + w) : w;
       if(ctx.measureText(test).width <= maxWidth){
@@ -565,7 +577,7 @@
       }
     }
     if(line) lines.push(line);
-    return lines;
+    return lines.slice(0, 4); // keep neat (max 4 lines)
   }
 
   function drawWheel(){
@@ -588,9 +600,17 @@
       wctx.strokeStyle="#3a3a66";
       wctx.stroke();
 
-      // label (wrapped + scaled)
-      const mid = a0 + slice/2;
+      // --- CLIP to slice so text cannot bleed into other slices ---
       wctx.save();
+      wctx.beginPath();
+      wctx.moveTo(cx,cy);
+      wctx.arc(cx,cy,r,a0,a1);
+      wctx.closePath();
+      wctx.clip();
+
+      // label
+      const mid = a0 + slice/2;
+
       wctx.translate(cx,cy);
       wctx.rotate(mid);
 
@@ -605,28 +625,27 @@
       wctx.textAlign="center";
       wctx.textBaseline="middle";
 
-      // wrap within a radial box
-      const maxWidth = 110;
-      const lines = wrapLines(wctx, s.label, maxWidth);
+      // max width based on arc length at text radius
+      const textRadius = (innerR + r) / 2; // centered in ring
+      const arcLen = slice * textRadius;
+      const maxWidth = Math.max(60, arcLen - 18);
 
+      const lines = wrapLines(wctx, s.label, maxWidth);
       const lineH = size + 2;
       const totalH = (lines.length - 1) * lineH;
-      const textRadius = 92; // where text sits
 
-      // draw lines centered
       lines.forEach((ln, idx) => {
         const y = (idx * lineH) - totalH/2;
         wctx.fillText(ln, textRadius, y);
       });
 
-      wctx.restore();
-
+      wctx.restore(); // end clip
       a = a1;
     }
 
-    // hub
+    // hub ring
     wctx.beginPath();
-    wctx.arc(cx,cy,28,0,Math.PI*2);
+    wctx.arc(cx,cy,innerR,0,Math.PI*2);
     wctx.fillStyle="#0b0b10"; wctx.fill();
     wctx.strokeStyle="#3a3a66"; wctx.stroke();
   }
@@ -654,18 +673,17 @@
     for(const s of segments){
       const slice = (Math.PI*2)*s.weight;
       const mid = a + slice/2;
-      if(s.label === label) return { mid, aStart: a, aEnd: a+slice };
+      if(s.label === label) return { mid };
       a += slice;
     }
-    return { mid: 0, aStart: 0, aEnd: 0 };
+    return { mid: 0 };
   }
 
   spinBtn.onclick = async () => {
     if(spinning) return;
     spinning=true;
 
-    // duck bgm so spin is clear
-    if(musicOn) duckBgm();
+    if(musicOn) duckBgm(); // duck during spin
 
     wheelSubtitle.textContent = "";
     wildBtn.classList.add("hidden");
@@ -691,6 +709,7 @@
       else{
         spinning=false;
 
+        // --- ONLY place where YAY plays ---
         confetti();
         yay.currentTime = 0;
         safePlay(yay);
@@ -703,7 +722,6 @@
   };
 
   wildBtn.onclick = () => {
-    // go to Aha page (this triggers happy.mp3 in show())
     show("s4b");
   };
 
@@ -753,7 +771,6 @@
     renderBook();
   });
 
-  // Desktop swipe (mouse)
   let mouseDown=false, mX=0;
   book.addEventListener("mousedown",(e)=>{mouseDown=true;mX=e.clientX;});
   window.addEventListener("mouseup",(e)=>{
