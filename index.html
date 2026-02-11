@@ -1,802 +1,337 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>You’ve got mail 💌</title>
-  <style>
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#0b0b10;color:#fff}
-    .wrap{max-width:760px;margin:0 auto;padding:18px;text-align:center}
-    .card{background:#141423;border:1px solid #2a2a44;border-radius:16px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
-    .hidden{display:none}
-    .big{font-size:28px}
-    .note{opacity:.85;font-size:14px;line-height:1.35}
-    .btn{padding:12px 16px;border-radius:12px;border:1px solid #3a3a66;background:#1d1d33;color:#fff;cursor:pointer}
-    .btn:active{transform:scale(.98)}
-    .divider{height:1px;background:#2a2a44;margin:16px 0}
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>You’ve got mail 💌</title>
 
-    /* Landing envelope */
-    .envelope{font-size:140px;cursor:pointer;user-select:none;display:inline-block;line-height:1}
-    .envelope:active{transform:scale(.98)}
-    .envelopeWrap{margin-top:14px}
-    .mailText{margin-top:10px;font-weight:700;opacity:.92}
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;
+  background:#0b0b10;
+  color:#fff;
+}
+.wrap{max-width:760px;margin:0 auto;padding:18px;text-align:center}
+.card{
+  background:#141423;
+  border:1px solid #2a2a44;
+  border-radius:16px;
+  padding:18px;
+  box-shadow:0 12px 40px rgba(0,0,0,.35)
+}
+.hidden{display:none}
+.big{font-size:26px}
+.note{opacity:.85;font-size:14px}
+.btn{
+  padding:12px 16px;
+  border-radius:12px;
+  border:1px solid #3a3a66;
+  background:#1d1d33;
+  color:#fff;
+  cursor:pointer
+}
+.btn:active{transform:scale(.97)}
+.divider{height:1px;background:#2a2a44;margin:16px 0}
 
-    /* Confetti */
-    .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
-    .confetti i{position:absolute;top:-10px;width:8px;height:10px;opacity:.9;animation:fall 1.8s linear forwards}
-    @keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:0.1}}
+/* Envelope */
+.envelope{font-size:120px;cursor:pointer}
+.envelope.clicked{opacity:.8}
 
-    /* Game */
-    canvas{max-width:520px;width:100%;background:#0f0f1a;border:1px solid #2a2a44;border-radius:14px;touch-action:manipulation}
-    .hud{display:flex;justify-content:space-between;gap:10px;max-width:520px;margin:10px auto 0 auto;flex-wrap:wrap}
-    .pill{font-size:12px;opacity:.9;border:1px solid #2a2a44;background:rgba(0,0,0,.25);padding:7px 10px;border-radius:999px}
+/* Game */
+canvas{width:100%;max-width:520px;background:#0f0f1a;border-radius:14px;border:1px solid #2a2a44}
+.hud{display:flex;justify-content:space-between;max-width:520px;margin:10px auto;gap:8px;flex-wrap:wrap}
+.pill{font-size:12px;border:1px solid #2a2a44;padding:6px 10px;border-radius:999px}
 
-    /* Coin insert */
-    .coinSlot{display:inline-flex;align-items:center;gap:12px;margin-top:10px;justify-content:center}
-    .coin{font-size:44px;cursor:pointer;user-select:none;display:inline-block}
-    .coin.inserted{animation:coinIn .55s ease forwards}
-    @keyframes coinIn{
-      0%{transform:translateX(0) translateY(0) scale(1)}
-      70%{transform:translateX(46px) translateY(-4px) scale(.92)}
-      100%{transform:translateX(62px) translateY(-2px) scale(.55);opacity:.15}
-    }
-    .slot{width:90px;height:22px;border:1px solid #3a3a66;border-radius:12px;position:relative;background:#0b0b10}
-    .slot:before{content:"";position:absolute;left:12px;right:12px;top:9px;height:4px;background:#2a2a44;border-radius:10px}
+/* Coin */
+.coin{font-size:42px;cursor:pointer}
+.coin.inserted{opacity:.3;transform:translateX(50px) scale(.5);transition:.5s}
 
-    /* Wheel */
-    .wheelBox{position:relative;width:300px;height:300px;margin:0 auto}
-    #wheel{width:300px;height:300px;border-radius:50%;border:2px solid #3a3a66;transform:rotate(0deg)}
-    .pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:28px}
-    .subtitle{opacity:.9;margin-top:6px}
+/* Wheel */
+.wheelBox{position:relative;width:300px;height:300px;margin:0 auto}
+#wheel{width:300px;height:300px;border-radius:50%}
+.pointer{
+  position:absolute;top:-6px;left:50%;
+  transform:translateX(-50%);
+  width:0;height:0;
+  border-left:14px solid transparent;
+  border-right:14px solid transparent;
+  border-bottom:22px solid #ff4d7d
+}
 
-    /* “After spin” page */
-    .bigWinMsg{font-size:34px;line-height:1.15;margin:8px 0 10px 0}
+/* Book */
+.book{position:relative;width:420px;height:560px;margin:0 auto;border-radius:16px;overflow:hidden}
+.book img{width:100%;height:100%;object-fit:cover}
+.caption{
+  position:absolute;top:10px;left:10px;right:10px;
+  background:rgba(0,0,0,.4);
+  padding:10px;border-radius:12px;font-size:14px
+}
 
-    /* Swipe Book */
-    .book{position:relative;max-width:420px;margin:0 auto;height:560px;border-radius:16px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
-    .page{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-    .page img{width:100%;height:100%;object-fit:cover}
-    .pageNumber{position:absolute;bottom:10px;right:12px;font-size:12px;opacity:.7;background:rgba(0,0,0,.35);padding:6px 8px;border-radius:10px}
-    .caption{
-      position:absolute;top:10px;left:10px;right:10px;
-      font-size:13px;opacity:.92;
-      background:rgba(0,0,0,.35);
-      border:1px solid rgba(255,255,255,.14);
-      padding:10px 12px;border-radius:14px;
-      text-align:left;
-      backdrop-filter: blur(6px);
-      font-weight:700;
-    }
-  </style>
+/* Bonus click */
+.avatarBig{font-size:90px;cursor:pointer}
+
+/* Final scene */
+.finalScene{
+  position:relative;
+  height:600px;
+  background:linear-gradient(#87cefa,#e0f7ff 60%,#7cd67c);
+  overflow:hidden
+}
+.sun{position:absolute;top:30px;right:40px;width:80px;height:80px;border-radius:50%;background:#ffd84d}
+.cloud{position:absolute;top:80px;width:120px;height:40px;background:#fff;border-radius:20px;opacity:.8;animation:cloud 30s linear infinite}
+@keyframes cloud{from{left:-140px}to{left:100%}}
+
+.char{
+  position:absolute;bottom:80px;font-size:110px;
+}
+.label{
+  position:absolute;top:-28px;left:50%;
+  transform:translateX(-50%);
+  font-size:14px;background:rgba(0,0,0,.5);
+  padding:4px 8px;border-radius:10px
+}
+
+#sljy{left:20px;animation:walk 3s forwards}
+@keyframes walk{to{left:220px}}
+
+.kiss{
+  position:absolute;font-size:40px;
+  top:-50px;left:50%;
+  transform:translateX(-50%);
+  opacity:0;transition:.4s
+}
+
+/* Petals */
+.petals{pointer-events:none;position:absolute;inset:0}
+.petals span{
+  position:absolute;top:-20px;
+  width:12px;height:12px;
+  background:#ffb7c5;
+  border-radius:60% 40% 60% 40%;
+  opacity:.9;
+  animation:fall 6s linear infinite
+}
+@keyframes fall{
+  to{transform:translateY(700px) rotate(360deg);opacity:.2}
+}
+</style>
 </head>
+
 <body>
-<div class="wrap">
-  <div class="card">
+<div class="wrap"><div class="card">
 
-    <!-- S1: Landing -->
-    <section id="s1">
-      <div class="big">Dear Mr Wong Duan Chiang,</div>
-      <p class="note">Have you turned your audio on? Click on the envelope.</p>
-      <div class="divider"></div>
+<!-- S1 -->
+<section id="s1">
+  <div class="big">Dear Mr Wong Duan Chiang,</div>
+  <p class="note">Have you turned your audio on? Click on the envelope.</p>
+  <div class="divider"></div>
+  <div class="envelope" id="env">💌</div>
+</section>
 
-      <div class="envelopeWrap">
-        <div class="envelope" id="env" title="Click me">💌</div>
-        <div class="mailText hidden" id="mailText">You’ve got mail!</div>
-      </div>
-
-      <!-- Audio -->
-      <audio id="voice" preload="auto" src="hmmmm.mp3"></audio>
-      <audio id="bgm" preload="auto" src="bgm.mp3" loop></audio>
-      <audio id="happy" preload="auto" src="happy.mp3" loop></audio>
-      <audio id="spinSfx" preload="auto" src="spin.mp3"></audio>
-      <audio id="yay" preload="auto" src="yay.mp3"></audio>
-    </section>
-
-    <!-- S2: Game -->
-    <section id="s2" class="hidden">
-      <div class="big">How OP are you? 🎮</div>
-      <p class="note">Reach 11 to win the game.</p>
-
-      <div class="hud">
-        <div class="pill">Player: <b>dcop</b></div>
-        <div class="pill">Score: <b id="score">0</b>/11</div>
-        <div class="pill" id="statusPill">Goal: 11</div>
-      </div>
-
-      <div style="margin-top:10px;">
-        <canvas id="game" width="520" height="360"></canvas>
-      </div>
-
-      <div style="margin-top:12px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
-        <button class="btn" id="start">Start</button>
-        <button class="btn" id="muteMusic">Music: On</button>
-      </div>
-
-      <p class="note" id="gameMsg" style="margin-top:10px;">Tap the screen to jump.</p>
-    </section>
-
-    <!-- S3: Coin -->
-    <section id="s3" class="hidden">
-      <div class="big">YOU WON 🏆</div>
-      <div class="bigWinMsg">Damn, you’re an 11/10 indeed!</div>
-      <div class="divider"></div>
-      <div class="big">🪙 +1 Coin</div>
-      <p class="note">Insert your coin to spin.</p>
-
-      <div class="coinSlot">
-        <span class="coin" id="coin" title="Insert coin">🪙</span>
-        <span class="slot" id="slot" title="coin slot"></span>
-      </div>
-
-      <p class="note" id="coinMsg" style="margin-top:8px;"></p>
-    </section>
-
-    <!-- S4: Wheel -->
-    <section id="s4" class="hidden">
-      <div class="big">Spin to win 🎡</div>
-      <p class="subtitle" id="wheelSubtitle"></p>
-
-      <div class="wheelBox">
-        <div class="pointer">🔻</div>
-        <canvas id="wheel" width="300" height="300"></canvas>
-      </div>
-
-      <div style="margin-top:12px;">
-        <button class="btn" id="spin">SPIN</button>
-      </div>
-
-      <div style="margin-top:12px;">
-        <button class="btn hidden" id="wildBtn">Wild card? Hmmmm</button>
-      </div>
-    </section>
-
-    <!-- S4B: After wheel -->
-    <section id="s4b" class="hidden">
-      <div class="bigWinMsg">Ha! Thought you were lucky? I’m the luckier one.</div>
-      <button class="btn" id="toBook" style="margin-top:10px;">Click to check your luck stats</button>
-    </section>
-
-    <!-- S5: Swipe book -->
-    <section id="s5" class="hidden">
-      <div class="big">📊 Luck Stats Report</div>
-      <p class="note">Swipe left/right.</p>
-      <div class="book" id="book"></div>
-    </section>
-
+<!-- S2 Game -->
+<section id="s2" class="hidden">
+  <div class="big">How OP are you? 🎮</div>
+  <p class="note">Reach 11 to win the game.</p>
+  <div class="hud">
+    <div class="pill">dcop</div>
+    <div class="pill">Goal: 11</div>
+    <div class="pill">Score: <span id="score">0</span></div>
   </div>
-</div>
+  <canvas id="game" width="520" height="360"></canvas>
+  <div style="margin-top:10px">
+    <button class="btn" id="start">Start</button>
+  </div>
+  <p class="note" id="gameMsg">Tap screen to jump.</p>
+</section>
 
-<div class="confetti hidden" id="confetti"></div>
+<!-- S3 Coin -->
+<section id="s3" class="hidden">
+  <div class="big">Damn, you’re an 11/10 indeed!</div>
+  <p class="note">🪙 Insert your coin</p>
+  <div class="coin" id="coin">🪙</div>
+</section>
+
+<!-- S4 Wheel -->
+<section id="s4" class="hidden">
+  <div class="big">Spin to win 🎡</div>
+  <div class="wheelBox">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="300" height="300"></canvas>
+  </div>
+  <button class="btn" id="spin">SPIN</button>
+  <button class="btn hidden" id="wildBtn">Wild card? Hmmmm</button>
+</section>
+
+<!-- S5 Book -->
+<section id="s5" class="hidden">
+  <div class="book" id="book"></div>
+  <button class="btn" id="bonusBtn" style="margin-top:12px">Bonus luck here!</button>
+</section>
+
+<!-- S6 Bonus Click -->
+<section id="s6" class="hidden">
+  <div class="big">Click on dcop to increase your luck stats!</div>
+  <div class="avatarBig" id="dcopBonus">🧍‍♂️</div>
+  <p class="note" id="bonusMsg"></p>
+</section>
+
+<!-- S7 Final -->
+<section id="s7" class="hidden">
+  <div class="finalScene">
+    <div class="sun"></div>
+    <div class="cloud" style="top:90px"></div>
+    <div class="cloud" style="top:140px;animation-delay:8s"></div>
+
+    <div class="char" id="dcop" style="left:300px">
+      <div class="label">dcop</div>🧍‍♂️
+    </div>
+
+    <div class="char" id="sljy">
+      <div class="label">sljy</div>🧍‍♀️
+      <div class="kiss" id="kiss">😘</div>
+    </div>
+
+    <div class="petals" id="petals"></div>
+  </div>
+  <div class="big" id="finalText">
+    Congrats! You have increased your girlfriend’s luck stat to mosterest!
+  </div>
+</section>
+
+</div></div>
+
+<!-- Audio -->
+<audio id="hmmmm" src="hmmmm.mp3"></audio>
+<audio id="bgm" src="bgm.mp3" loop></audio>
+<audio id="spinSfx" src="spin.mp3"></audio>
+<audio id="yay" src="yay.mp3"></audio>
+<audio id="happy" src="happy.mp3" loop></audio>
+<audio id="kissAudio" src="kiss.mp3"></audio>
+<audio id="loveAudio" src="love.mp3"></audio>
 
 <script>
-  // ---------- Screen router ----------
-  const show = (id) => {
-    ["s1","s2","s3","s4","s4b","s5"].forEach(x => document.getElementById(x).classList.add("hidden"));
-    document.getElementById(id).classList.remove("hidden");
+const show=id=>["s1","s2","s3","s4","s5","s6","s7"].forEach(s=>document.getElementById(s).classList.toggle("hidden",s!==id))
 
-    if(id === "s4b" && musicOn){
-      stopBgm();
-      startHappy();
-    }
-  };
+/* Envelope */
+env.onclick=async()=>{
+  env.textContent="📨";
+  await hmmmm.play();
+  setTimeout(()=>show("s2"),1500)
+}
 
-  // ---------- Audio ----------
-  const voice = document.getElementById("voice");
-  const bgm   = document.getElementById("bgm");
-  const happy = document.getElementById("happy");
-  const spinSfx = document.getElementById("spinSfx");
-  const yay = document.getElementById("yay");
-
-  let musicOn = true;
-
-  async function safePlay(audioEl){
-    try { await audioEl.play(); } catch(e) {}
+/* Game (simple counter mock) */
+let score=0
+start.onclick=()=>{
+  bgm.play()
+  score=0
+  scoreEl.textContent=0
+}
+game.onclick=()=>{
+  score++
+  scoreEl.textContent=score
+  if(score>=11){
+    bgm.volume=.25
+    show("s3")
   }
+}
 
-  function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+/* Coin */
+coin.onclick=()=>{
+  coin.classList.add("inserted")
+  setTimeout(()=>show("s4"),600)
+}
 
-  let fadeRAF = null;
-  function fadeBgmTo(target, ms=320){
-    if(!musicOn) return;
-    target = clamp01(target);
-    const startV = (typeof bgm.volume === "number") ? bgm.volume : 1;
-    const startT = performance.now();
+/* Wheel */
+const wheel=document.getElementById("wheel")
+const ctx=wheel.getContext("2d")
+const labels=[
+ "Free massage for girlfriend",
+ "You plan next date",
+ "5 mins Onyx",
+ "Tomyum ramen on you",
+ "Wild card"
+]
+function drawWheel(){
+ let a=0
+ labels.forEach((t,i)=>{
+  const slice=Math.PI*2/labels.length
+  ctx.beginPath()
+  ctx.moveTo(150,150)
+  ctx.arc(150,150,140,a,a+slice)
+  ctx.fillStyle=i%2?"#1d1d33":"#141423"
+  ctx.fill()
+  ctx.save()
+  ctx.translate(150,150)
+  ctx.rotate(a+slice/2)
+  ctx.fillStyle="#fff"
+  ctx.font="10px system-ui"
+  ctx.textAlign="center"
+  ctx.fillText(t.split(" ").slice(0,3).join(" "),90,0)
+  ctx.restore()
+  a+=slice
+ })
+}
+drawWheel()
 
-    if(fadeRAF) cancelAnimationFrame(fadeRAF);
+spin.onclick=()=>{
+ spinSfx.play()
+ setTimeout(()=>{
+  yay.play()
+  wildBtn.classList.remove("hidden")
+ },2000)
+}
 
-    const step = (now) => {
-      const p = Math.min(1, (now - startT)/ms);
-      const eased = 1 - Math.pow(1-p, 3);
-      bgm.volume = clamp01(startV + (target - startV) * eased);
-      if(p < 1) fadeRAF = requestAnimationFrame(step);
-    };
-    fadeRAF = requestAnimationFrame(step);
-  }
+wildBtn.onclick=()=>{
+ happy.volume=.25
+ happy.play()
+ show("s5")
+}
 
-  function startBgm(){
-    stopHappy();
-    bgm.volume = 1;
-    safePlay(bgm);
-  }
+/* Book */
+const pages=["photos/page1.jpg","photos/page2.jpg","photos/page3.jpg","photos/page4.jpg","photos/page5.jpg"]
+const caps=[
+ "Luck stat: 1",
+ "Luck stat increasing to…2",
+ "Luck stat increasing more…3",
+ "Luck stat increasing morer…4",
+ "Luck stat increasing morerest…5"
+]
+let idx=0
+function renderBook(){
+ book.innerHTML=`<img src="${pages[idx]}"><div class="caption">${caps[idx]}</div>`
+}
+renderBook()
+book.onclick=()=>{if(idx<4){idx++;renderBook()}}
 
-  function duckBgm(){ fadeBgmTo(0.25, 260); }
-  function stopBgm(){
-    if(fadeRAF) cancelAnimationFrame(fadeRAF);
-    fadeRAF = null;
-    bgm.pause();
-    bgm.currentTime = 0;
-  }
+bonusBtn.onclick=()=>show("s6")
 
-  function startHappy(){
-    stopBgm();
-    happy.volume = 1;
-    safePlay(happy);
-  }
-
-  function stopHappy(){
-    happy.pause();
-    happy.currentTime = 0;
-  }
-
-  function stopAllMusic(){
-    stopBgm();
-    stopHappy();
-  }
-
-  // Landing: envelope click -> play hmmmm -> change icon/text -> game
-  document.getElementById("env").addEventListener("click", async () => {
-    const env = document.getElementById("env");
-    const mailText = document.getElementById("mailText");
-
-    env.textContent = "📨";
-    mailText.classList.remove("hidden");
-
-    await safePlay(voice);
-
-    let moved = false;
-    const go = () => { if(moved) return; moved = true; show("s2"); };
-    const t = setTimeout(go, 2200);
-    voice.onended = () => { clearTimeout(t); go(); };
-  });
-
-  // ---------- Game ----------
-  const canvas = document.getElementById("game");
-  const ctx = canvas.getContext("2d");
-
-  const scoreEl = document.getElementById("score");
-  const statusPill = document.getElementById("statusPill");
-  const gameMsg = document.getElementById("gameMsg");
-
-  let running = false;
-  let last = 0;
-  let score = 0;
-
-  const groundY = 300;
-  const gravity = 1200;
-  const jumpV = -520;
-  const speed = 260;
-  const targetScore = 11;
-
-  const p = { x: 120, y: groundY, vy: 0, w: 28, h: 44, onGround: true };
-  let spikes = [];
-  let spawnTimer = 0;
-
-  let hearts = [];
-  function spawnHearts(){
-    hearts = [];
-    for(let i=0;i<18;i++){
-      hearts.push({
-        x: p.x + 4 + Math.random()*20,
-        y: (p.y - p.h) - 10 + Math.random()*10,
-        vx: -80 + Math.random()*160,
-        vy: -220 - Math.random()*180,
-        life: 0.9 + Math.random()*0.6
-      });
-    }
-  }
-
-  function resetGame(){
-    running = false;
-    last = performance.now();
-    score = 0;
-    scoreEl.textContent = "0";
-    p.y = groundY; p.vy = 0; p.onGround = true;
-    spikes = [];
-    spawnTimer = 0;
-    hearts = [];
-    statusPill.textContent = "Goal: 11";
-    gameMsg.textContent = "Tap the screen to jump.";
-    draw();
-  }
-
-  function jump(){
-    if(!running) return;
-    if(p.onGround){
-      p.vy = jumpV;
-      p.onGround = false;
-    }
-  }
-
-  function spawnSpike(){
-    spikes.push({ x: 560, w: 26, h: 34, passed: false });
-  }
-
-  function collideRect(ax,ay,aw,ah, bx,by,bw,bh){
-    return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
-  }
-
-  function lose(){
-    running = false;
-    statusPill.textContent = "Try again 😭";
-    gameMsg.textContent = "You touched a spike. Press Start and try again.";
-  }
-
-  function win(){
-    running = false;
-    statusPill.textContent = "WIN ✅";
-    gameMsg.textContent = "Damn, you’re an 11/10 indeed!";
-    if(musicOn) duckBgm();
-    spawnHearts();
-    setTimeout(() => show("s3"), 900);
-  }
-
-  function update(dt){
-    p.vy += gravity * dt;
-    p.y += p.vy * dt;
-
-    if(p.y >= groundY){
-      p.y = groundY;
-      p.vy = 0;
-      p.onGround = true;
-    }
-
-    spawnTimer -= dt;
-    if(spawnTimer <= 0){
-      spawnSpike();
-      spawnTimer = 0.8 + Math.random() * 0.65;
-    }
-
-    spikes.forEach(s => s.x -= speed * dt);
-    spikes = spikes.filter(s => s.x > -80);
-
-    for(const s of spikes){
-      if(!s.passed && s.x + s.w < p.x){
-        s.passed = true;
-        score++;
-        scoreEl.textContent = String(score);
-        if(score >= targetScore){
-          win();
-          return;
-        }
+/* Bonus clicks */
+let clicks=0
+dcopBonus.onclick=()=>{
+ clicks++
+ bonusMsg.textContent=[
+  "Better luck next time! Try again",
+  "Ohhhhh mans…. Try again!"
+ ][clicks-1]||""
+ if(clicks>=3){
+  show("s7")
+  setTimeout(()=>{
+    kissAudio.play()
+    document.getElementById("kiss").style.opacity=1
+    setTimeout(()=>{
+      loveAudio.play()
+      finalText.innerHTML="Happy Valentines mi baby! I’m the luckiest to have you.<br>With lots of love, Sandra"
+      for(let i=0;i<30;i++){
+        const p=document.createElement("span")
+        p.style.left=Math.random()*100+"%"
+        p.style.animationDelay=Math.random()*3+"s"
+        petals.appendChild(p)
       }
-    }
-
-    for(const s of spikes){
-      const spikeX = s.x;
-      const spikeY = groundY - s.h;
-      const hit = collideRect(p.x, p.y - p.h, p.w, p.h, spikeX+3, spikeY+6, s.w-6, s.h-6);
-      if(hit){ lose(); return; }
-    }
-
-    hearts.forEach(h => {
-      h.life -= dt;
-      h.vy += 600 * dt;
-      h.x += h.vx * dt;
-      h.y += h.vy * dt;
-    });
-    hearts = hearts.filter(h => h.life > 0);
-
-    draw();
-  }
-
-  function drawHeart(x,y){
-    ctx.fillStyle = "rgba(255,214,231,.95)";
-    ctx.fillRect(x, y, 3, 3);
-    ctx.fillRect(x+6, y, 3, 3);
-    ctx.fillRect(x-3, y+3, 3, 3);
-    ctx.fillRect(x+3, y+3, 3, 3);
-    ctx.fillRect(x+9, y+3, 3, 3);
-    ctx.fillRect(x, y+6, 3, 3);
-    ctx.fillRect(x+6, y+6, 3, 3);
-    ctx.fillRect(x+3, y+9, 3, 3);
-  }
-
-  function drawPixelBoy(){
-    const x = p.x, y = p.y;
-    const top = y - p.h;
-
-    ctx.fillStyle = "rgba(0,0,0,.35)";
-    ctx.fillRect(x+3, y+6, 22, 6);
-
-    ctx.fillStyle = "#1d1d33";
-    ctx.fillRect(x+6, top+28, 7, 14);
-    ctx.fillRect(x+15, top+28, 7, 14);
-
-    ctx.fillStyle = "#0b0b10";
-    ctx.fillRect(x+5, top+42, 9, 2);
-    ctx.fillRect(x+14, top+42, 9, 2);
-
-    ctx.fillStyle = "#f6f6ff";
-    ctx.fillRect(x+5, top+18, 18, 12);
-
-    ctx.fillStyle = "#f1d0b5";
-    ctx.fillRect(x+3, top+20, 3, 8);
-    ctx.fillRect(x+23, top+20, 3, 8);
-
-    ctx.fillStyle = "#f1d0b5";
-    ctx.fillRect(x+7, top+4, 14, 14);
-
-    ctx.fillStyle = "#0b0b10";
-    ctx.fillRect(x+6, top+2, 16, 6);
-    ctx.fillRect(x+6, top+7, 4, 4);
-    ctx.fillRect(x+10, top+7, 4, 3);
-    ctx.fillRect(x+14, top+7, 4, 4);
-    ctx.fillRect(x+18, top+7, 4, 3);
-
-    ctx.fillStyle = "#000";
-    ctx.fillRect(x+11, top+10, 2, 2);
-    ctx.fillRect(x+17, top+10, 2, 2);
-
-    ctx.fillStyle = "#0b0b10";
-    ctx.font = "10px system-ui";
-    ctx.fillText("27", x+10, top+27);
-
-    ctx.font = "12px system-ui";
-    ctx.fillStyle = "rgba(255,255,255,.92)";
-    ctx.fillText("dcop", x+1, top-6);
-  }
-
-  function drawSpike(s){
-    const spikeX = s.x, baseY = groundY, h = s.h, w = s.w;
-    ctx.fillStyle = "#2a2a44";
-    ctx.beginPath();
-    ctx.moveTo(spikeX, baseY);
-    ctx.lineTo(spikeX + w/2, baseY - h);
-    ctx.lineTo(spikeX + w, baseY);
-    ctx.closePath();
-    ctx.fill();
-    ctx.strokeStyle = "#3a3a66";
-    ctx.stroke();
-  }
-
-  function draw(){
-    ctx.clearRect(0,0,520,360);
-    ctx.fillStyle = "#0f0f1a";
-    ctx.fillRect(0,0,520,360);
-
-    ctx.fillStyle = "rgba(255,255,255,.08)";
-    for(let i=0;i<30;i++) ctx.fillRect((i*73)%520, (i*41)%260, 2, 2);
-
-    ctx.fillStyle = "#141423";
-    ctx.fillRect(0, groundY, 520, 60);
-    ctx.fillStyle = "#2a2a44";
-    ctx.fillRect(0, groundY, 520, 2);
-
-    spikes.forEach(drawSpike);
-    drawPixelBoy();
-    hearts.forEach(h => drawHeart(h.x, h.y));
-  }
-
-  function loop(now){
-    const dt = Math.min(0.033, (now - last)/1000);
-    last = now;
-    if(running) update(dt);
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
-
-  document.getElementById("start").onclick = async () => {
-    resetGame();
-    running = true;
-    statusPill.textContent = "Goal: 11";
-    if(musicOn) startBgm();
-  };
-
-  canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
-
-  document.getElementById("muteMusic").onclick = () => {
-    musicOn = !musicOn;
-    const btn = document.getElementById("muteMusic");
-    btn.textContent = musicOn ? "Music: On" : "Music: Off";
-
-    if(!musicOn){
-      stopAllMusic();
-    } else {
-      const s4bVisible = !document.getElementById("s4b").classList.contains("hidden");
-      if(s4bVisible) startHappy();
-      else startBgm();
-    }
-  };
-
-  resetGame();
-
-  // ---------- Coin insert animation -> wheel ----------
-  const coinEl = document.getElementById("coin");
-  let coinUsed = false;
-
-  coinEl.onclick = () => {
-    if(coinUsed) return;
-    coinUsed = true;
-    document.getElementById("coinMsg").textContent = "Coin inserted 😏";
-    coinEl.classList.add("inserted");
-    setTimeout(() => show("s4"), 620);
-  };
-
-  // ---------- Wheel ----------
-  const wheelSubtitle = document.getElementById("wheelSubtitle");
-  const wildBtn = document.getElementById("wildBtn");
-
-  const segments = [
-    { label: "Free massage for girlfriend", weight: 0.225 },
-    { label: "You plan next date",          weight: 0.225 },
-    { label: "5 mins Onyx",                 weight: 0.225 },
-    { label: "Tomyum ramen on you",         weight: 0.225 },
-    { label: "Wild card",                   weight: 0.10  }
-  ];
-  const forcedLabel = "Wild card";
-
-  const wheel = document.getElementById("wheel");
-  const wctx = wheel.getContext("2d");
-  const cx=150, cy=150, r=138;
-  const innerR = 55;
-
-  const totalW = segments.reduce((a,s)=>a+s.weight,0);
-  segments.forEach(s => s.weight = s.weight/totalW);
-
-  function breakLongWord(ctx, word, maxWidth){
-    const parts = [];
-    let cur = "";
-    for(const ch of word){
-      const test = cur + ch;
-      if(ctx.measureText(test).width <= maxWidth){
-        cur = test;
-      } else {
-        if(cur) parts.push(cur);
-        cur = ch;
-      }
-    }
-    if(cur) parts.push(cur);
-    return parts;
-  }
-
-  function wrapLines(ctx, text, maxWidth){
-    const rawWords = text.split(" ");
-    const words = [];
-    for(const w of rawWords){
-      if(ctx.measureText(w).width <= maxWidth) {
-        words.push(w);
-      } else {
-        words.push(...breakLongWord(ctx, w, maxWidth));
-      }
-    }
-
-    const lines = [];
-    let line = "";
-    for(const w of words){
-      const test = line ? (line + " " + w) : w;
-      if(ctx.measureText(test).width <= maxWidth){
-        line = test;
-      } else {
-        if(line) lines.push(line);
-        line = w;
-      }
-    }
-    if(line) lines.push(line);
-    return lines.slice(0, 5); // allow up to 5 lines
-  }
-
-  function linesFit(ctx, lines, maxWidth){
-    return lines.every(ln => ctx.measureText(ln).width <= maxWidth);
-  }
-
-  function drawWheel(){
-    wctx.clearRect(0,0,300,300);
-    let a = 0;
-
-    for(let i=0;i<segments.length;i++){
-      const s = segments[i];
-      const slice = (Math.PI*2) * s.weight;
-      const a0 = a;
-      const a1 = a + slice;
-
-      // slice
-      wctx.beginPath();
-      wctx.moveTo(cx,cy);
-      wctx.arc(cx,cy,r,a0,a1);
-      wctx.closePath();
-      wctx.fillStyle = (i%2===0) ? "#1d1d33" : "#141423";
-      wctx.fill();
-      wctx.strokeStyle="#3a3a66";
-      wctx.stroke();
-
-      // clip to slice
-      wctx.save();
-      wctx.beginPath();
-      wctx.moveTo(cx,cy);
-      wctx.arc(cx,cy,r,a0,a1);
-      wctx.closePath();
-      wctx.clip();
-
-      const mid = a0 + slice/2;
-      wctx.translate(cx,cy);
-      wctx.rotate(mid);
-
-      const upsideDown = (mid > Math.PI/2 && mid < (Math.PI*3)/2);
-      if(upsideDown) wctx.rotate(Math.PI);
-
-      wctx.fillStyle="rgba(255,255,255,.92)";
-      wctx.textAlign="center";
-      wctx.textBaseline="middle";
-
-      const textRadius = (innerR + r) / 2;
-      const xPos = upsideDown ? -textRadius : textRadius;
-
-      // ✅ FORCE WRAP: intentionally narrower width so it breaks into lines
-      // (instead of letting arc-length keep it as one long line)
-      const forcedWrapWidth = 64;                 // <- tweak if you want tighter/looser
-      const arcLen = slice * textRadius;
-      const maxWidth = Math.min(forcedWrapWidth, Math.max(52, arcLen - 22));
-
-      // ✅ Smaller font range
-      let size = 11;
-      while(size >= 8){
-        wctx.font = `${size}px system-ui`;
-        const lines = wrapLines(wctx, s.label, maxWidth);
-
-        if(linesFit(wctx, lines, maxWidth)){
-          const lineH = size + 2;
-          const totalH = (lines.length - 1) * lineH;
-          lines.forEach((ln, idx) => {
-            const y = (idx * lineH) - totalH/2;
-            wctx.fillText(ln, xPos, y);
-          });
-          break;
-        }
-        size--;
-      }
-
-      wctx.restore();
-      a = a1;
-    }
-
-    // hub
-    wctx.beginPath();
-    wctx.arc(cx,cy,innerR,0,Math.PI*2);
-    wctx.fillStyle="#0b0b10"; wctx.fill();
-    wctx.strokeStyle="#3a3a66"; wctx.stroke();
-  }
-  drawWheel();
-
-  function confetti(){
-    const c = document.getElementById("confetti");
-    c.innerHTML="";
-    c.classList.remove("hidden");
-    for(let i=0;i<70;i++){
-      const p=document.createElement("i");
-      p.style.left = Math.random()*100+"vw";
-      p.style.background = (i%3===0) ? "#fff" : (i%3===1 ? "#b9b9ff" : "#ffd6e7");
-      p.style.animationDelay = (Math.random()*0.2)+"s";
-      c.appendChild(p);
-    }
-    setTimeout(()=>c.classList.add("hidden"), 1800);
-  }
-
-  const spinBtn = document.getElementById("spin");
-  let spinning=false;
-
-  function angleForSegmentLabel(label){
-    let a = 0;
-    for(const s of segments){
-      const slice = (Math.PI*2)*s.weight;
-      const mid = a + slice/2;
-      if(s.label === label) return { mid };
-      a += slice;
-    }
-    return { mid: 0 };
-  }
-
-  spinBtn.onclick = async () => {
-    if(spinning) return;
-    spinning=true;
-
-    if(musicOn) duckBgm();
-
-    wheelSubtitle.textContent = "";
-    wildBtn.classList.add("hidden");
-
-    spinSfx.currentTime = 0;
-    await safePlay(spinSfx);
-
-    const target = angleForSegmentLabel(forcedLabel);
-    const pointerAngle = Math.PI * 1.5;
-    const turns = 5;
-    const targetRot = (Math.PI*2)*turns + (pointerAngle - target.mid);
-
-    const start = performance.now();
-    const dur = 3600;
-
-    const anim = (now) => {
-      const p = Math.min(1,(now-start)/dur);
-      const ease = 1 - Math.pow(1-p, 3);
-      const rot = ease * targetRot;
-      wheel.style.transform = `rotate(${rot}rad)`;
-
-      if(p<1) requestAnimationFrame(anim);
-      else{
-        spinning=false;
-
-        confetti();
-        yay.currentTime = 0;
-        safePlay(yay);
-
-        wheelSubtitle.textContent = "Wild card? Hmmmm";
-        wildBtn.classList.remove("hidden");
-      }
-    };
-    requestAnimationFrame(anim);
-  };
-
-  wildBtn.onclick = () => show("s4b");
-
-  // ---------- Book ----------
-  const pages = [
-    "photos/page1.jpg",
-    "photos/page2.jpg",
-    "photos/page3.jpg",
-    "photos/page4.jpg",
-    "photos/page5.jpg"
-  ];
-
-  const captions = [
-    "Luck stat: 1",
-    "Luck stat increasing to…2",
-    "Luck stat increasing more…3",
-    "Luck stat increasing morer…4",
-    "Luck stat increasing morerest…5"
-  ];
-
-  const book = document.getElementById("book");
-  let idx = 0;
-
-  function renderBook(){
-    book.innerHTML="";
-    const p = document.createElement("div");
-    p.className="page";
-    p.innerHTML = `
-      <img src="${pages[idx]}" alt="page"/>
-      <div class="caption">${captions[idx]}</div>
-      <div class="pageNumber">${idx+1} / ${pages.length}</div>
-    `;
-    book.appendChild(p);
-  }
-  renderBook();
-
-  let startX=null;
-  book.addEventListener("touchstart", (e)=>{ startX = e.touches[0].clientX; }, {passive:true});
-  book.addEventListener("touchend", (e)=>{
-    if(startX==null) return;
-    const endX = e.changedTouches[0].clientX;
-    const dx = endX - startX;
-    startX=null;
-    if(Math.abs(dx) < 35) return;
-    if(dx < 0 && idx < pages.length-1) idx++;
-    if(dx > 0 && idx > 0) idx--;
-    renderBook();
-  });
-
-  let mouseDown=false, mX=0;
-  book.addEventListener("mousedown",(e)=>{mouseDown=true;mX=e.clientX;});
-  window.addEventListener("mouseup",(e)=>{
-    if(!mouseDown) return;
-    mouseDown=false;
-    const dx=e.clientX-mX;
-    if(Math.abs(dx) < 50) return;
-    if(dx < 0 && idx < pages.length-1) idx++;
-    if(dx > 0 && idx > 0) idx--;
-    renderBook();
-  });
-
-  document.getElementById("toBook").onclick = () => show("s5");
+    },800)
+  },3000)
+ }
+}
 </script>
 </body>
 </html>
