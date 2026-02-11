@@ -192,7 +192,13 @@
 
     /* Walk sljy 5-ish steps */
     .sljyWalk{animation:walkTo 1.6s ease-out forwards}
-    @keyframes walkTo{to{left:230px}}
+@keyframes walkTo{
+  to{
+    left:170px;                 /* closer to dcop */
+    transform:rotate(-6deg);    /* lean in */
+  }
+}
+
   </style>
 </head>
 <body>
@@ -347,12 +353,14 @@
 
           <div class="charRow" id="charRow">
             <!-- sljy -->
-            <div class="char" id="sljyFinal" style="left:46px;">
+            <div class="char" id="sljyFinal" style="left:110px;">
               <div class="nameTag" id="sljyTag">sljy</div>
               <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
                
-                <!-- hair (dark brown, centre-parting, wavy-ish) -->
-<div style="position:absolute;left:24px;top:14px;width:46px;height:50px;background:#3b2418;border-radius:10px;opacity:.96"></div>
+                <!-- hair (dark brown, simple blocky like before) -->
+<div style="position:absolute;left:28px;top:16px;width:38px;height:38px;background:#3b2418;border-radius:8px"></div>
+<div style="position:absolute;left:24px;top:26px;width:46px;height:46px;background:#3b2418;border-radius:10px;opacity:.95"></div>
+
 
 <!-- center part line -->
 <div style="position:absolute;left:46px;top:18px;width:4px;height:22px;background:#2a170f;border-radius:3px;opacity:.55"></div>
@@ -387,7 +395,7 @@
 
     
             <!-- dcop -->
-<div class="char" id="dcopFinal" style="left:292px;">
+<div class="char" id="dcopFinal" style="left:250px;">
   <div class="nameTag" id="dcopTag">dcop</div>
 
   <!-- Use SAME sprite logic as S6, just scaled for S7 -->
@@ -1166,20 +1174,22 @@
 
 function positionKissBetweenHeads(){
   const kiss = document.getElementById("kissIcon");
+  const a = document.getElementById("sljyFinal").getBoundingClientRect();
+  const b = document.getElementById("dcopFinal").getBoundingClientRect();
+  const sky = document.getElementById("sky").getBoundingClientRect();
 
-  const aTag = document.getElementById("sljyTag").getBoundingClientRect();
-  const bTag = document.getElementById("dcopTag").getBoundingClientRect();
-  const sky  = document.getElementById("sky").getBoundingClientRect();
+  // center X between the two chars
+  const midX = ((a.left + a.right)/2 + (b.left + b.right)/2) / 2;
 
-  const aMid = (aTag.left + aTag.right) / 2;
-  const bMid = (bTag.left + bTag.right) / 2;
-  const midX = (aMid + bMid) / 2;
+  // place ABOVE the name tags (higher than before)
+  const topY = Math.min(a.top, b.top) - 18;
 
-  // put kiss ABOVE both name tags
-  const y = Math.min(aTag.top, bTag.top) - 22;
+  // convert to sky-local coords
+  const x = midX - sky.left;
+  const y = topY - sky.top;
 
-  kiss.style.left = (midX - sky.left) + "px";
-  kiss.style.top  = (y - sky.top) + "px";
+  kiss.style.left = x + "px";
+  kiss.style.top = y + "px";
 }
 
 
