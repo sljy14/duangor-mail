@@ -194,8 +194,8 @@
     .sljyWalk{animation:walkTo 1.6s ease-out forwards}
 @keyframes walkTo{
   to{
-    left:170px;                 /* closer to dcop */
-    transform:rotate(-6deg);    /* lean in */
+    left:205px;                 /* ✅ ends right next to dcop */
+    transform:rotate(-10deg);   /* ✅ more obvious lean-in */
   }
 }
 
@@ -353,13 +353,17 @@
 
           <div class="charRow" id="charRow">
             <!-- sljy -->
-            <div class="char" id="sljyFinal" style="left:110px;">
+            <div class="char" id="sljyFinal" style="left:170px;">
               <div class="nameTag" id="sljyTag">sljy</div>
               <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
                
-                <!-- hair (dark brown, simple blocky like before) -->
-<div style="position:absolute;left:28px;top:16px;width:38px;height:38px;background:#3b2418;border-radius:8px"></div>
-<div style="position:absolute;left:24px;top:26px;width:46px;height:46px;background:#3b2418;border-radius:10px;opacity:.95"></div>
+                
+<!-- hair (straight block) -->
+<div style="position:absolute;left:26px;top:16px;width:42px;height:14px;background:#3b2418"></div>
+<div style="position:absolute;left:24px;top:28px;width:46px;height:22px;background:#3b2418"></div>
+<div style="position:absolute;left:24px;top:50px;width:8px;height:20px;background:#3b2418"></div>
+<div style="position:absolute;left:62px;top:50px;width:8px;height:20px;background:#3b2418"></div>
+
 
 
 <!-- center part line -->
@@ -395,7 +399,7 @@
 
     
             <!-- dcop -->
-<div class="char" id="dcopFinal" style="left:250px;">
+<div class="char" id="dcopFinal" style="left:245px;">
   <div class="nameTag" id="dcopTag">dcop</div>
 
   <!-- Use SAME sprite logic as S6, just scaled for S7 -->
@@ -1113,28 +1117,28 @@
 
   // iOS audio unlock (must be inside user gesture)
   async function unlockAudio(){
+  // iOS: must be inside a user gesture.
+  // Use muted play/pause so it NEVER becomes audible and doesn't "pre-fire" later.
   try{
-    // iOS Safari: best unlock pattern = play() while muted inside a user gesture
-    kissAudio.pause(); loveAudio.pause();
-    kissAudio.currentTime = 0; loveAudio.currentTime = 0;
-
     kissAudio.muted = true;
     loveAudio.muted = true;
 
+    kissAudio.currentTime = 0;
     await safePlay(kissAudio);
     kissAudio.pause();
-    kissAudio.currentTime = 0;
 
+    loveAudio.currentTime = 0;
     await safePlay(loveAudio);
     loveAudio.pause();
+
+    kissAudio.currentTime = 0;
     loveAudio.currentTime = 0;
 
-    // unmute for real playback later
     kissAudio.muted = false;
     loveAudio.muted = false;
-
   }catch(e){}
 }
+
 
 
   // ---------- S7 helpers ----------
@@ -1182,7 +1186,7 @@ function positionKissBetweenHeads(){
   const midX = ((a.left + a.right)/2 + (b.left + b.right)/2) / 2;
 
   // place ABOVE the name tags (higher than before)
-  const topY = Math.min(a.top, b.top) - 18;
+  const topY = Math.min(a.top, b.top) - 55;
 
   // convert to sky-local coords
   const x = midX - sky.left;
@@ -1193,52 +1197,58 @@ function positionKissBetweenHeads(){
 }
 
 
-  async function startFinalSequence(){
+  let finalSeqStarted = false;
+let loveTimer = null;
+
+async function startFinalSequence(){
+  if(finalSeqStarted) return;       // ✅ prevents double-trigger
+  finalSeqStarted = true;
+
   const sljy = document.getElementById("sljyFinal");
   const kiss = document.getElementById("kissIcon");
-  const dcop = document.getElementById("dcopFinal");
 
-  // Make sure both chars are on-screen before we measure
-  layoutFinalChars();
+  // stop any stray love that might have started
+  try{
+    loveAudio.pause();
+    loveAudio.currentTime = 0;
+  }catch(e){}
 
-  const sljyLeft = parseFloat(sljy.style.left || "0");
-  const dcopLeft = parseFloat(dcop.style.left || "0");
+  // ensure happy is low so kiss/love can be heard
+  if(musicOn){
+    happy.volume = 0.18;
+  }
 
-  // Stop near dcop (so both are visible)
-  const targetLeft = Math.max(sljyLeft, dcopLeft - 92);
+  // walk + lean in
+  sljy.classList.add("sljyWalk");
 
-  // Walk (more reliable than fixed CSS keyframes)
-  sljy.animate(
-    [{ left: sljyLeft + "px" }, { left: targetLeft + "px" }],
-    { duration: 1600, easing: "ease-out", fill: "forwards" }
-  );
-  sljy.style.left = targetLeft + "px";
-
+  // after walk: show kiss, play kiss, then love once
   setTimeout(async ()=>{
     positionKissBetweenHeads();
     kiss.style.opacity = 1;
 
-    // Duck happy briefly so kiss is audible, then restore
-    const prevHappyVol = happy.volume;
-    happy.volume = 0.12;
-
+    kissAudio.pause();
     kissAudio.currentTime = 0;
     kissAudio.volume = 1;
     await safePlay(kissAudio);
 
-    happy.volume = prevHappyVol; // back to 0.25
-
     startPetals();
 
-    // 0.5s after kiss: play love (ONE-SHOT)
-    setTimeout(async ()=>{
+    if(loveTimer) clearTimeout(loveTimer);
+    loveTimer = setTimeout(async ()=>{
+      loveAudio.pause();
       loveAudio.currentTime = 0;
       loveAudio.volume = 1;
       await safePlay(loveAudio);
+
+      // restore happy to 0.25 after love starts
+      if(musicOn){
+        happy.volume = 0.25;
+      }
     }, 500);
 
-  }, 1600);
+  }, 1650);
 }
+
 
 
   window.addEventListener("resize", ()=>{
