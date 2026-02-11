@@ -1,337 +1,839 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>You’ve got mail 💌</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>You’ve got mail 💌</title>
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#0b0b10;color:#fff}
+    .wrap{max-width:760px;margin:0 auto;padding:18px;text-align:center}
+    .card{background:#141423;border:1px solid #2a2a44;border-radius:16px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+    .hidden{display:none}
+    .big{font-size:28px}
+    .note{opacity:.85;font-size:14px;line-height:1.35}
+    .btn{padding:12px 16px;border-radius:12px;border:1px solid #3a3a66;background:#1d1d33;color:#fff;cursor:pointer}
+    .btn:active{transform:scale(.98)}
+    .divider{height:1px;background:#2a2a44;margin:16px 0}
 
-<style>
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto;
-  background:#0b0b10;
-  color:#fff;
-}
-.wrap{max-width:760px;margin:0 auto;padding:18px;text-align:center}
-.card{
-  background:#141423;
-  border:1px solid #2a2a44;
-  border-radius:16px;
-  padding:18px;
-  box-shadow:0 12px 40px rgba(0,0,0,.35)
-}
-.hidden{display:none}
-.big{font-size:26px}
-.note{opacity:.85;font-size:14px}
-.btn{
-  padding:12px 16px;
-  border-radius:12px;
-  border:1px solid #3a3a66;
-  background:#1d1d33;
-  color:#fff;
-  cursor:pointer
-}
-.btn:active{transform:scale(.97)}
-.divider{height:1px;background:#2a2a44;margin:16px 0}
+    /* Error banner (shows JS errors on iPhone) */
+    .errBanner{
+      display:none;
+      margin:12px auto 0 auto;
+      max-width:520px;
+      text-align:left;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,80,110,.55);
+      background:rgba(255,80,110,.12);
+      color:#ffd6e7;
+      font-size:12px;
+      line-height:1.35;
+      white-space:pre-wrap;
+    }
 
-/* Envelope */
-.envelope{font-size:120px;cursor:pointer}
-.envelope.clicked{opacity:.8}
+    /* Envelope */
+    .envelope{font-size:120px;cursor:pointer;user-select:none;display:inline-block;line-height:1}
+    .envelope:active{transform:scale(.98)}
+    .envTitle{margin-top:8px;font-size:18px;opacity:.9}
 
-/* Game */
-canvas{width:100%;max-width:520px;background:#0f0f1a;border-radius:14px;border:1px solid #2a2a44}
-.hud{display:flex;justify-content:space-between;max-width:520px;margin:10px auto;gap:8px;flex-wrap:wrap}
-.pill{font-size:12px;border:1px solid #2a2a44;padding:6px 10px;border-radius:999px}
+    /* Game */
+    canvas.game{max-width:520px;width:100%;background:#0f0f1a;border:1px solid #2a2a44;border-radius:14px;touch-action:manipulation}
+    .hud{display:flex;justify-content:space-between;gap:10px;max-width:520px;margin:10px auto 0 auto;flex-wrap:wrap}
+    .pill{font-size:12px;opacity:.9;border:1px solid #2a2a44;background:rgba(0,0,0,.25);padding:7px 10px;border-radius:999px}
 
-/* Coin */
-.coin{font-size:42px;cursor:pointer}
-.coin.inserted{opacity:.3;transform:translateX(50px) scale(.5);transition:.5s}
+    /* Coin */
+    .coinSlot{display:inline-flex;align-items:center;gap:12px;margin-top:10px;justify-content:center}
+    .coin{font-size:44px;cursor:pointer;user-select:none;display:inline-block}
+    .coin.inserted{animation:coinIn .55s ease forwards}
+    @keyframes coinIn{
+      0%{transform:translateX(0) translateY(0) scale(1)}
+      70%{transform:translateX(46px) translateY(-4px) scale(.92)}
+      100%{transform:translateX(62px) translateY(-2px) scale(.55);opacity:.15}
+    }
+    .slot{width:90px;height:22px;border:1px solid #3a3a66;border-radius:12px;position:relative;background:#0b0b10}
+    .slot:before{content:"";position:absolute;left:12px;right:12px;top:9px;height:4px;background:#2a2a44;border-radius:10px}
 
-/* Wheel */
-.wheelBox{position:relative;width:300px;height:300px;margin:0 auto}
-#wheel{width:300px;height:300px;border-radius:50%}
-.pointer{
-  position:absolute;top:-6px;left:50%;
-  transform:translateX(-50%);
-  width:0;height:0;
-  border-left:14px solid transparent;
-  border-right:14px solid transparent;
-  border-bottom:22px solid #ff4d7d
-}
+    /* Wheel */
+    .wheelBox{position:relative;width:300px;height:300px;margin:0 auto}
+    #wheel{width:300px;height:300px;border-radius:50%;border:2px solid #3a3a66;transform:rotate(0deg)}
+    .pointer{
+      position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+      width:0;height:0;
+      border-left:14px solid transparent;border-right:14px solid transparent;
+      border-bottom:22px solid #ff4d7d;
+      filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));
+    }
+    .subtitle{opacity:.9;margin-top:6px}
+    .result{margin-top:14px;font-size:16px;min-height:22px}
 
-/* Book */
-.book{position:relative;width:420px;height:560px;margin:0 auto;border-radius:16px;overflow:hidden}
-.book img{width:100%;height:100%;object-fit:cover}
-.caption{
-  position:absolute;top:10px;left:10px;right:10px;
-  background:rgba(0,0,0,.4);
-  padding:10px;border-radius:12px;font-size:14px
-}
+    /* Confetti */
+    .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+    .confetti i{position:absolute;top:-10px;width:8px;height:10px;opacity:.9;animation:fall 1.8s linear forwards}
+    @keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:0.12}}
 
-/* Bonus click */
-.avatarBig{font-size:90px;cursor:pointer}
+    /* Book */
+    .book{position:relative;max-width:420px;margin:0 auto;height:560px;border-radius:16px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
+    .page{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+    .page img{width:100%;height:100%;object-fit:cover}
+    .pageNumber{position:absolute;bottom:10px;right:12px;font-size:12px;opacity:.7;background:rgba(0,0,0,.35);padding:6px 8px;border-radius:10px}
+    .caption{
+      position:absolute;top:10px;left:10px;right:10px;
+      font-size:13px;opacity:.92;
+      background:rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.14);
+      padding:10px 12px;border-radius:14px;
+      text-align:left;
+      backdrop-filter: blur(6px);
+    }
 
-/* Final scene */
-.finalScene{
-  position:relative;
-  height:600px;
-  background:linear-gradient(#87cefa,#e0f7ff 60%,#7cd67c);
-  overflow:hidden
-}
-.sun{position:absolute;top:30px;right:40px;width:80px;height:80px;border-radius:50%;background:#ffd84d}
-.cloud{position:absolute;top:80px;width:120px;height:40px;background:#fff;border-radius:20px;opacity:.8;animation:cloud 30s linear infinite}
-@keyframes cloud{from{left:-140px}to{left:100%}}
+    /* Bonus click page */
+    .bigAvatarBtn{display:inline-block;cursor:pointer;user-select:none;margin-top:14px}
+    .bigAvatarBtn:active{transform:scale(.98)}
+    .bonusHint{margin-top:10px;min-height:22px}
 
-.char{
-  position:absolute;bottom:80px;font-size:110px;
-}
-.label{
-  position:absolute;top:-28px;left:50%;
-  transform:translateX(-50%);
-  font-size:14px;background:rgba(0,0,0,.5);
-  padding:4px 8px;border-radius:10px
-}
+    /* Final sunny scene */
+    .finalWrap{max-width:520px;margin:0 auto;border-radius:16px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
+    .sky{
+      position:relative;
+      height:520px;
+      background:linear-gradient(#8fd3ff,#e9fbff 62%,#7fe07f 62%,#57c457);
+      overflow:hidden;
+    }
+    .sun{position:absolute;top:26px;right:28px;width:86px;height:86px;border-radius:50%;background:#ffd55b;box-shadow:0 0 24px rgba(255,213,91,.55)}
+    .cloud{position:absolute;top:70px;width:150px;height:46px;background:rgba(255,255,255,.92);border-radius:28px;filter:blur(.2px);opacity:.9}
+    .cloud:before,.cloud:after{content:"";position:absolute;background:rgba(255,255,255,.92);border-radius:50%}
+    .cloud:before{width:54px;height:54px;left:22px;top:-24px}
+    .cloud:after{width:70px;height:70px;left:62px;top:-38px}
+    .cloud.c1{left:-180px;animation:cloudMove 28s linear infinite}
+    .cloud.c2{top:128px;left:-220px;animation:cloudMove 34s linear infinite;opacity:.78}
+    @keyframes cloudMove{to{transform:translateX(980px)}}
 
-#sljy{left:20px;animation:walk 3s forwards}
-@keyframes walk{to{left:220px}}
+    .charRow{position:absolute;left:0;right:0;bottom:110px;height:220px}
+    .char{position:absolute;bottom:0;width:120px;height:170px;}
+    .nameTag{
+      position:absolute;top:-28px;left:50%;transform:translateX(-50%);
+      font-size:12px;background:rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.18);
+      padding:5px 8px;border-radius:12px;backdrop-filter:blur(6px)
+    }
+    .pix{position:absolute;left:0;top:0;width:120px;height:170px}
+    .kissIcon{
+      position:absolute;left:50%;top:-52px;transform:translateX(-50%);
+      font-size:34px;opacity:0;transition:.25s
+    }
 
-.kiss{
-  position:absolute;font-size:40px;
-  top:-50px;left:50%;
-  transform:translateX(-50%);
-  opacity:0;transition:.4s
-}
+    .sljyWalk{animation:walkTo 2.0s ease-out forwards}
+    @keyframes walkTo{to{left:250px}}
 
-/* Petals */
-.petals{pointer-events:none;position:absolute;inset:0}
-.petals span{
-  position:absolute;top:-20px;
-  width:12px;height:12px;
-  background:#ffb7c5;
-  border-radius:60% 40% 60% 40%;
-  opacity:.9;
-  animation:fall 6s linear infinite
-}
-@keyframes fall{
-  to{transform:translateY(700px) rotate(360deg);opacity:.2}
-}
-</style>
+    .petals{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .petals span{
+      position:absolute;top:-20px;width:12px;height:12px;
+      background:#ffb7c5;border-radius:60% 40% 60% 40%;
+      opacity:.92;
+      animation:petalFall 6.5s linear infinite;
+    }
+    @keyframes petalFall{
+      to{transform:translateY(560px) rotate(360deg);opacity:.2}
+    }
+    .finalText{margin-top:14px;font-size:18px;line-height:1.35}
+  </style>
 </head>
-
 <body>
-<div class="wrap"><div class="card">
+<div class="wrap">
+  <div class="card">
 
-<!-- S1 -->
-<section id="s1">
-  <div class="big">Dear Mr Wong Duan Chiang,</div>
-  <p class="note">Have you turned your audio on? Click on the envelope.</p>
-  <div class="divider"></div>
-  <div class="envelope" id="env">💌</div>
-</section>
+    <!-- JS error banner -->
+    <div class="errBanner" id="errBanner"></div>
 
-<!-- S2 Game -->
-<section id="s2" class="hidden">
-  <div class="big">How OP are you? 🎮</div>
-  <p class="note">Reach 11 to win the game.</p>
-  <div class="hud">
-    <div class="pill">dcop</div>
-    <div class="pill">Goal: 11</div>
-    <div class="pill">Score: <span id="score">0</span></div>
+    <!-- S1 -->
+    <section id="s1">
+      <div class="big">Dear Mr Wong Duan Chiang,</div>
+      <p class="note">Have you turned your audio on? Click on the envelope.</p>
+      <div class="divider"></div>
+      <div class="envelope" id="env" title="Click me">💌</div>
+      <div class="envTitle" id="envTitle"></div>
+
+      <!-- Audio -->
+      <audio id="hmmmm" preload="auto" src="hmmmm.mp3"></audio>
+      <audio id="bgm" preload="auto" src="bgm.mp3" loop></audio>
+      <audio id="spinSfx" preload="auto" src="spin.mp3"></audio>
+      <audio id="yay" preload="auto" src="yay.mp3"></audio>
+      <audio id="happy" preload="auto" src="happy.mp3" loop></audio>
+      <audio id="kissAudio" preload="auto" src="kiss.mp3"></audio>
+      <audio id="loveAudio" preload="auto" src="love.mp3"></audio>
+    </section>
+
+    <!-- S2 Game -->
+    <section id="s2" class="hidden">
+      <div class="big">How OP are you? 🎮</div>
+      <p class="note">Reach 11 to win the game.</p>
+
+      <div class="hud">
+        <div class="pill">Player: <b>dcop</b></div>
+        <div class="pill">Goal: <b>11</b></div>
+        <div class="pill">Score: <b id="score">0</b>/11</div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <canvas class="game" id="game" width="520" height="360"></canvas>
+      </div>
+
+      <div style="margin-top:12px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+        <button class="btn" id="start">Start</button>
+        <button class="btn" id="muteMusic">Music: On</button>
+      </div>
+
+      <p class="note" id="gameMsg" style="margin-top:10px;">Tap the screen to jump.</p>
+    </section>
+
+    <!-- S3 Coin -->
+    <section id="s3" class="hidden">
+      <div class="big">YOU WON 🏆</div>
+      <div class="big" style="font-size:24px;margin-top:6px;">Damn, you’re an 11/10 indeed!</div>
+      <div class="divider"></div>
+      <div class="big">🪙 +1 Coin</div>
+      <p class="note">Insert your coin to spin.</p>
+
+      <div class="coinSlot">
+        <span class="coin" id="coin" title="Insert coin">🪙</span>
+        <span class="slot" id="slot" title="coin slot"></span>
+      </div>
+
+      <p class="note" id="coinMsg" style="margin-top:8px;"></p>
+    </section>
+
+    <!-- S4 Wheel -->
+    <section id="s4" class="hidden">
+      <div class="big">Spin to win 🎡</div>
+      <p class="subtitle" id="wheelSubtitle"></p>
+
+      <div class="wheelBox">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="300" height="300"></canvas>
+      </div>
+
+      <div style="margin-top:12px;">
+        <button class="btn" id="spin">SPIN</button>
+      </div>
+
+      <button class="btn hidden" id="wildBtn" style="margin-top:14px;">Wild card? Hmmmm</button>
+      <p class="result" id="wheelResult"></p>
+    </section>
+
+    <!-- S5 Book -->
+    <section id="s5" class="hidden">
+      <div class="big">📊 Luck Stats Report</div>
+      <p class="note">Swipe left/right.</p>
+      <div class="book" id="book"></div>
+
+      <button class="btn" id="bonusBtn" style="margin-top:14px;">Bonus luck here!</button>
+    </section>
+
+    <!-- S6 Bonus clicks -->
+    <section id="s6" class="hidden">
+      <div class="big">Click on dcop to increase your luck stats!</div>
+      <p class="note">Just tap him 😏</p>
+
+      <div class="bigAvatarBtn" id="dcopTap" aria-label="dcop">
+        <svg width="160" height="200" viewBox="0 0 160 200">
+          <rect x="0" y="0" width="160" height="200" fill="transparent"/>
+          <text x="80" y="22" text-anchor="middle" fill="white" font-size="14" opacity="0.9">dcop</text>
+          <rect x="62" y="38" width="36" height="36" fill="#f1d0b5"/>
+          <rect x="58" y="34" width="44" height="14" fill="#0b0b10"/>
+          <rect x="54" y="74" width="52" height="36" fill="#f6f6ff"/>
+          <text x="80" y="98" text-anchor="middle" fill="#0b0b10" font-size="14">27</text>
+          <rect x="58" y="110" width="18" height="48" fill="#1d1d33"/>
+          <rect x="84" y="110" width="18" height="48" fill="#1d1d33"/>
+          <rect x="56" y="158" width="24" height="6" fill="#0b0b10"/>
+          <rect x="82" y="158" width="24" height="6" fill="#0b0b10"/>
+        </svg>
+      </div>
+
+      <div class="bonusHint note" id="bonusMsg"></div>
+    </section>
+
+    <!-- S7 Final -->
+    <section id="s7" class="hidden">
+      <div class="finalWrap">
+        <div class="sky" id="sky">
+          <div class="sun"></div>
+          <div class="cloud c1"></div>
+          <div class="cloud c2"></div>
+
+          <div class="charRow">
+            <div class="char" id="dcopFinal" style="left:310px;">
+              <div class="nameTag">dcop</div>
+              <div class="pix">
+                <div style="position:absolute;left:46px;top:30px;width:32px;height:32px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:42px;top:26px;width:40px;height:14px;background:#0b0b10"></div>
+                <div style="position:absolute;left:38px;top:62px;width:48px;height:34px;background:#f6f6ff"></div>
+                <div style="position:absolute;left:52px;top:80px;color:#0b0b10;font-size:14px;font-weight:700;">27</div>
+                <div style="position:absolute;left:42px;top:96px;width:16px;height:46px;background:#1d1d33"></div>
+                <div style="position:absolute;left:66px;top:96px;width:16px;height:46px;background:#1d1d33"></div>
+                <div style="position:absolute;left:40px;top:142px;width:22px;height:6px;background:#0b0b10"></div>
+                <div style="position:absolute;left:64px;top:142px;width:22px;height:6px;background:#0b0b10"></div>
+              </div>
+            </div>
+
+            <div class="char" id="sljyFinal" style="left:30px;">
+              <div class="nameTag">sljy</div>
+              <div class="kissIcon" id="kissIcon">😘</div>
+              <div class="pix">
+                <div style="position:absolute;left:40px;top:22px;width:44px;height:40px;background:#3b2418;border-radius:6px"></div>
+                <div style="position:absolute;left:46px;top:34px;width:32px;height:30px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:38px;top:64px;width:48px;height:30px;background:#0b0b10"></div>
+                <div style="position:absolute;left:40px;top:94px;width:44px;height:18px;background:#111"></div>
+                <div style="position:absolute;left:46px;top:112px;width:14px;height:38px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:64px;top:112px;width:14px;height:38px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:44px;top:150px;width:18px;height:6px;background:#d31f2a"></div>
+                <div style="position:absolute;left:62px;top:150px;width:18px;height:6px;background:#d31f2a"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="petals" id="petals"></div>
+        </div>
+      </div>
+
+      <div class="finalText" id="finalText">Congrats! You have increased your girlfriend’s luck stat to mosterest!</div>
+    </section>
+
   </div>
-  <canvas id="game" width="520" height="360"></canvas>
-  <div style="margin-top:10px">
-    <button class="btn" id="start">Start</button>
-  </div>
-  <p class="note" id="gameMsg">Tap screen to jump.</p>
-</section>
+</div>
 
-<!-- S3 Coin -->
-<section id="s3" class="hidden">
-  <div class="big">Damn, you’re an 11/10 indeed!</div>
-  <p class="note">🪙 Insert your coin</p>
-  <div class="coin" id="coin">🪙</div>
-</section>
-
-<!-- S4 Wheel -->
-<section id="s4" class="hidden">
-  <div class="big">Spin to win 🎡</div>
-  <div class="wheelBox">
-    <div class="pointer"></div>
-    <canvas id="wheel" width="300" height="300"></canvas>
-  </div>
-  <button class="btn" id="spin">SPIN</button>
-  <button class="btn hidden" id="wildBtn">Wild card? Hmmmm</button>
-</section>
-
-<!-- S5 Book -->
-<section id="s5" class="hidden">
-  <div class="book" id="book"></div>
-  <button class="btn" id="bonusBtn" style="margin-top:12px">Bonus luck here!</button>
-</section>
-
-<!-- S6 Bonus Click -->
-<section id="s6" class="hidden">
-  <div class="big">Click on dcop to increase your luck stats!</div>
-  <div class="avatarBig" id="dcopBonus">🧍‍♂️</div>
-  <p class="note" id="bonusMsg"></p>
-</section>
-
-<!-- S7 Final -->
-<section id="s7" class="hidden">
-  <div class="finalScene">
-    <div class="sun"></div>
-    <div class="cloud" style="top:90px"></div>
-    <div class="cloud" style="top:140px;animation-delay:8s"></div>
-
-    <div class="char" id="dcop" style="left:300px">
-      <div class="label">dcop</div>🧍‍♂️
-    </div>
-
-    <div class="char" id="sljy">
-      <div class="label">sljy</div>🧍‍♀️
-      <div class="kiss" id="kiss">😘</div>
-    </div>
-
-    <div class="petals" id="petals"></div>
-  </div>
-  <div class="big" id="finalText">
-    Congrats! You have increased your girlfriend’s luck stat to mosterest!
-  </div>
-</section>
-
-</div></div>
-
-<!-- Audio -->
-<audio id="hmmmm" src="hmmmm.mp3"></audio>
-<audio id="bgm" src="bgm.mp3" loop></audio>
-<audio id="spinSfx" src="spin.mp3"></audio>
-<audio id="yay" src="yay.mp3"></audio>
-<audio id="happy" src="happy.mp3" loop></audio>
-<audio id="kissAudio" src="kiss.mp3"></audio>
-<audio id="loveAudio" src="love.mp3"></audio>
+<div class="confetti hidden" id="confetti"></div>
 
 <script>
-const show=id=>["s1","s2","s3","s4","s5","s6","s7"].forEach(s=>document.getElementById(s).classList.toggle("hidden",s!==id))
+  // SHOW JS ERRORS ON PAGE (iPhone friendly)
+  window.addEventListener("error", (e) => {
+    const b = document.getElementById("errBanner");
+    if(!b) return;
+    b.style.display = "block";
+    b.textContent =
+      "JS ERROR:\n" +
+      (e.message || "Unknown") +
+      (e.filename ? ("\n" + e.filename + ":" + e.lineno + ":" + e.colno) : "");
+  });
 
-/* Envelope */
-env.onclick=async()=>{
-  env.textContent="📨";
-  await hmmmm.play();
-  setTimeout(()=>show("s2"),1500)
-}
+  // ---------- Helpers ----------
+  const $ = (id)=>document.getElementById(id);
+  const show = (id) => ["s1","s2","s3","s4","s5","s6","s7"].forEach(x => $(x).classList.toggle("hidden", x!==id));
 
-/* Game (simple counter mock) */
-let score=0
-start.onclick=()=>{
-  bgm.play()
-  score=0
-  scoreEl.textContent=0
-}
-game.onclick=()=>{
-  score++
-  scoreEl.textContent=score
-  if(score>=11){
-    bgm.volume=.25
-    show("s3")
+  // Elements
+  const env = $("env");
+  const envTitle = $("envTitle");
+
+  const hmmmm = $("hmmmm");
+  const bgm = $("bgm");
+  const spinSfx = $("spinSfx");
+  const yay = $("yay");
+  const happy = $("happy");
+  const kissAudio = $("kissAudio");
+  const loveAudio = $("loveAudio");
+
+  let musicOn = true;
+
+  async function safePlay(a){
+    try { await a.play(); } catch(e) {}
   }
-}
 
-/* Coin */
-coin.onclick=()=>{
-  coin.classList.add("inserted")
-  setTimeout(()=>show("s4"),600)
-}
+  // ---------- S1 -> S2 ----------
+  env.addEventListener("click", async () => {
+    env.textContent = "📨";
+    envTitle.textContent = "You’ve got mail!";
+    safePlay(hmmmm);
+    setTimeout(()=>show("s2"), 1100);
+  });
 
-/* Wheel */
-const wheel=document.getElementById("wheel")
-const ctx=wheel.getContext("2d")
-const labels=[
- "Free massage for girlfriend",
- "You plan next date",
- "5 mins Onyx",
- "Tomyum ramen on you",
- "Wild card"
-]
-function drawWheel(){
- let a=0
- labels.forEach((t,i)=>{
-  const slice=Math.PI*2/labels.length
-  ctx.beginPath()
-  ctx.moveTo(150,150)
-  ctx.arc(150,150,140,a,a+slice)
-  ctx.fillStyle=i%2?"#1d1d33":"#141423"
-  ctx.fill()
-  ctx.save()
-  ctx.translate(150,150)
-  ctx.rotate(a+slice/2)
-  ctx.fillStyle="#fff"
-  ctx.font="10px system-ui"
-  ctx.textAlign="center"
-  ctx.fillText(t.split(" ").slice(0,3).join(" "),90,0)
-  ctx.restore()
-  a+=slice
- })
-}
-drawWheel()
+  // ---------- GAME (runner with spikes) ----------
+  const canvas = $("game");
+  const ctx = canvas.getContext("2d");
 
-spin.onclick=()=>{
- spinSfx.play()
- setTimeout(()=>{
-  yay.play()
-  wildBtn.classList.remove("hidden")
- },2000)
-}
+  const scoreEl = $("score");
+  const gameMsg = $("gameMsg");
+  const startBtn = $("start");
+  const muteBtn = $("muteMusic");
 
-wildBtn.onclick=()=>{
- happy.volume=.25
- happy.play()
- show("s5")
-}
+  let running = false;
+  let last = performance.now();
+  let score = 0;
 
-/* Book */
-const pages=["photos/page1.jpg","photos/page2.jpg","photos/page3.jpg","photos/page4.jpg","photos/page5.jpg"]
-const caps=[
- "Luck stat: 1",
- "Luck stat increasing to…2",
- "Luck stat increasing more…3",
- "Luck stat increasing morer…4",
- "Luck stat increasing morerest…5"
-]
-let idx=0
-function renderBook(){
- book.innerHTML=`<img src="${pages[idx]}"><div class="caption">${caps[idx]}</div>`
-}
-renderBook()
-book.onclick=()=>{if(idx<4){idx++;renderBook()}}
+  const groundY = 300;
+  const gravity = 1200;
+  const jumpV = -520;
+  const speed = 260;
+  const targetScore = 11;
 
-bonusBtn.onclick=()=>show("s6")
+  // renamed from p -> player (safer)
+  const player = { x: 120, y: groundY, vy: 0, w: 28, h: 44, onGround: true };
+  let spikes = [];
+  let spawnTimer = 0;
 
-/* Bonus clicks */
-let clicks=0
-dcopBonus.onclick=()=>{
- clicks++
- bonusMsg.textContent=[
-  "Better luck next time! Try again",
-  "Ohhhhh mans…. Try again!"
- ][clicks-1]||""
- if(clicks>=3){
-  show("s7")
-  setTimeout(()=>{
-    kissAudio.play()
-    document.getElementById("kiss").style.opacity=1
-    setTimeout(()=>{
-      loveAudio.play()
-      finalText.innerHTML="Happy Valentines mi baby! I’m the luckiest to have you.<br>With lots of love, Sandra"
-      for(let i=0;i<30;i++){
-        const p=document.createElement("span")
-        p.style.left=Math.random()*100+"%"
-        p.style.animationDelay=Math.random()*3+"s"
-        petals.appendChild(p)
+  function resetGame(){
+    running = false;
+    score = 0;
+    scoreEl.textContent = "0";
+    player.y = groundY; player.vy = 0; player.onGround = true;
+    spikes = [];
+    spawnTimer = 0;
+    gameMsg.textContent = "Tap the screen to jump.";
+    draw();
+  }
+
+  function jump(){
+    if(!running) return;
+    if(player.onGround){
+      player.vy = jumpV;
+      player.onGround = false;
+    }
+  }
+
+  function spawnSpike(){
+    spikes.push({ x: 560, w: 26, h: 34, passed: false });
+  }
+
+  function collideRect(ax,ay,aw,ah, bx,by,bw,bh){
+    return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+  }
+
+  function lose(){
+    running = false;
+    gameMsg.textContent = "You touched a spike. Press Start and try again.";
+  }
+
+  function win(){
+    running = false;
+    bgm.volume = 0.25; // requested
+    setTimeout(() => show("s3"), 450);
+  }
+
+  function update(dt){
+    player.vy += gravity * dt;
+    player.y += player.vy * dt;
+
+    if(player.y >= groundY){
+      player.y = groundY;
+      player.vy = 0;
+      player.onGround = true;
+    }
+
+    spawnTimer -= dt;
+    if(spawnTimer <= 0){
+      spawnSpike();
+      spawnTimer = 0.85 + Math.random() * 0.65;
+    }
+
+    spikes.forEach(s => s.x -= speed * dt);
+    spikes = spikes.filter(s => s.x > -80);
+
+    for(const s of spikes){
+      if(!s.passed && s.x + s.w < player.x){
+        s.passed = true;
+        score++;
+        scoreEl.textContent = String(score);
+        if(score >= targetScore){
+          win();
+          return;
+        }
       }
-    },800)
-  },3000)
- }
-}
+    }
+
+    for(const s of spikes){
+      const spikeX = s.x;
+      const spikeY = groundY - s.h;
+      const hit = collideRect(player.x, player.y - player.h, player.w, player.h, spikeX+3, spikeY+6, s.w-6, s.h-6);
+      if(hit){ lose(); return; }
+    }
+
+    draw();
+  }
+
+  function drawPixelBoy(){
+    const x = player.x, y = player.y;
+    const top = y - player.h;
+
+    ctx.fillStyle = "rgba(0,0,0,.35)";
+    ctx.fillRect(x+3, y+6, 22, 6);
+
+    ctx.fillStyle = "#1d1d33";
+    ctx.fillRect(x+6, top+28, 7, 14);
+    ctx.fillRect(x+15, top+28, 7, 14);
+
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+5, top+42, 9, 2);
+    ctx.fillRect(x+14, top+42, 9, 2);
+
+    ctx.fillStyle = "#f6f6ff";
+    ctx.fillRect(x+5, top+18, 18, 12);
+
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+3, top+20, 3, 8);
+    ctx.fillRect(x+23, top+20, 3, 8);
+
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+7, top+4, 14, 14);
+
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+6, top+2, 16, 6);
+    ctx.fillRect(x+6, top+7, 4, 4);
+    ctx.fillRect(x+10, top+7, 4, 3);
+    ctx.fillRect(x+14, top+7, 4, 4);
+    ctx.fillRect(x+18, top+7, 4, 3);
+
+    ctx.fillStyle = "#000";
+    ctx.fillRect(x+11, top+10, 2, 2);
+    ctx.fillRect(x+17, top+10, 2, 2);
+
+    ctx.fillStyle = "#0b0b10";
+    ctx.font = "10px system-ui";
+    ctx.fillText("27", x+10, top+27);
+
+    ctx.font = "12px system-ui";
+    ctx.fillStyle = "rgba(255,255,255,.92)";
+    ctx.fillText("dcop", x+1, top-6);
+  }
+
+  function drawSpike(s){
+    const spikeX = s.x, baseY = groundY, h = s.h, w = s.w;
+    ctx.fillStyle = "#2a2a44";
+    ctx.beginPath();
+    ctx.moveTo(spikeX, baseY);
+    ctx.lineTo(spikeX + w/2, baseY - h);
+    ctx.lineTo(spikeX + w, baseY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "#3a3a66";
+    ctx.stroke();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,520,360);
+    ctx.fillStyle = "#0f0f1a";
+    ctx.fillRect(0,0,520,360);
+
+    ctx.fillStyle = "rgba(255,255,255,.08)";
+    for(let i=0;i<30;i++) ctx.fillRect((i*73)%520, (i*41)%260, 2, 2);
+
+    ctx.fillStyle = "#141423";
+    ctx.fillRect(0, groundY, 520, 60);
+    ctx.fillStyle = "#2a2a44";
+    ctx.fillRect(0, groundY, 520, 2);
+
+    spikes.forEach(drawSpike);
+    drawPixelBoy();
+  }
+
+  function loop(now){
+    const dt = Math.min(0.033, (now - last)/1000);
+    last = now;
+    if(running) update(dt);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  startBtn.onclick = async () => {
+    resetGame();
+    running = true;
+    if(musicOn){
+      bgm.volume = 1.0;
+      await safePlay(bgm);
+    }
+  };
+
+  canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
+
+  muteBtn.onclick = () => {
+    musicOn = !musicOn;
+    muteBtn.textContent = musicOn ? "Music: On" : "Music: Off";
+    if(!musicOn){
+      bgm.pause(); bgm.currentTime = 0;
+      happy.pause(); happy.currentTime = 0;
+    } else {
+      safePlay(bgm);
+    }
+  };
+
+  // IMPORTANT: force a draw on load so canvas never appears empty
+  window.addEventListener("load", () => {
+    try { resetGame(); } catch(e) {}
+  });
+  resetGame();
+
+  // ---------- S3 coin -> S4 ----------
+  const coinEl = $("coin");
+  let coinUsed = false;
+  coinEl.onclick = () => {
+    if(coinUsed) return;
+    coinUsed = true;
+    $("coinMsg").textContent = "Coin inserted 😏";
+    coinEl.classList.add("inserted");
+    setTimeout(() => show("s4"), 620);
+  };
+
+  // ---------- Wheel (force WILD CARD + wrap) ----------
+  const wheelCanvas = $("wheel");
+  const wctx = wheelCanvas.getContext("2d");
+  const wheelSubtitle = $("wheelSubtitle");
+  const spinBtn = $("spin");
+  const wildBtn = $("wildBtn");
+
+  const segments = [
+    { label: "Free massage for girlfriend" },
+    { label: "You plan next date" },
+    { label: "5 mins Onyx" },
+    { label: "Tomyum ramen on you" },
+    { label: "Wild card" }
+  ];
+  const forcedLabel = "Wild card";
+
+  function wrapText(ctx2, text, x, y, maxWidth, lineHeight){
+    const words = text.split(" ");
+    let line = "";
+    const lines = [];
+    for(let n=0;n<words.length;n++){
+      const testLine = line + words[n] + " ";
+      const metrics = ctx2.measureText(testLine);
+      if(metrics.width > maxWidth && n>0){
+        lines.push(line.trim());
+        line = words[n] + " ";
+      } else {
+        line = testLine;
+      }
+    }
+    lines.push(line.trim());
+    const totalH = (lines.length-1)*lineHeight;
+    for(let i=0;i<lines.length;i++){
+      ctx2.fillText(lines[i], x, y + i*lineHeight - totalH/2);
+    }
+  }
+
+  function drawWheel(){
+    wctx.clearRect(0,0,300,300);
+    const cx=150, cy=150, r=138;
+    const slice = (Math.PI*2) / segments.length;
+
+    for(let i=0;i<segments.length;i++){
+      const a0 = i*slice;
+      const a1 = a0 + slice;
+
+      wctx.beginPath();
+      wctx.moveTo(cx,cy);
+      wctx.arc(cx,cy,r,a0,a1);
+      wctx.closePath();
+      wctx.fillStyle = (i%2===0) ? "#1d1d33" : "#141423";
+      wctx.fill();
+      wctx.strokeStyle="#3a3a66";
+      wctx.stroke();
+
+      const mid = a0 + slice/2;
+      wctx.save();
+      wctx.translate(cx,cy);
+      wctx.rotate(mid);
+
+      const upsideDown = (mid > Math.PI/2 && mid < (Math.PI*3)/2);
+      if(upsideDown) wctx.rotate(Math.PI);
+
+      wctx.fillStyle="rgba(255,255,255,.92)";
+      wctx.textAlign="center";
+      wctx.textBaseline="middle";
+
+      const len = segments[i].label.length;
+      const fontSize = len > 22 ? 9 : (len > 16 ? 10 : 11);
+      wctx.font = `${fontSize}px system-ui`;
+
+      wrapText(wctx, segments[i].label, 92, 0, 92, fontSize+2);
+
+      wctx.restore();
+    }
+
+    wctx.beginPath();
+    wctx.arc(150,150,28,0,Math.PI*2);
+    wctx.fillStyle="#0b0b10"; wctx.fill();
+    wctx.strokeStyle="#3a3a66"; wctx.stroke();
+  }
+  drawWheel();
+
+  function confetti(){
+    const c = $("confetti");
+    c.innerHTML="";
+    c.classList.remove("hidden");
+    for(let i=0;i<70;i++){
+      const piece=document.createElement("i");
+      piece.style.left = Math.random()*100+"vw";
+      piece.style.background = (i%3===0) ? "#fff" : (i%3===1 ? "#b9b9ff" : "#ffd6e7");
+      piece.style.animationDelay = (Math.random()*0.2)+"s";
+      c.appendChild(piece);
+    }
+    setTimeout(()=>c.classList.add("hidden"), 1800);
+  }
+
+  function angleForLabel(label){
+    const slice = (Math.PI*2) / segments.length;
+    for(let i=0;i<segments.length;i++){
+      if(segments[i].label === label){
+        return i*slice + slice/2;
+      }
+    }
+    return 0;
+  }
+
+  let spinning=false;
+  spinBtn.onclick = async () => {
+    if(spinning) return;
+    spinning=true;
+    wheelSubtitle.textContent = "";
+    wildBtn.classList.add("hidden");
+
+    spinSfx.currentTime = 0;
+    await safePlay(spinSfx);
+
+    const targetMid = angleForLabel(forcedLabel);
+    const pointerAngle = Math.PI * 1.5;
+    const turns = 5;
+    const targetRot = (Math.PI*2)*turns + (pointerAngle - targetMid);
+
+    const start = performance.now();
+    const dur = 3400;
+
+    const anim = (now) => {
+      const prog = Math.min(1,(now-start)/dur);
+      const ease = 1 - Math.pow(1-prog, 3);
+      const rot = ease * targetRot;
+      wheelCanvas.style.transform = `rotate(${rot}rad)`;
+      if(prog<1) requestAnimationFrame(anim);
+      else{
+        spinning=false;
+        confetti();
+        yay.currentTime = 0;
+        safePlay(yay);
+        wildBtn.classList.remove("hidden");
+      }
+    };
+    requestAnimationFrame(anim);
+  };
+
+  wildBtn.onclick = () => {
+    happy.volume = 0.25;
+    safePlay(happy);
+    show("s5");
+  };
+
+  // ---------- Book ----------
+  const pages = [
+    "photos/page1.jpg",
+    "photos/page2.jpg",
+    "photos/page3.jpg",
+    "photos/page4.jpg",
+    "photos/page5.jpg"
+  ];
+  const captions = [
+    "Luck stat: 1",
+    "Luck stat increasing to…2",
+    "Luck stat increasing more…3",
+    "Luck stat increasing morer…4",
+    "Luck stat increasing morerest…5"
+  ];
+
+  const book = $("book");
+  let idx = 0;
+
+  function renderBook(){
+    book.innerHTML="";
+    const pageEl = document.createElement("div"); // renamed (safe)
+    pageEl.className="page";
+    pageEl.innerHTML = `
+      <img src="${pages[idx]}" alt="page"/>
+      <div class="caption">${captions[idx]}</div>
+      <div class="pageNumber">${idx+1} / ${pages.length}</div>
+    `;
+    book.appendChild(pageEl);
+  }
+  renderBook();
+
+  let startX=null;
+  book.addEventListener("touchstart", (e)=>{ startX = e.touches[0].clientX; }, {passive:true});
+  book.addEventListener("touchend", (e)=>{
+    if(startX==null) return;
+    const endX = e.changedTouches[0].clientX;
+    const dx = endX - startX;
+    startX=null;
+    if(Math.abs(dx) < 35) return;
+    if(dx < 0 && idx < pages.length-1) idx++;
+    if(dx > 0 && idx > 0) idx--;
+    renderBook();
+  });
+
+  let mouseDown=false, mX=0;
+  book.addEventListener("mousedown",(e)=>{mouseDown=true;mX=e.clientX;});
+  window.addEventListener("mouseup",(e)=>{
+    if(!mouseDown) return;
+    mouseDown=false;
+    const dx=e.clientX-mX;
+    if(Math.abs(dx) < 50) return;
+    if(dx < 0 && idx < pages.length-1) idx++;
+    if(dx > 0 && idx > 0) idx--;
+    renderBook();
+  });
+
+  $("bonusBtn").onclick = () => show("s6");
+
+  // ---------- Bonus clicks ----------
+  const dcopTap = $("dcopTap");
+  const bonusMsg = $("bonusMsg");
+  let tapCount = 0;
+
+  function startPetals(){
+    const petals = $("petals");
+    setInterval(()=>{
+      const s=document.createElement("span");
+      s.style.left = (Math.random()*100) + "%";
+      s.style.animationDuration = (5.5 + Math.random()*2.5) + "s";
+      s.style.opacity = (0.65 + Math.random()*0.35);
+      s.style.transform = `rotate(${Math.random()*360}deg)`;
+      petals.appendChild(s);
+      setTimeout(()=>s.remove(), 9000);
+    }, 180);
+  }
+
+  function startFinalSequence(){
+    const sljy = $("sljyFinal");
+    const kissIcon = $("kissIcon");
+    const finalText = $("finalText");
+
+    sljy.classList.add("sljyWalk");
+
+    setTimeout(async ()=>{
+      kissIcon.style.opacity = 1;
+
+      happy.volume = 0.25;
+      kissAudio.currentTime = 0;
+      await safePlay(kissAudio);
+
+      startPetals();
+
+      setTimeout(async ()=>{
+        loveAudio.currentTime = 0;
+        await safePlay(loveAudio);
+
+        finalText.innerHTML =
+          "Happy Valentines mi baby! I’m the luckiest to have you.<br><br>With lots of love,<br>Sandra";
+      }, 650);
+
+    }, 2100);
+  }
+
+  dcopTap.onclick = () => {
+    tapCount++;
+    if(tapCount === 1){
+      bonusMsg.textContent = "Better luck next time! Try again";
+    } else if(tapCount === 2){
+      bonusMsg.textContent = "Ohhhhh mans…. Try again!";
+    } else {
+      show("s7");
+      $("finalText").textContent = "Congrats! You have increased your girlfriend’s luck stat to mosterest!";
+      startFinalSequence();
+    }
+  };
 </script>
 </body>
 </html>
