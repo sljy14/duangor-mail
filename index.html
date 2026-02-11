@@ -36,7 +36,7 @@
     .coin{font-size:44px;cursor:pointer;user-select:none;display:inline-block}
     .coin.inserted{animation:coinIn .55s ease forwards}
     @keyframes coinIn{
-      0% . {transform:translateX(0) translateY(0) scale(1)}
+      0%{transform:translateX(0) translateY(0) scale(1)}
       70%{transform:translateX(46px) translateY(-4px) scale(.92)}
       100%{transform:translateX(62px) translateY(-2px) scale(.55);opacity:.15}
     }
@@ -68,98 +68,109 @@
       font-weight:700;
     }
 
-    /* S6 bonus click */
-    .bonusBox{max-width:520px;margin:0 auto}
-    .tapAvatar{display:inline-block;cursor:pointer;user-select:none;margin-top:14px}
-    .tapAvatar:active{transform:scale(.98)}
-    .tapMsg{margin-top:12px;min-height:22px}
+    /* ---------- NEW: S6 ---------- */
+    .bonusStage{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      margin-top:8px;
+    }
+    .bonusCanvasWrap{
+      width:min(520px, 100%);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+    #dcopBig{
+      background:transparent;
+      border:none;
+      width:260px;
+      height:320px;
+      max-width:80vw;
+      max-height:42vh;
+      touch-action:manipulation;
+    }
+    .bonusMsg{
+      min-height:22px;
+      font-size:16px;
+      opacity:.92;
+      margin-top:4px;
+    }
 
-    /* S7 Final sunny scene (simple & clean like your screenshot) */
-    .finalWrap{max-width:620px;margin:0 auto;border-radius:18px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
+    /* ---------- NEW: S7 final scene (fits iPhone, no scroll) ---------- */
+    .finalCard{
+      max-width:520px;
+      margin:0 auto;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid #2a2a44;
+      background:#0f0f1a;
+    }
     .sky{
       position:relative;
-      height:560px;
-      background:linear-gradient(#a7d7ff,#e9fbff 60%,#7fe07f 60%,#57c457);
+      width:100%;
+      height:min(58vh, 460px); /* key: fit on iPhone */
+      background:linear-gradient(#8fd3ff,#e9fbff 62%,#7fe07f 62%,#57c457);
       overflow:hidden;
     }
-    .sun{position:absolute;top:28px;right:34px;width:110px;height:110px;border-radius:50%;background:#ffd55b;opacity:.92;box-shadow:0 0 24px rgba(255,213,91,.55)}
-    .cloud{position:absolute;top:90px;width:200px;height:62px;background:rgba(255,255,255,.92);border-radius:34px;opacity:.95}
+    .sun{
+      position:absolute;top:22px;right:22px;
+      width:82px;height:82px;border-radius:50%;
+      background:#ffd55b;box-shadow:0 0 24px rgba(255,213,91,.55)
+    }
+    .cloud{
+      position:absolute;top:70px;width:150px;height:46px;
+      background:rgba(255,255,255,.92);border-radius:28px;opacity:.9
+    }
     .cloud:before,.cloud:after{content:"";position:absolute;background:rgba(255,255,255,.92);border-radius:50%}
-    .cloud:before{width:70px;height:70px;left:28px;top:-30px}
-    .cloud:after{width:92px;height:92px;left:82px;top:-48px}
-    .cloud.c1{left:90px}
-    .cloud.c2{left:300px;top:150px;opacity:.8}
+    .cloud:before{width:54px;height:54px;left:22px;top:-24px}
+    .cloud:after{width:70px;height:70px;left:62px;top:-38px}
+    .cloud.c1{left:-180px;animation:cloudMove 28s linear infinite}
+    .cloud.c2{top:128px;left:-220px;animation:cloudMove 34s linear infinite;opacity:.78}
+    @keyframes cloudMove{to{transform:translateX(980px)}}
 
-    .charStage{position:absolute;left:0;right:0;bottom:120px;height:260px}
-    .charWrap{position:absolute;bottom:0;transform-origin:bottom center}
-    .namePlain{
+    .charLayer{
       position:absolute;
-      top:-34px;
-      left:50%;
-      transform:translateX(-50%);
-      font-size:14px;
-      font-weight:700;
-      color:rgba(255,255,255,.92);
-      text-shadow:0 2px 8px rgba(0,0,0,.55);
-      white-space:nowrap;
+      left:0; right:0;
+      bottom:86px;
+      height:220px;
       pointer-events:none;
     }
-
-    /* Use exact game-style pixel layout, then scale up */
-    .pixelDcop, .pixelSljy{position:relative;width:28px;height:44px}
-    .px{position:absolute;box-sizing:border-box}
-
-    /* dcop parts (exactly matches your canvas drawPixelBoy) */
-    .dcop .pantsL{left:6px;top:28px;width:7px;height:14px;background:#1d1d33}
-    .dcop .pantsR{left:15px;top:28px;width:7px;height:14px;background:#1d1d33}
-    .dcop .shoeL{left:5px;top:42px;width:9px;height:2px;background:#0b0b10}
-    .dcop .shoeR{left:14px;top:42px;width:9px;height:2px;background:#0b0b10}
-    .dcop .shirt{left:5px;top:18px;width:18px;height:12px;background:#f6f6ff}
-    .dcop .armL{left:3px;top:20px;width:3px;height:8px;background:#f1d0b5}
-    .dcop .armR{left:23px;top:20px;width:3px;height:8px;background:#f1d0b5}
-    .dcop .head{left:7px;top:4px;width:14px;height:14px;background:#f1d0b5}
-    .dcop .hairTop{left:6px;top:2px;width:16px;height:6px;background:#0b0b10}
-    .dcop .hair1{left:6px;top:7px;width:4px;height:4px;background:#0b0b10}
-    .dcop .hair2{left:10px;top:7px;width:4px;height:3px;background:#0b0b10}
-    .dcop .hair3{left:14px;top:7px;width:4px;height:4px;background:#0b0b10}
-    .dcop .hair4{left:18px;top:7px;width:4px;height:3px;background:#0b0b10}
-    .dcop .eyeL{left:11px;top:10px;width:2px;height:2px;background:#000}
-    .dcop .eyeR{left:17px;top:10px;width:2px;height:2px;background:#000}
-    .dcop .num{
-      left:9px;top:22px;
-      font-size:10px;font-weight:800;color:#0b0b10;
-      font-family:system-ui;
+    .charBox{
+      position:absolute;
+      bottom:0;
+      --scale: 1;
+      transform: translateX(-50%) scale(var(--scale));
+      transform-origin: bottom center;
     }
 
-    /* sljy: same “blocky game vibe” but with your outfit specs */
-    .sljy .hair{left:5px;top:1px;width:18px;height:12px;background:#3b2418}
-    .sljy .hair2{left:4px;top:10px;width:20px;height:5px;background:#3b2418}
-    .sljy .head{left:7px;top:6px;width:14px;height:12px;background:#f1d0b5}
-    .sljy .tee{left:5px;top:18px;width:18px;height:12px;background:#0b0b10}
-    .sljy .skirt{left:6px;top:30px;width:16px;height:6px;background:#111}
-    .sljy .legL{left:8px;top:36px;width:5px;height:8px;background:#f1d0b5}
-    .sljy .legR{left:15px;top:36px;width:5px;height:8px;background:#f1d0b5}
-    .sljy .shoeL{left:7px;top:42px;width:6px;height:2px;background:#d31f2a}
-    .sljy .shoeR{left:14px;top:42px;width:6px;height:2px;background:#d31f2a}
-
-    /* Walk: about “5 steps” (short distance) */
-    .walkToDcop{
-      animation:walkTo 1.6s ease-out forwards;
-    }
-    @keyframes walkTo{
-      to{ transform:translateX(170px) scale(var(--scale)); }
+    /* plain hovering name (no pill) */
+    .nameHover{
+      position:absolute;
+      left:50%;
+      top:-20px;
+      transform:translateX(-50%);
+      color:rgba(255,255,255,.95);
+      font-weight:700;
+      text-shadow:0 2px 8px rgba(0,0,0,.45);
+      font-size: calc(12px * var(--scale));
+      white-space:nowrap;
+      letter-spacing:0.2px;
     }
 
     .kissIcon{
       position:absolute;
-      font-size:42px;
+      top:-46px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size: calc(30px * var(--scale));
       opacity:0;
-      transition:opacity .25s ease;
-      text-shadow:0 2px 10px rgba(0,0,0,.55);
-      pointer-events:none;
+      transition:opacity .2s ease;
+      text-shadow:0 2px 10px rgba(0,0,0,.35);
     }
 
-    /* Petals (continuous) */
+    /* petals */
     .petals{position:absolute;inset:0;pointer-events:none;overflow:hidden}
     .petals span{
       position:absolute;top:-20px;width:12px;height:12px;
@@ -168,15 +179,22 @@
       animation:petalFall 6.5s linear infinite;
     }
     @keyframes petalFall{
-      to{transform:translateY(620px) rotate(360deg);opacity:.18}
+      to{transform:translateY(700px) rotate(360deg);opacity:.2}
     }
 
     .finalText{
-      padding:18px 12px 22px 12px;
-      font-size:22px;
+      padding:14px 12px 2px 12px;
+      font-size:18px;
       line-height:1.35;
     }
-    .finalTextSmall{font-size:18px;opacity:.95}
+
+    /* walk: sljy moves towards dcop */
+    .walk{
+      animation:walkTo 2.0s ease-out forwards;
+    }
+    @keyframes walkTo{
+      to{ left: 58%; } /* ends near dcop */
+    }
   </style>
 </head>
 <body>
@@ -201,7 +219,7 @@
       <audio id="spinSfx" preload="auto" src="spin.mp3"></audio>
       <audio id="yay" preload="auto" src="yay.mp3"></audio>
 
-      <!-- NEW (not in folder) -->
+      <!-- NEW -->
       <audio id="kissAudio" preload="auto" src="kiss.mp3"></audio>
       <audio id="loveAudio" preload="auto" src="love.mp3"></audio>
     </section>
@@ -276,87 +294,53 @@
       <p class="note">Swipe left/right.</p>
       <div class="book" id="book"></div>
 
-      <!-- NEW: Bonus button (always visible; simple) -->
-      <button class="btn" id="bonusBtn" style="margin-top:14px;">Bonus luck here!</button>
+      <!-- NEW: only shown on last page -->
+      <button class="btn hidden" id="bonusBtn" style="margin-top:14px;">Bonus luck here!</button>
     </section>
 
-    <!-- S6: Bonus taps -->
+    <!-- S6: Bonus tap -->
     <section id="s6" class="hidden">
-      <div class="big">Click on dcop to increase your luck stats!</div>
-      <p class="note">Just tap him 😏</p>
+      <div class="big">Will you get some bonus luck? 🍀</div>
+      <p class="note">click on dcop to try</p>
 
-      <div class="bonusBox">
-        <!-- dcop (exact game style) but bigger via scale -->
-        <div class="tapAvatar" id="dcopTap" aria-label="dcop">
-          <div style="--scale:6; transform:scale(var(--scale)); transform-origin:top center; display:inline-block;">
-            <div class="pixelDcop dcop">
-              <div class="px pantsL"></div><div class="px pantsR"></div>
-              <div class="px shoeL"></div><div class="px shoeR"></div>
-              <div class="px shirt"></div>
-              <div class="px armL"></div><div class="px armR"></div>
-              <div class="px head"></div>
-              <div class="px hairTop"></div>
-              <div class="px hair1"></div><div class="px hair2"></div><div class="px hair3"></div><div class="px hair4"></div>
-              <div class="px eyeL"></div><div class="px eyeR"></div>
-              <div class="px num">27</div>
-            </div>
-          </div>
+      <div class="bonusStage">
+        <div class="bonusCanvasWrap">
+          <canvas id="dcopBig" width="260" height="320" aria-label="dcop"></canvas>
         </div>
-
-        <div class="note tapMsg" id="bonusMsg"></div>
+        <div class="bonusMsg" id="bonusMsg"></div>
       </div>
     </section>
 
-    <!-- S7: Final scene -->
+    <!-- S7: Final -->
     <section id="s7" class="hidden">
-      <div class="finalWrap">
+      <div class="finalCard">
         <div class="sky" id="sky">
           <div class="sun"></div>
           <div class="cloud c1"></div>
           <div class="cloud c2"></div>
 
-          <div class="petals" id="petals"></div>
-
-          <div class="charStage">
-            <!-- sljy starts left -->
-            <div class="charWrap" id="sljyWrap" style="left:200px; --scale:6; transform:translateX(0) scale(var(--scale));">
-              <div class="namePlain">sljy</div>
-              <div class="pixelSljy sljy">
-                <div class="px hair"></div><div class="px hair2"></div>
-                <div class="px head"></div>
-                <div class="px tee"></div>
-                <div class="px skirt"></div>
-                <div class="px legL"></div><div class="px legR"></div>
-                <div class="px shoeL"></div><div class="px shoeR"></div>
-              </div>
+          <div class="charLayer" id="charLayer">
+            <!-- sljy -->
+            <div class="charBox" id="sljyBox" style="left:30%; --scale: 1;">
+              <div class="nameHover">sljy</div>
+              <div class="kissIcon" id="kissIcon">😘</div>
+              <canvas id="sljyCanvas" width="140" height="200" style="background:transparent;border:none;"></canvas>
             </div>
 
-            <!-- dcop on right -->
-            <div class="charWrap" id="dcopWrap" style="left:420px; --scale:6; transform:scale(var(--scale));">
-              <div class="namePlain">dcop</div>
-              <div class="pixelDcop dcop">
-                <div class="px pantsL"></div><div class="px pantsR"></div>
-                <div class="px shoeL"></div><div class="px shoeR"></div>
-                <div class="px shirt"></div>
-                <div class="px armL"></div><div class="px armR"></div>
-                <div class="px head"></div>
-                <div class="px hairTop"></div>
-                <div class="px hair1"></div><div class="px hair2"></div><div class="px hair3"></div><div class="px hair4"></div>
-                <div class="px eyeL"></div><div class="px eyeR"></div>
-                <div class="px num">27</div>
-              </div>
+            <!-- dcop -->
+            <div class="charBox" id="dcopBox" style="left:62%; --scale: 1;">
+              <div class="nameHover">dcop</div>
+              <canvas id="dcopCanvas" width="140" height="200" style="background:transparent;border:none;"></canvas>
             </div>
-
-            <!-- kiss icon (positioned by JS to be centered between heads) -->
-            <div class="kissIcon" id="kissIcon">😘</div>
           </div>
+
+          <div class="petals" id="petals"></div>
+        </div>
+
+        <div class="finalText" id="finalText">
+          Congrats! You have increased your girlfriend’s luck stat to mosterest!
         </div>
       </div>
-
-      <div class="finalText" id="finalText">
-        Congrats! You have increased your girlfriend’s luck stat to mosterest!
-      </div>
-      <div class="finalTextSmall" id="finalText2"></div>
     </section>
 
   </div>
@@ -370,7 +354,6 @@
     ["s1","s2","s3","s4","s4b","s5","s6","s7"].forEach(x => document.getElementById(x).classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
 
-    // when we enter s4b, we stop bgm & start happy (quiet)
     if(id === "s4b" && musicOn){
       stopBgm();
       startHappy();
@@ -383,7 +366,6 @@
   const happy = document.getElementById("happy");
   const spinSfx = document.getElementById("spinSfx");
   const yay = document.getElementById("yay");
-
   const kissAudio = document.getElementById("kissAudio");
   const loveAudio = document.getElementById("loveAudio");
 
@@ -419,7 +401,7 @@
     safePlay(bgm);
   }
 
-  function duckBgm(){ fadeBgmTo(0.25, 260); } // your final requirement
+  function duckBgm(){ fadeBgmTo(0.25, 260); }
   function stopBgm(){
     if(fadeRAF) cancelAnimationFrame(fadeRAF);
     fadeRAF = null;
@@ -429,8 +411,7 @@
 
   function startHappy(){
     stopBgm();
-    // ✅ keep happy quiet so kiss/love are clear
-    happy.volume = 0.25;
+    happy.volume = 0.25; // ✅ always 0.25 as requested
     safePlay(happy);
   }
 
@@ -444,8 +425,39 @@
     stopHappy();
   }
 
+  // ✅ iPhone audio unlock (does NOT play audible sound)
+  let audioUnlocked = false;
+  async function unlockAudioOnce(){
+    if(audioUnlocked) return;
+    audioUnlocked = true;
+
+    // keep it silent
+    const prevK = kissAudio.volume, prevL = loveAudio.volume;
+    kissAudio.volume = 0;
+    loveAudio.volume = 0;
+
+    // tiny play-pause to unlock
+    try{
+      await kissAudio.play();
+      kissAudio.pause();
+      kissAudio.currentTime = 0;
+    }catch(e){}
+
+    try{
+      await loveAudio.play();
+      loveAudio.pause();
+      loveAudio.currentTime = 0;
+    }catch(e){}
+
+    // restore
+    kissAudio.volume = prevK;
+    loveAudio.volume = prevL;
+  }
+
   // Landing: envelope click -> play hmmmm -> change icon/text -> game
   document.getElementById("env").addEventListener("click", async () => {
+    await unlockAudioOnce(); // ✅ unlock early
+
     const env = document.getElementById("env");
     const mailText = document.getElementById("mailText");
 
@@ -602,51 +614,54 @@
     ctx.fillRect(x+3, y+9, 3, 3);
   }
 
+  function drawPixelBoyAt(ctx2, x, y){
+    // x,y = feet position
+    const w = 28, h = 44;
+    const top = y - h;
+
+    ctx2.fillStyle = "rgba(0,0,0,.35)";
+    ctx2.fillRect(x+3, y+6, 22, 6);
+
+    ctx2.fillStyle = "#1d1d33";
+    ctx2.fillRect(x+6, top+28, 7, 14);
+    ctx2.fillRect(x+15, top+28, 7, 14);
+
+    ctx2.fillStyle = "#0b0b10";
+    ctx2.fillRect(x+5, top+42, 9, 2);
+    ctx2.fillRect(x+14, top+42, 9, 2);
+
+    ctx2.fillStyle = "#f6f6ff";
+    ctx2.fillRect(x+5, top+18, 18, 12);
+
+    ctx2.fillStyle = "#f1d0b5";
+    ctx2.fillRect(x+3, top+20, 3, 8);
+    ctx2.fillRect(x+23, top+20, 3, 8);
+
+    ctx2.fillStyle = "#f1d0b5";
+    ctx2.fillRect(x+7, top+4, 14, 14);
+
+    ctx2.fillStyle = "#0b0b10";
+    ctx2.fillRect(x+6, top+2, 16, 6);
+    ctx2.fillRect(x+6, top+7, 4, 4);
+    ctx2.fillRect(x+10, top+7, 4, 3);
+    ctx2.fillRect(x+14, top+7, 4, 4);
+    ctx2.fillRect(x+18, top+7, 4, 3);
+
+    ctx2.fillStyle = "#000";
+    ctx2.fillRect(x+11, top+10, 2, 2);
+    ctx2.fillRect(x+17, top+10, 2, 2);
+
+    // "27"
+    ctx2.fillStyle = "#0b0b10";
+    ctx2.font = "10px system-ui";
+    ctx2.fillText("27", x+10, top+27);
+  }
+
   function drawPixelBoy(){
-    const x = p.x, y = p.y;
-    const top = y - p.h;
-
-    ctx.fillStyle = "rgba(0,0,0,.35)";
-    ctx.fillRect(x+3, y+6, 22, 6);
-
-    ctx.fillStyle = "#1d1d33";
-    ctx.fillRect(x+6, top+28, 7, 14);
-    ctx.fillRect(x+15, top+28, 7, 14);
-
-    ctx.fillStyle = "#0b0b10";
-    ctx.fillRect(x+5, top+42, 9, 2);
-    ctx.fillRect(x+14, top+42, 9, 2);
-
-    ctx.fillStyle = "#f6f6ff";
-    ctx.fillRect(x+5, top+18, 18, 12);
-
-    ctx.fillStyle = "#f1d0b5";
-    ctx.fillRect(x+3, top+20, 3, 8);
-    ctx.fillRect(x+23, top+20, 3, 8);
-
-    ctx.fillStyle = "#f1d0b5";
-    ctx.fillRect(x+7, top+4, 14, 14);
-
-    ctx.fillStyle,
-/* keep same hair */
-    ctx.fillStyle = "#0b0b10";
-    ctx.fillRect(x+6, top+2, 16, 6);
-    ctx.fillRect(x+6, top+7, 4, 4);
-    ctx.fillRect(x+10, top+7, 4, 3);
-    ctx.fillRect(x+14, top+7, 4, 4);
-    ctx.fillRect(x+18, top+7, 4, 3);
-
-    ctx.fillStyle = "#000";
-    ctx.fillRect(x+11, top+10, 2, 2);
-    ctx.fillRect(x+17, top+10, 2, 2);
-
-    ctx.fillStyle = "#0b0b10";
-    ctx.font = "10px system-ui";
-    ctx.fillText("27", x+10, top+27);
-
+    drawPixelBoyAt(ctx, p.x, p.y);
     ctx.font = "12px system-ui";
     ctx.fillStyle = "rgba(255,255,255,.92)";
-    ctx.fillText("dcop", x+1, top-6);
+    ctx.fillText("dcop", p.x+1, (p.y - p.h)-6);
   }
 
   function drawSpike(s){
@@ -689,13 +704,18 @@
   requestAnimationFrame(loop);
 
   document.getElementById("start").onclick = async () => {
+    await unlockAudioOnce(); // ✅ unlock also here
     resetGame();
     running = true;
     statusPill.textContent = "Goal: 11";
     if(musicOn) startBgm();
   };
 
-  canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
+  canvas.addEventListener("pointerdown", async (e) => {
+    e.preventDefault();
+    await unlockAudioOnce(); // ✅ unlock on tap too
+    jump();
+  });
 
   document.getElementById("muteMusic").onclick = () => {
     musicOn = !musicOn;
@@ -717,7 +737,8 @@
   const coinEl = document.getElementById("coin");
   let coinUsed = false;
 
-  coinEl.onclick = () => {
+  coinEl.onclick = async () => {
+    await unlockAudioOnce();
     if(coinUsed) return;
     coinUsed = true;
     document.getElementById("coinMsg").textContent = "Coin inserted 😏";
@@ -893,6 +914,7 @@
   }
 
   spinBtn.onclick = async () => {
+    await unlockAudioOnce();
     if(spinning) return;
     spinning=true;
 
@@ -923,7 +945,7 @@
         spinning=false;
 
         confetti();
-        yay.currentTime = 0;       // ✅ only once, here
+        yay.currentTime = 0;
         safePlay(yay);
 
         wheelSubtitle.textContent = "Wild card? Hmmmm";
@@ -933,7 +955,10 @@
     requestAnimationFrame(anim);
   };
 
-  wildBtn.onclick = () => show("s4b");
+  wildBtn.onclick = async () => {
+    await unlockAudioOnce();
+    show("s4b");
+  };
 
   // ---------- Book ----------
   const pages = [
@@ -953,6 +978,7 @@
   ];
 
   const book = document.getElementById("book");
+  const bonusBtn = document.getElementById("bonusBtn");
   let idx = 0;
 
   function renderBook(){
@@ -965,6 +991,13 @@
       <div class="pageNumber">${idx+1} / ${pages.length}</div>
     `;
     book.appendChild(p);
+
+    // ✅ only show bonus button on LAST page
+    if(idx === pages.length - 1){
+      bonusBtn.classList.remove("hidden");
+    } else {
+      bonusBtn.classList.add("hidden");
+    }
   }
   renderBook();
 
@@ -995,100 +1028,217 @@
 
   document.getElementById("toBook").onclick = () => show("s5");
 
-  // ---------- NEW: S5 -> S6 ----------
-  document.getElementById("bonusBtn").onclick = () => {
+  // ✅ bonus button goes to S6
+  bonusBtn.onclick = async () => {
+    await unlockAudioOnce();
     show("s6");
+    drawDcopBig();
   };
 
-  // ---------- NEW: S6 taps -> S7 ----------
-  const bonusMsg = document.getElementById("bonusMsg");
+  // ---------- S6 / S7 character drawing (match game vibe) ----------
+  function drawDcopScaled(canvasEl, scale){
+    const c = canvasEl.getContext("2d");
+    c.clearRect(0,0,canvasEl.width,canvasEl.height);
+    c.save();
+    c.imageSmoothingEnabled = false;
+
+    // draw at scale
+    c.translate(0,0);
+    c.scale(scale, scale);
+
+    // center horizontally
+    const baseW = 28;
+    const baseH = 44;
+    const px = Math.floor((canvasEl.width/scale - baseW)/2);
+    const py = Math.floor((canvasEl.height/scale - 8)); // feet near bottom
+    drawPixelBoyAt(c, px, py);
+
+    // redraw "27" centered better for big scale (fix misalign)
+    // wipe shirt area then draw
+    c.fillStyle = "#f6f6ff";
+    c.fillRect(px+5, (py-baseH)+18, 18, 12);
+    c.fillStyle = "#0b0b10";
+    c.font = "10px system-ui";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText("27", px+14, (py-baseH)+24);
+
+    c.restore();
+  }
+
+  function drawSljyScaled(canvasEl, scale){
+    const c = canvasEl.getContext("2d");
+    c.clearRect(0,0,canvasEl.width,canvasEl.height);
+    c.save();
+    c.imageSmoothingEnabled = false;
+    c.scale(scale, scale);
+
+    // base girl proportions similar height to dcop
+    const baseW = 30;
+    const baseH = 46;
+    const px = Math.floor((canvasEl.width/scale - baseW)/2);
+    const py = Math.floor((canvasEl.height/scale - 8));
+
+    const top = py - baseH;
+
+    // shadow
+    c.fillStyle = "rgba(0,0,0,.30)";
+    c.fillRect(px+4, py+6, 22, 6);
+
+    // legs (skin)
+    c.fillStyle = "#f1d0b5";
+    c.fillRect(px+10, top+28, 6, 16);
+    c.fillRect(px+18, top+28, 6, 16);
+
+    // red shoes
+    c.fillStyle = "#d31f2a";
+    c.fillRect(px+9, top+44, 8, 2);
+    c.fillRect(px+17, top+44, 8, 2);
+
+    // skirt (black mini)
+    c.fillStyle = "#111";
+    c.fillRect(px+8, top+24, 18, 6);
+
+    // tee (black)
+    c.fillStyle = "#0b0b10";
+    c.fillRect(px+8, top+16, 18, 10);
+
+    // arms (skin)
+    c.fillStyle = "#f1d0b5";
+    c.fillRect(px+6, top+18, 3, 8);
+    c.fillRect(px+27, top+18, 3, 8);
+
+    // head
+    c.fillStyle = "#f1d0b5";
+    c.fillRect(px+10, top+4, 14, 12);
+
+    // hair (dark brown, loose/wavy vibe = slightly bigger block with edges)
+    c.fillStyle = "#3b2418";
+    c.fillRect(px+8, top+1, 18, 6);
+    c.fillRect(px+8, top+6, 4, 6);
+    c.fillRect(px+22, top+6, 4, 6);
+    c.fillRect(px+9, top+6, 16, 4);
+
+    // eyes
+    c.fillStyle = "#000";
+    c.fillRect(px+13, top+9, 2, 2);
+    c.fillRect(px+19, top+9, 2, 2);
+
+    c.restore();
+  }
+
+  // S6 big dcop (clickable)
+  const dcopBig = document.getElementById("dcopBig");
+  const bonusMsgEl = document.getElementById("bonusMsg");
   let tapCount = 0;
 
-  document.getElementById("dcopTap").onclick = async () => {
+  function drawDcopBig(){
+    // scale so it looks like the game sprite but bigger
+    drawDcopScaled(dcopBig, 6);
+  }
+
+  dcopBig.addEventListener("pointerdown", async (e) => {
+    e.preventDefault();
+    await unlockAudioOnce();
+
     tapCount++;
     if(tapCount === 1){
-      bonusMsg.textContent = "Better luck next time! Try again";
+      bonusMsgEl.textContent = "Better luck next time! Try again";
     } else if(tapCount === 2){
-      bonusMsg.textContent = "Ohhhhh mans…. Try again!";
+      bonusMsgEl.textContent = "Ohhhhh mans…. Try again!";
     } else {
       // third tap -> final
+      bonusMsgEl.textContent = "";
       show("s7");
-      startFinalSequence();
+      startFinalScene();
     }
-  };
+  });
 
-  // ---------- NEW: Final sequence ----------
+  // ---------- Final scene sequence ----------
   let petalsTimer = null;
 
   function startPetals(){
     const petals = document.getElementById("petals");
-    if(petalsTimer) clearInterval(petalsTimer);
-
+    if(petalsTimer) return;
     petalsTimer = setInterval(()=>{
       const s=document.createElement("span");
       s.style.left = (Math.random()*100) + "%";
       s.style.animationDuration = (5.5 + Math.random()*2.5) + "s";
-      s.style.opacity = (0.55 + Math.random()*0.35);
+      s.style.opacity = (0.65 + Math.random()*0.35);
       petals.appendChild(s);
       setTimeout(()=>s.remove(), 9000);
-    }, 170);
+    }, 180);
   }
 
   function centerKissBetweenHeads(){
+    const sljyBox = document.getElementById("sljyBox");
+    const dcopBox = document.getElementById("dcopBox");
     const kiss = document.getElementById("kissIcon");
-    const sljy = document.getElementById("sljyWrap");
-    const dcop = document.getElementById("dcopWrap");
 
-    // compute head centers by bounding boxes (good enough visually)
-    const s = sljy.getBoundingClientRect();
-    const d = dcop.getBoundingClientRect();
+    const r1 = sljyBox.getBoundingClientRect();
+    const r2 = dcopBox.getBoundingClientRect();
 
-    // "head area" is around top third of each char
-    const sHeadX = s.left + s.width/2;
-    const dHeadX = d.left + d.width/2;
-    const headY  = Math.min(s.top, d.top) + Math.min(s.height, d.height) * 0.22;
+    // head approx: top area of sprite
+    const sljyHeadX = r1.left + r1.width/2;
+    const dcopHeadX = r2.left + r2.width/2;
+    const midX = (sljyHeadX + dcopHeadX) / 2;
 
-    const midX = (sHeadX + dHeadX) / 2;
-
-    // position kiss relative to the sky container
-    const sky = document.getElementById("sky").getBoundingClientRect();
-    kiss.style.left = (midX - sky.left) + "px";
-    kiss.style.top  = (headY - sky.top - 30) + "px";
-    kiss.style.transform = "translate(-50%, -50%)";
+    // position kiss relative to sljyBox (it owns the kiss icon)
+    const parent = sljyBox.getBoundingClientRect();
+    const leftPx = midX - parent.left;
+    kiss.style.left = leftPx + "px";
   }
 
-  async function startFinalSequence(){
+  async function startFinalScene(){
+    await unlockAudioOnce();
+
+    // keep happy looping quietly
+    if(musicOn){
+      happy.volume = 0.25;
+      safePlay(happy);
+    }
+
+    // set scales small enough for iPhone
+    const sljyBox = document.getElementById("sljyBox");
+    const dcopBox = document.getElementById("dcopBox");
+    sljyBox.style.setProperty("--scale","0.9");
+    dcopBox.style.setProperty("--scale","0.9");
+
+    // draw sprites
+    drawSljyScaled(document.getElementById("sljyCanvas"), 4.5);
+    drawDcopScaled(document.getElementById("dcopCanvas"), 4.5);
+
+    // reset positions (start sljy left)
+    sljyBox.classList.remove("walk");
+    sljyBox.style.left = "30%";
+    dcopBox.style.left = "62%";
+
     const finalText = document.getElementById("finalText");
-    const finalText2 = document.getElementById("finalText2");
-    const sljyWrap = document.getElementById("sljyWrap");
-    const kiss = document.getElementById("kissIcon");
+    finalText.innerHTML = "Congrats! You have increased your girlfriend’s luck stat to mosterest!";
 
-    // reset
-    kiss.style.opacity = 0;
-    finalText.textContent = "Congrats! You have increased your girlfriend’s luck stat to mosterest!";
-    finalText2.textContent = "";
+    // start walking
+    requestAnimationFrame(()=>{
+      sljyBox.classList.add("walk");
+    });
 
-    // keep happy quiet (already 0.25)
-    if(musicOn) startHappy();
-
-    // walk “5 steps”
-    sljyWrap.classList.remove("walkToDcop");
-    void sljyWrap.offsetWidth; // restart animation
-    sljyWrap.classList.add("walkToDcop");
-
-    // after walk ends, place & show kiss, play kiss.mp3 once
+    // at kiss moment (after walk)
     setTimeout(async ()=>{
+      // center kiss emoji
       centerKissBetweenHeads();
+      const kiss = document.getElementById("kissIcon");
       kiss.style.opacity = 1;
 
+      // play kiss EXACTLY at kiss moment
+      kissAudio.volume = 1.0;
       kissAudio.currentTime = 0;
       await safePlay(kissAudio);
 
-      // petals start after kiss
+      // start petals AFTER kiss
       startPetals();
 
-      // then love.mp3, then swap to final valentine text
+      // then love audio + final text
       setTimeout(async ()=>{
+        loveAudio.volume = 1.0;
         loveAudio.currentTime = 0;
         await safePlay(loveAudio);
 
@@ -1096,12 +1246,9 @@
           "Happy Valentines mi baby! I’m the luckiest to have you.<br><br>With lots of love,<br>Sandra";
       }, 650);
 
-    }, 1650);
-
-    // re-center kiss if layout shifts (mobile)
-    setTimeout(centerKissBetweenHeads, 250);
-    window.addEventListener("resize", centerKissBetweenHeads, {passive:true});
+    }, 2000);
   }
+
 </script>
 </body>
 </html>
