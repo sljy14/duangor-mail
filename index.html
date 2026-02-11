@@ -16,10 +16,10 @@
     .divider{height:1px;background:#2a2a44;margin:16px 0}
 
     /* Landing envelope */
-    .envelopeWrap{margin-top:14px}
     .envelope{font-size:140px;cursor:pointer;user-select:none;display:inline-block;line-height:1}
     .envelope:active{transform:scale(.98)}
-    .mailText{margin-top:10px;font-size:18px;opacity:.95}
+    .envelopeWrap{margin-top:14px}
+    .mailText{margin-top:10px;font-weight:700;opacity:.92}
 
     /* Confetti */
     .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
@@ -46,7 +46,7 @@
     /* Wheel */
     .wheelBox{position:relative;width:300px;height:300px;margin:0 auto}
     #wheel{width:300px;height:300px;border-radius:50%;border:2px solid #3a3a66;transform:rotate(0deg)}
-    .pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:26px}
+    .pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:28px}
     .subtitle{opacity:.9;margin-top:6px}
     .result{margin-top:14px;font-size:16px;min-height:22px}
 
@@ -67,6 +67,7 @@
       padding:10px 12px;border-radius:14px;
       text-align:left;
       backdrop-filter: blur(6px);
+      font-weight:700;
     }
   </style>
 </head>
@@ -87,7 +88,8 @@
 
       <!-- Audio -->
       <audio id="voice" preload="auto" src="hmmmm.mp3"></audio>
-      <audio id="bgm" preload="auto" src="happy.mp3" loop></audio>
+      <audio id="bgm" preload="auto" src="bgm.mp3" loop></audio>
+      <audio id="happy" preload="auto" src="happy.mp3" loop></audio>
       <audio id="spinSfx" preload="auto" src="spin.mp3"></audio>
       <audio id="yay" preload="auto" src="yay.mp3"></audio>
     </section>
@@ -146,9 +148,13 @@
       </div>
 
       <p class="result" id="wheelResult"></p>
+
+      <div style="margin-top:12px;">
+        <button class="btn hidden" id="wildBtn">Wild card? Hmmmm</button>
+      </div>
     </section>
 
-    <!-- S4B: After wheel (next page) -->
+    <!-- S4B: After wheel -->
     <section id="s4b" class="hidden">
       <div class="bigWinMsg">Ha! Thought you were lucky? I’m the luckier one.</div>
       <button class="btn" id="toBook" style="margin-top:10px;">Click to check your luck stats</button>
@@ -171,38 +177,84 @@
   const show = (id) => {
     ["s1","s2","s3","s4","s4b","s5"].forEach(x => document.getElementById(x).classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
+
+    // When we hit Aha page: switch to happy.mp3
+    if(id === "s4b"){
+      if(musicOn){
+        stopBgm();
+        startHappy();
+      }
+    }
   };
 
   // ---------- Audio ----------
-  const voice = document.getElementById("voice");
-  const bgm = document.getElementById("bgm");
+  const voice = document.getElementById("voice");     // hmmmm.mp3
+  const bgm   = document.getElementById("bgm");       // bgm.mp3
+  const happy = document.getElementById("happy");     // happy.mp3
   const spinSfx = document.getElementById("spinSfx");
   const yay = document.getElementById("yay");
+
   let musicOn = true;
 
   async function safePlay(audioEl){
     try { await audioEl.play(); } catch(e) {}
   }
 
-  // Landing: envelope click -> play voice -> show "You've got mail!" -> game
+  function setBgmVolume(v){
+    bgm.volume = Math.max(0, Math.min(1, v));
+  }
+
+  function startBgm(){
+    stopHappy();
+    setBgmVolume(1);
+    safePlay(bgm);
+  }
+
+  function duckBgm(){
+    // 50% volume during win/spin so SFX is clear
+    setBgmVolume(0.5);
+  }
+
+  function stopBgm(){
+    bgm.pause();
+    bgm.currentTime = 0;
+  }
+
+  function startHappy(){
+    stopBgm();
+    happy.volume = 1;
+    safePlay(happy);
+  }
+
+  function stopHappy(){
+    happy.pause();
+    happy.currentTime = 0;
+  }
+
+  function stopAllMusic(){
+    stopBgm();
+    stopHappy();
+  }
+
+  // Landing: envelope click -> play hmmmm -> change icon/text -> game
   document.getElementById("env").addEventListener("click", async () => {
-    // Change envelope look
     const env = document.getElementById("env");
     const mailText = document.getElementById("mailText");
+
+    // change envelope state
     env.textContent = "📨";
     mailText.classList.remove("hidden");
 
-    // Play voice ("hmmmm")
+    // play hmmmm (keep as-is)
     await safePlay(voice);
 
-    // Go to game after audio ends (fallback 2.2s)
     let moved = false;
     const go = () => { if(moved) return; moved = true; show("s2"); };
     const t = setTimeout(go, 2200);
     voice.onended = () => { clearTimeout(t); go(); };
   });
 
-  // ---------- Game: runner vs spikes ----------
+  // ---------- Game ----------
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
 
@@ -220,13 +272,11 @@
   const speed = 260;
   const targetScore = 11;
 
-  // boy proportions
   const p = { x: 120, y: groundY, vy: 0, w: 28, h: 44, onGround: true };
 
   let spikes = [];
   let spawnTimer = 0;
 
-  // Hearts burst on win
   let hearts = [];
   function spawnHearts(){
     hearts = [];
@@ -281,7 +331,14 @@
     running = false;
     statusPill.textContent = "WIN ✅";
     gameMsg.textContent = "Damn, you’re an 11/10 indeed!";
+
+    // duck bgm during win + SFX
+    if(musicOn) duckBgm();
+
     spawnHearts();
+    yay.currentTime = 0;
+    safePlay(yay);
+
     setTimeout(() => show("s3"), 900);
   }
 
@@ -346,7 +403,7 @@
     ctx.fillRect(x+3, y+9, 3, 3);
   }
 
-  // Pixel boy: black fringe + white shirt “27” + "dcop" above
+  // New “boy-like” pixel avatar: black fringe + white shirt “27”
   function drawPixelBoy(){
     const x = p.x, y = p.y;
     const top = y - p.h;
@@ -435,7 +492,11 @@
     resetGame();
     running = true;
     statusPill.textContent = "Goal: 11";
-    if(musicOn) await safePlay(bgm);
+
+    if(musicOn){
+      // game start = bgm.mp3
+      startBgm();
+    }
   };
 
   canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
@@ -445,9 +506,12 @@
     const btn = document.getElementById("muteMusic");
     btn.textContent = musicOn ? "Music: On" : "Music: Off";
     if(!musicOn){
-      bgm.pause(); bgm.currentTime = 0;
+      stopAllMusic();
     } else {
-      safePlay(bgm);
+      // resume what fits current screen
+      const s4bVisible = !document.getElementById("s4b").classList.contains("hidden");
+      if(s4bVisible) startHappy();
+      else startBgm();
     }
   };
 
@@ -465,16 +529,16 @@
     setTimeout(() => show("s4"), 620);
   };
 
-  // ---------- Wheel (Option C: on-wheel wrapped, auto font) ----------
+  // ---------- Wheel ----------
   const wheelSubtitle = document.getElementById("wheelSubtitle");
-  wheelSubtitle.textContent = "";
+  const wildBtn = document.getElementById("wildBtn");
 
   const segments = [
-    { label: "Free massage for girlfriend", weight: 0.2375 },
-    { label: "You plan next date", weight: 0.2375 },
-    { label: "5 mins Onyx", weight: 0.2375 },
-    { label: "Tomyum ramen on you", weight: 0.2375 },
-    { label: "Wild card", weight: 0.05 }
+    { label: "Free massage for girlfriend", weight: 0.225 },
+    { label: "You plan next date",          weight: 0.225 },
+    { label: "5 mins Onyx",                 weight: 0.225 },
+    { label: "Tomyum ramen on you",         weight: 0.225 },
+    { label: "Wild card",                   weight: 0.10  }
   ];
 
   const forcedLabel = "Wild card";
@@ -483,25 +547,31 @@
   const wctx = wheel.getContext("2d");
   const cx=150, cy=150, r=138;
 
-  // normalize weights
   const totalW = segments.reduce((a,s)=>a+s.weight,0);
   segments.forEach(s => s.weight = s.weight/totalW);
 
-  function splitIntoTwoLines(text, maxCharsPerLine = 14) {
-    if (text.length <= maxCharsPerLine) return [text];
-    const idx = text.lastIndexOf(" ", maxCharsPerLine);
-    if (idx > 0) {
-      const a = text.slice(0, idx).trim();
-      const b = text.slice(idx + 1).trim();
-      return [a, b];
+  function wrapLines(ctx, text, maxWidth){
+    const words = text.split(" ");
+    const lines = [];
+    let line = "";
+
+    for(const w of words){
+      const test = line ? (line + " " + w) : w;
+      if(ctx.measureText(test).width <= maxWidth){
+        line = test;
+      } else {
+        if(line) lines.push(line);
+        line = w;
+      }
     }
-    return [text.slice(0, maxCharsPerLine).trim(), text.slice(maxCharsPerLine).trim()];
+    if(line) lines.push(line);
+    return lines;
   }
 
   function drawWheel(){
     wctx.clearRect(0,0,300,300);
-
     let a = 0;
+
     for(let i=0;i<segments.length;i++){
       const s = segments[i];
       const slice = (Math.PI*2) * s.weight;
@@ -518,9 +588,8 @@
       wctx.strokeStyle="#3a3a66";
       wctx.stroke();
 
-      // label
+      // label (wrapped + scaled)
       const mid = a0 + slice/2;
-
       wctx.save();
       wctx.translate(cx,cy);
       wctx.rotate(mid);
@@ -528,30 +597,30 @@
       const upsideDown = (mid > Math.PI/2 && mid < (Math.PI*3)/2);
       if(upsideDown) wctx.rotate(Math.PI);
 
-      const baseFont = 12;
-      const sliceFactor = Math.max(0.78, Math.min(1, slice / 1.25));
-      const lenFactor = Math.max(0.75, Math.min(1, 18 / s.label.length));
-      const fontSize = Math.floor(baseFont * sliceFactor * lenFactor);
-
+      // font sizing by length
+      const baseSize = 12;
+      const size = Math.max(10, Math.min(baseSize, 12 - Math.floor(s.label.length / 18)));
+      wctx.font = `${size}px system-ui`;
       wctx.fillStyle="rgba(255,255,255,.92)";
-      wctx.font=`${fontSize}px system-ui`;
       wctx.textAlign="center";
       wctx.textBaseline="middle";
 
-      const maxChars = fontSize <= 9 ? 11 : (fontSize <= 10 ? 12 : 14);
-      const lines = splitIntoTwoLines(s.label, maxChars);
+      // wrap within a radial box
+      const maxWidth = 110;
+      const lines = wrapLines(wctx, s.label, maxWidth);
 
-      const textRadius = 84;
+      const lineH = size + 2;
+      const totalH = (lines.length - 1) * lineH;
+      const textRadius = 92; // where text sits
 
-      if (lines.length === 1) {
-        wctx.fillText(lines[0], textRadius, 0);
-      } else {
-        const lineGap = Math.max(10, fontSize + 2);
-        wctx.fillText(lines[0], textRadius, -lineGap/2);
-        wctx.fillText(lines[1], textRadius, +lineGap/2);
-      }
+      // draw lines centered
+      lines.forEach((ln, idx) => {
+        const y = (idx * lineH) - totalH/2;
+        wctx.fillText(ln, textRadius, y);
+      });
 
       wctx.restore();
+
       a = a1;
     }
 
@@ -578,7 +647,6 @@
   }
 
   const spinBtn = document.getElementById("spin");
-  const wheelResult = document.getElementById("wheelResult");
   let spinning=false;
 
   function angleForSegmentLabel(label){
@@ -595,15 +663,18 @@
   spinBtn.onclick = async () => {
     if(spinning) return;
     spinning=true;
-    wheelResult.textContent = "";
+
+    // duck bgm so spin is clear
+    if(musicOn) duckBgm();
+
     wheelSubtitle.textContent = "";
+    wildBtn.classList.add("hidden");
 
     spinSfx.currentTime = 0;
     await safePlay(spinSfx);
 
     const target = angleForSegmentLabel(forcedLabel);
-    const pointerAngle = Math.PI * 1.5; // top
-
+    const pointerAngle = Math.PI * 1.5; // top pointer
     const turns = 5;
     const targetRot = (Math.PI*2)*turns + (pointerAngle - target.mid);
 
@@ -615,23 +686,25 @@
       const ease = 1 - Math.pow(1-p, 3);
       const rot = ease * targetRot;
       wheel.style.transform = `rotate(${rot}rad)`;
+
       if(p<1) requestAnimationFrame(anim);
       else{
         spinning=false;
+
         confetti();
         yay.currentTime = 0;
         safePlay(yay);
 
         wheelSubtitle.textContent = "Wild card? Hmmmm";
-        wheelResult.innerHTML = `<button class="btn" id="wildBtn" style="margin-top:8px;">Wild card? Hmmmm</button>`;
-
-        setTimeout(() => {
-          const b = document.getElementById("wildBtn");
-          if (b) b.onclick = () => show("s4b");
-        }, 0);
+        wildBtn.classList.remove("hidden");
       }
     };
     requestAnimationFrame(anim);
+  };
+
+  wildBtn.onclick = () => {
+    // go to Aha page (this triggers happy.mp3 in show())
+    show("s4b");
   };
 
   // ---------- Book ----------
@@ -680,6 +753,7 @@
     renderBook();
   });
 
+  // Desktop swipe (mouse)
   let mouseDown=false, mX=0;
   book.addEventListener("mousedown",(e)=>{mouseDown=true;mX=e.clientX;});
   window.addEventListener("mouseup",(e)=>{
