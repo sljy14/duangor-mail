@@ -1071,11 +1071,11 @@
   const congratsMsg = document.getElementById("congratsMsg");
   let tapCount = 0;
 
-  function doDcopJump(){
-    dcopSvg.classList.remove("dcopJump");
-    void dcopSvg.offsetWidth; // reflow
-    dcopSvg.classList.add("dcopJump");
-  }
+ function doDcopJump(){
+  dcopTap.classList.remove("dcopJump");
+  void dcopTap.offsetWidth; // reflow
+  dcopTap.classList.add("dcopJump");
+}
 
   // iOS audio unlock (must be inside user gesture)
   async function unlockAudio(){
@@ -1092,6 +1092,25 @@
   }
 
   // ---------- S7 helpers ----------
+  function layoutFinalChars(){
+  const sky = document.getElementById("sky");
+  const sljy = document.getElementById("sljyFinal");
+  const dcop = document.getElementById("dcopFinal");
+
+  const w = sky.clientWidth;
+
+  const leftPad = Math.max(18, w * 0.08);
+  const rightPad = Math.max(18, w * 0.08);
+
+  const charW = 92;
+
+  const sljyLeft = leftPad;
+  const dcopLeft = Math.max(sljyLeft + 140, w - rightPad - charW);
+
+  sljy.style.left = sljyLeft + "px";
+  dcop.style.left = dcopLeft + "px";
+}
+  
   let petalsStarted = false;
   function startPetals(){
     if(petalsStarted) return;
@@ -1107,68 +1126,78 @@
     }, 180);
   }
 
-  function positionKissBetweenHeads(){
-    const kiss = document.getElementById("kissIcon");
-    const a = document.getElementById("sljyFinal").getBoundingClientRect();
-    const b = document.getElementById("dcopFinal").getBoundingClientRect();
-    const sky = document.getElementById("sky").getBoundingClientRect();
+function positionKissBetweenHeads(){
+  const kiss = document.getElementById("kissIcon");
+  const a = document.getElementById("sljyFinal").getBoundingClientRect();
+  const b = document.getElementById("dcopFinal").getBoundingClientRect();
+  const sky = document.getElementById("sky").getBoundingClientRect();
 
-    // center X between the two chars
-    const midX = ((a.left + a.right)/2 + (b.left + b.right)/2) / 2;
+  const aMid = (a.left + a.right) / 2;
+  const bMid = (b.left + b.right) / 2;
+  const midX = (aMid + bMid) / 2;
 
-    // Y: slightly above their heads
-    const topY = Math.min(a.top, b.top) + 18;
+  // Above BOTH name tags
+  const y = Math.min(a.top, b.top) - 10;
 
-    // convert to sky-local coords
-    const x = midX - sky.left;
-    const y = topY - sky.top;
+  kiss.style.left = (midX - sky.left) + "px";
+  kiss.style.top  = (y - sky.top) + "px";
+}
 
-    kiss.style.left = x + "px";
-    kiss.style.top = y + "px";
-  }
 
   async function startFinalSequence(){
-    const sljy = document.getElementById("sljyFinal");
-    const kiss = document.getElementById("kissIcon");
+  const sljy = document.getElementById("sljyFinal");
+  const kiss = document.getElementById("kissIcon");
+  const dcop = document.getElementById("dcopFinal");
 
-    // ensure happy is low so kiss/love can be heard
-    if(musicOn){
-      happy.volume = 0.18;
-    }
+  // Make sure both chars are on-screen before we measure
+  layoutFinalChars();
 
-    // walk
-    sljy.classList.add("sljyWalk");
+  const sljyLeft = parseFloat(sljy.style.left || "0");
+  const dcopLeft = parseFloat(dcop.style.left || "0");
 
-    // after walk: show kiss, play kiss, then petals + love
+  // Stop near dcop (so both are visible)
+  const targetLeft = Math.max(sljyLeft, dcopLeft - 92);
+
+  // Walk (more reliable than fixed CSS keyframes)
+  sljy.animate(
+    [{ left: sljyLeft + "px" }, { left: targetLeft + "px" }],
+    { duration: 1600, easing: "ease-out", fill: "forwards" }
+  );
+  sljy.style.left = targetLeft + "px";
+
+  setTimeout(async ()=>{
+    positionKissBetweenHeads();
+    kiss.style.opacity = 1;
+
+    // Duck happy briefly so kiss is audible, then restore
+    const prevHappyVol = happy.volume;
+    happy.volume = 0.12;
+
+    kissAudio.currentTime = 0;
+    kissAudio.volume = 1;
+    await safePlay(kissAudio);
+
+    happy.volume = prevHappyVol; // back to 0.25
+
+    startPetals();
+
+    // 0.5s after kiss: play love (ONE-SHOT)
     setTimeout(async ()=>{
-      positionKissBetweenHeads();
-      kiss.style.opacity = 1;
+      loveAudio.currentTime = 0;
+      loveAudio.volume = 1;
+      await safePlay(loveAudio);
+    }, 500);
 
-      kissAudio.currentTime = 0;
-      kissAudio.volume = 1;
-      await safePlay(kissAudio);
+  }, 1600);
+}
 
-      // petals start AFTER kiss
-      startPetals();
-
-      setTimeout(async ()=>{
-        loveAudio.currentTime = 0;
-        loveAudio.volume = 1;
-        await safePlay(loveAudio);
-
-        // restore happy to 0.25 after love starts
-        if(musicOn){
-          happy.volume = 0.25;
-        }
-      }, 500);
-
-    }, 1650);
-  }
 
   window.addEventListener("resize", ()=>{
-    const kiss = document.getElementById("kissIcon");
-    if(kiss && kiss.style.opacity === "1") positionKissBetweenHeads();
-  });
+  layoutFinalChars();
+  const kiss = document.getElementById("kissIcon");
+  if(kiss && kiss.style.opacity === "1") positionKissBetweenHeads();
+});
+
 
   dcopTap.onclick = async () => {
     doDcopJump();
@@ -1185,23 +1214,30 @@
     } else if(tapCount === 2){
       bonusMsg.textContent = "Ohhhhh mans…. Try again!";
     } else {
-      // 3rd tap -> show congrats in S6, then go S7
-      bonusMsg.textContent = "";
-      congratsMsg.classList.remove("hidden");
+  // 3rd tap -> unlock audio INSIDE this user gesture (iOS-safe)
+  await unlockAudio();
 
-      setTimeout(()=>{
-        show("s7");
+  bonusMsg.textContent = "";
+  congratsMsg.classList.remove("hidden");
 
-        // ensure happy is running (still loop at 0.25 normally)
-        if(musicOn){
-          startHappy();
-          happy.volume = 0.25;
-        }
+  // Keep congrats on-screen 1.5s
+  setTimeout(()=>{
+    show("s7");
 
-        // kick off final animation + kiss/love
-        setTimeout(()=>startFinalSequence(), 250);
-      }, 900);
+    // S7 happy loop at 0.25 volume
+    if(musicOn){
+      startHappy();
+      happy.volume = 0.25;
     }
+
+    // Ensure chars fit screen before sequence
+    layoutFinalChars();
+
+    // Start walk+kissing immediately after entering S7
+    setTimeout(()=>startFinalSequence(), 50);
+  }, 1500);
+}
+
   };
 </script>
 </body>
