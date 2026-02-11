@@ -54,8 +54,8 @@
 
     /* Swipe Book */
     .book{position:relative;max-width:420px;margin:0 auto;height:560px;border-radius:16px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
-    .page{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-    .page img{width:100%;height:100%;object-fit:cover}
+    .page{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .25s ease}
+    .page img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
     .pageNumber{position:absolute;bottom:10px;right:12px;font-size:12px;opacity:.7;background:rgba(0,0,0,.35);padding:6px 8px;border-radius:10px}
     .caption{
       position:absolute;top:10px;left:10px;right:10px;
@@ -68,38 +68,40 @@
       font-weight:700;
     }
 
-    /* ---------- NEW: S6 ---------- */
-    .bonusStage{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:12px;
-      margin-top:8px;
-    }
-    .bonusCanvasWrap{
-      width:min(520px, 100%);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-    }
-    #dcopBig{
-      background:transparent;
-      border:none;
-      width:260px;
-      height:320px;
-      max-width:80vw;
-      max-height:42vh;
-      touch-action:manipulation;
-    }
-    .bonusMsg{
-      min-height:22px;
-      font-size:16px;
+    /* S5: Bonus reveal effect (only on last page) */
+    .bonusBtnWrap{display:flex;justify-content:center;margin-top:14px;min-height:54px}
+    #bonusBtn{transform:scale(1);transition:transform .28s ease, opacity .28s ease}
+    #bonusBtn.hidden{display:none}
+    .bonusPop{transform:scale(1.18)}
+    .photoShrink img{transform:scale(.93)}
+
+    /* S6 layout */
+    .centerStack{display:flex;flex-direction:column;align-items:center;gap:10px}
+    .tapMsg{
+      min-height:26px;
       opacity:.92;
-      margin-top:4px;
+      font-size:16px;
+      margin-top:6px;
+      text-align:center;
+    }
+    .dcopWrap{margin-top:8px}
+    .dcopJump{animation:dcopJump .18s ease-out}
+    @keyframes dcopJump{
+      0%{transform:translateY(0)}
+      60%{transform:translateY(-18px)}
+      100%{transform:translateY(0)}
+    }
+    .congrats{
+      font-size:20px;
+      font-weight:800;
+      line-height:1.25;
+      margin-top:8px;
+      opacity:.95;
+      text-align:center;
     }
 
-    /* ---------- NEW: S7 final scene (fits iPhone, no scroll) ---------- */
-    .finalCard{
+    /* S7 Final scene (fit iPhone, no scroll) */
+    .finalWrap{
       max-width:520px;
       margin:0 auto;
       border-radius:16px;
@@ -109,68 +111,59 @@
     }
     .sky{
       position:relative;
-      width:100%;
-      height:min(58vh, 460px); /* key: fit on iPhone */
+      height:420px;
       background:linear-gradient(#8fd3ff,#e9fbff 62%,#7fe07f 62%,#57c457);
       overflow:hidden;
     }
-    .sun{
-      position:absolute;top:22px;right:22px;
-      width:82px;height:82px;border-radius:50%;
-      background:#ffd55b;box-shadow:0 0 24px rgba(255,213,91,.55)
-    }
-    .cloud{
-      position:absolute;top:70px;width:150px;height:46px;
-      background:rgba(255,255,255,.92);border-radius:28px;opacity:.9
-    }
+    .sun{position:absolute;top:20px;right:20px;width:70px;height:70px;border-radius:50%;background:#ffd55b;box-shadow:0 0 22px rgba(255,213,91,.55)}
+    .cloud{position:absolute;top:64px;width:140px;height:42px;background:rgba(255,255,255,.92);border-radius:28px;opacity:.9}
     .cloud:before,.cloud:after{content:"";position:absolute;background:rgba(255,255,255,.92);border-radius:50%}
-    .cloud:before{width:54px;height:54px;left:22px;top:-24px}
-    .cloud:after{width:70px;height:70px;left:62px;top:-38px}
-    .cloud.c1{left:-180px;animation:cloudMove 28s linear infinite}
-    .cloud.c2{top:128px;left:-220px;animation:cloudMove 34s linear infinite;opacity:.78}
+    .cloud:before{width:50px;height:50px;left:20px;top:-22px}
+    .cloud:after{width:64px;height:64px;left:58px;top:-34px}
+    .cloud.c1{left:-180px;animation:cloudMove 26s linear infinite}
+    .cloud.c2{top:118px;left:-220px;animation:cloudMove 32s linear infinite;opacity:.78}
     @keyframes cloudMove{to{transform:translateX(980px)}}
 
-    .charLayer{
+    .charRow{
       position:absolute;
-      left:0; right:0;
-      bottom:86px;
+      left:0;right:0;
+      bottom:92px;
       height:220px;
+    }
+    .char{
+      position:absolute;bottom:0;
+      width:92px;height:132px; /* smaller to fit iPhone */
+      transform-origin:bottom center;
+    }
+
+    /* MapleStory-ish name: plain text hovering */
+    .nameTag{
+      position:absolute;
+      top:-22px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:12px;
+      font-weight:700;
+      color:rgba(255,255,255,.92);
+      text-shadow:0 2px 10px rgba(0,0,0,.55);
+      white-space:nowrap;
       pointer-events:none;
     }
-    .charBox{
-      position:absolute;
-      bottom:0;
-      --scale: 1;
-      transform: translateX(-50%) scale(var(--scale));
-      transform-origin: bottom center;
-    }
 
-    /* plain hovering name (no pill) */
-    .nameHover{
-      position:absolute;
-      left:50%;
-      top:-20px;
-      transform:translateX(-50%);
-      color:rgba(255,255,255,.95);
-      font-weight:700;
-      text-shadow:0 2px 8px rgba(0,0,0,.45);
-      font-size: calc(12px * var(--scale));
-      white-space:nowrap;
-      letter-spacing:0.2px;
-    }
-
+    /* Kiss icon positioned dynamically via JS */
     .kissIcon{
       position:absolute;
-      top:-46px;
+      top:20px;
       left:50%;
       transform:translateX(-50%);
-      font-size: calc(30px * var(--scale));
+      font-size:32px;
       opacity:0;
-      transition:opacity .2s ease;
+      transition:opacity .25s ease;
+      pointer-events:none;
       text-shadow:0 2px 10px rgba(0,0,0,.35);
     }
 
-    /* petals */
+    /* Petals */
     .petals{position:absolute;inset:0;pointer-events:none;overflow:hidden}
     .petals span{
       position:absolute;top:-20px;width:12px;height:12px;
@@ -179,22 +172,27 @@
       animation:petalFall 6.5s linear infinite;
     }
     @keyframes petalFall{
-      to{transform:translateY(700px) rotate(360deg);opacity:.2}
+      to{transform:translateY(520px) rotate(360deg);opacity:.2}
     }
 
-    .finalText{
-      padding:14px 12px 2px 12px;
+    .finalMsg{
+      margin-top:12px;
+      font-size:20px;
+      line-height:1.35;
+      font-weight:800;
+    }
+    .finalMsg small{
+      display:block;
+      font-weight:600;
+      opacity:.95;
+      margin-top:10px;
       font-size:18px;
       line-height:1.35;
     }
 
-    /* walk: sljy moves towards dcop */
-    .walk{
-      animation:walkTo 2.0s ease-out forwards;
-    }
-    @keyframes walkTo{
-      to{ left: 58%; } /* ends near dcop */
-    }
+    /* Walk sljy 5-ish steps */
+    .sljyWalk{animation:walkTo 1.6s ease-out forwards}
+    @keyframes walkTo{to{left:230px}}
   </style>
 </head>
 <body>
@@ -219,7 +217,7 @@
       <audio id="spinSfx" preload="auto" src="spin.mp3"></audio>
       <audio id="yay" preload="auto" src="yay.mp3"></audio>
 
-      <!-- NEW -->
+      <!-- NEW: kiss + love (root files) -->
       <audio id="kissAudio" preload="auto" src="kiss.mp3"></audio>
       <audio id="loveAudio" preload="auto" src="love.mp3"></audio>
     </section>
@@ -294,52 +292,120 @@
       <p class="note">Swipe left/right.</p>
       <div class="book" id="book"></div>
 
-      <!-- NEW: only shown on last page -->
-      <button class="btn hidden" id="bonusBtn" style="margin-top:14px;">Bonus luck here!</button>
+      <!-- NEW: button holder (only appears on page 5/5) -->
+      <div class="bonusBtnWrap">
+        <button class="btn hidden" id="bonusBtn">Bonus luck here!</button>
+      </div>
     </section>
 
-    <!-- S6: Bonus tap -->
+    <!-- S6: Bonus taps -->
     <section id="s6" class="hidden">
       <div class="big">Will you get some bonus luck? 🍀</div>
       <p class="note">click on dcop to try</p>
 
-      <div class="bonusStage">
-        <div class="bonusCanvasWrap">
-          <canvas id="dcopBig" width="260" height="320" aria-label="dcop"></canvas>
+      <div class="centerStack">
+        <div class="dcopWrap" id="dcopTap" aria-label="dcop">
+          <!-- dcop: keep the SAME vibe as game sprite, just bigger -->
+          <svg id="dcopSvg" width="180" height="240" viewBox="0 0 160 200" style="display:block;">
+            <rect x="0" y="0" width="160" height="200" fill="transparent"/>
+            <!-- head -->
+            <rect x="62" y="38" width="36" height="36" fill="#f1d0b5"/>
+            <!-- hair -->
+            <rect x="58" y="34" width="44" height="14" fill="#0b0b10"/>
+            <rect x="66" y="46" width="10" height="8" fill="#0b0b10"/>
+            <rect x="84" y="46" width="10" height="8" fill="#0b0b10"/>
+            <!-- body -->
+            <rect x="54" y="74" width="52" height="36" fill="#f6f6ff"/>
+            <!-- "27" centered -->
+            <text x="80" y="100" text-anchor="middle" dominant-baseline="middle" fill="#0b0b10" font-size="16" font-weight="800">27</text>
+            <!-- arms -->
+            <rect x="46" y="78" width="8" height="30" fill="#f1d0b5"/>
+            <rect x="106" y="78" width="8" height="30" fill="#f1d0b5"/>
+            <!-- legs -->
+            <rect x="58" y="110" width="18" height="52" fill="#1d1d33"/>
+            <rect x="84" y="110" width="18" height="52" fill="#1d1d33"/>
+            <!-- shoes -->
+            <rect x="56" y="162" width="24" height="7" fill="#0b0b10"/>
+            <rect x="82" y="162" width="24" height="7" fill="#0b0b10"/>
+          </svg>
         </div>
-        <div class="bonusMsg" id="bonusMsg"></div>
+
+        <div class="tapMsg" id="bonusMsg"></div>
+        <div class="congrats hidden" id="congratsMsg">Congrats! You have increased your girlfriend’s luck stat to mosterest!</div>
       </div>
     </section>
 
     <!-- S7: Final -->
     <section id="s7" class="hidden">
-      <div class="finalCard">
+      <div class="finalWrap">
         <div class="sky" id="sky">
           <div class="sun"></div>
           <div class="cloud c1"></div>
           <div class="cloud c2"></div>
 
-          <div class="charLayer" id="charLayer">
+          <div class="kissIcon" id="kissIcon">😘</div>
+
+          <div class="charRow" id="charRow">
             <!-- sljy -->
-            <div class="charBox" id="sljyBox" style="left:30%; --scale: 1;">
-              <div class="nameHover">sljy</div>
-              <div class="kissIcon" id="kissIcon">😘</div>
-              <canvas id="sljyCanvas" width="140" height="200" style="background:transparent;border:none;"></canvas>
+            <div class="char" id="sljyFinal" style="left:46px;">
+              <div class="nameTag" id="sljyTag">sljy</div>
+              <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
+                <!-- hair (dark brown, loose-ish) -->
+                <div style="position:absolute;left:28px;top:16px;width:38px;height:38px;background:#3b2418;border-radius:8px"></div>
+                <div style="position:absolute;left:24px;top:26px;width:46px;height:46px;background:#3b2418;border-radius:10px;opacity:.95"></div>
+
+                <!-- head -->
+                <div style="position:absolute;left:34px;top:34px;width:28px;height:26px;background:#f1d0b5"></div>
+
+                <!-- black tee -->
+                <div style="position:absolute;left:28px;top:58px;width:36px;height:22px;background:#0b0b10"></div>
+
+                <!-- black mini skirt -->
+                <div style="position:absolute;left:30px;top:80px;width:32px;height:14px;background:#111"></div>
+
+                <!-- legs -->
+                <div style="position:absolute;left:34px;top:94px;width:10px;height:28px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:48px;top:94px;width:10px;height:28px;background:#f1d0b5"></div>
+
+                <!-- red shoes -->
+                <div style="position:absolute;left:32px;top:122px;width:14px;height:6px;background:#d31f2a"></div>
+                <div style="position:absolute;left:46px;top:122px;width:14px;height:6px;background:#d31f2a"></div>
+              </div>
             </div>
 
             <!-- dcop -->
-            <div class="charBox" id="dcopBox" style="left:62%; --scale: 1;">
-              <div class="nameHover">dcop</div>
-              <canvas id="dcopCanvas" width="140" height="200" style="background:transparent;border:none;"></canvas>
+            <div class="char" id="dcopFinal" style="left:292px;">
+              <div class="nameTag" id="dcopTag">dcop</div>
+              <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
+                <!-- head -->
+                <div style="position:absolute;left:34px;top:28px;width:28px;height:28px;background:#f1d0b5"></div>
+                <!-- hair (same as game vibe) -->
+                <div style="position:absolute;left:30px;top:24px;width:36px;height:12px;background:#0b0b10"></div>
+                <div style="position:absolute;left:38px;top:34px;width:8px;height:6px;background:#0b0b10"></div>
+                <div style="position:absolute;left:54px;top:34px;width:8px;height:6px;background:#0b0b10"></div>
+
+                <!-- shirt -->
+                <div style="position:absolute;left:28px;top:56px;width:36px;height:26px;background:#f6f6ff"></div>
+                <div style="position:absolute;left:44px;top:70px;color:#0b0b10;font-size:14px;font-weight:800;">27</div>
+
+                <!-- legs -->
+                <div style="position:absolute;left:32px;top:82px;width:12px;height:36px;background:#1d1d33"></div>
+                <div style="position:absolute;left:48px;top:82px;width:12px;height:36px;background:#1d1d33"></div>
+
+                <!-- shoes -->
+                <div style="position:absolute;left:30px;top:118px;width:16px;height:6px;background:#0b0b10"></div>
+                <div style="position:absolute;left:46px;top:118px;width:16px;height:6px;background:#0b0b10"></div>
+              </div>
             </div>
           </div>
 
           <div class="petals" id="petals"></div>
         </div>
+      </div>
 
-        <div class="finalText" id="finalText">
-          Congrats! You have increased your girlfriend’s luck stat to mosterest!
-        </div>
+      <div class="finalMsg" id="finalText">
+        Happy Valentines mi baby! I’m the luckiest to have you.
+        <small>With lots of love,<br/>Sandra</small>
       </div>
     </section>
 
@@ -351,9 +417,14 @@
 <script>
   // ---------- Screen router ----------
   const show = (id) => {
-    ["s1","s2","s3","s4","s4b","s5","s6","s7"].forEach(x => document.getElementById(x).classList.add("hidden"));
-    document.getElementById(id).classList.remove("hidden");
+    ["s1","s2","s3","s4","s4b","s5","s6","s7"].forEach(x => {
+      const el = document.getElementById(x);
+      if(el) el.classList.add("hidden");
+    });
+    const target = document.getElementById(id);
+    if(target) target.classList.remove("hidden");
 
+    // Keep your audio behavior: when entering s4b -> happy starts
     if(id === "s4b" && musicOn){
       stopBgm();
       startHappy();
@@ -411,7 +482,7 @@
 
   function startHappy(){
     stopBgm();
-    happy.volume = 0.25; // ✅ always 0.25 as requested
+    happy.volume = 0.25;   // ✅ your requirement: loop at 0.25
     safePlay(happy);
   }
 
@@ -425,39 +496,8 @@
     stopHappy();
   }
 
-  // ✅ iPhone audio unlock (does NOT play audible sound)
-  let audioUnlocked = false;
-  async function unlockAudioOnce(){
-    if(audioUnlocked) return;
-    audioUnlocked = true;
-
-    // keep it silent
-    const prevK = kissAudio.volume, prevL = loveAudio.volume;
-    kissAudio.volume = 0;
-    loveAudio.volume = 0;
-
-    // tiny play-pause to unlock
-    try{
-      await kissAudio.play();
-      kissAudio.pause();
-      kissAudio.currentTime = 0;
-    }catch(e){}
-
-    try{
-      await loveAudio.play();
-      loveAudio.pause();
-      loveAudio.currentTime = 0;
-    }catch(e){}
-
-    // restore
-    kissAudio.volume = prevK;
-    loveAudio.volume = prevL;
-  }
-
   // Landing: envelope click -> play hmmmm -> change icon/text -> game
   document.getElementById("env").addEventListener("click", async () => {
-    await unlockAudioOnce(); // ✅ unlock early
-
     const env = document.getElementById("env");
     const mailText = document.getElementById("mailText");
 
@@ -614,54 +654,49 @@
     ctx.fillRect(x+3, y+9, 3, 3);
   }
 
-  function drawPixelBoyAt(ctx2, x, y){
-    // x,y = feet position
-    const w = 28, h = 44;
-    const top = y - h;
-
-    ctx2.fillStyle = "rgba(0,0,0,.35)";
-    ctx2.fillRect(x+3, y+6, 22, 6);
-
-    ctx2.fillStyle = "#1d1d33";
-    ctx2.fillRect(x+6, top+28, 7, 14);
-    ctx2.fillRect(x+15, top+28, 7, 14);
-
-    ctx2.fillStyle = "#0b0b10";
-    ctx2.fillRect(x+5, top+42, 9, 2);
-    ctx2.fillRect(x+14, top+42, 9, 2);
-
-    ctx2.fillStyle = "#f6f6ff";
-    ctx2.fillRect(x+5, top+18, 18, 12);
-
-    ctx2.fillStyle = "#f1d0b5";
-    ctx2.fillRect(x+3, top+20, 3, 8);
-    ctx2.fillRect(x+23, top+20, 3, 8);
-
-    ctx2.fillStyle = "#f1d0b5";
-    ctx2.fillRect(x+7, top+4, 14, 14);
-
-    ctx2.fillStyle = "#0b0b10";
-    ctx2.fillRect(x+6, top+2, 16, 6);
-    ctx2.fillRect(x+6, top+7, 4, 4);
-    ctx2.fillRect(x+10, top+7, 4, 3);
-    ctx2.fillRect(x+14, top+7, 4, 4);
-    ctx2.fillRect(x+18, top+7, 4, 3);
-
-    ctx2.fillStyle = "#000";
-    ctx2.fillRect(x+11, top+10, 2, 2);
-    ctx2.fillRect(x+17, top+10, 2, 2);
-
-    // "27"
-    ctx2.fillStyle = "#0b0b10";
-    ctx2.font = "10px system-ui";
-    ctx2.fillText("27", x+10, top+27);
-  }
-
   function drawPixelBoy(){
-    drawPixelBoyAt(ctx, p.x, p.y);
+    const x = p.x, y = p.y;
+    const top = y - p.h;
+
+    ctx.fillStyle = "rgba(0,0,0,.35)";
+    ctx.fillRect(x+3, y+6, 22, 6);
+
+    ctx.fillStyle = "#1d1d33";
+    ctx.fillRect(x+6, top+28, 7, 14);
+    ctx.fillRect(x+15, top+28, 7, 14);
+
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+5, top+42, 9, 2);
+    ctx.fillRect(x+14, top+42, 9, 2);
+
+    ctx.fillStyle = "#f6f6ff";
+    ctx.fillRect(x+5, top+18, 18, 12);
+
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+3, top+20, 3, 8);
+    ctx.fillRect(x+23, top+20, 3, 8);
+
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+7, top+4, 14, 14);
+
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+6, top+2, 16, 6);
+    ctx.fillRect(x+6, top+7, 4, 4);
+    ctx.fillRect(x+10, top+7, 4, 3);
+    ctx.fillRect(x+14, top+7, 4, 4);
+    ctx.fillRect(x+18, top+7, 4, 3);
+
+    ctx.fillStyle = "#000";
+    ctx.fillRect(x+11, top+10, 2, 2);
+    ctx.fillRect(x+17, top+10, 2, 2);
+
+    ctx.fillStyle = "#0b0b10";
+    ctx.font = "10px system-ui";
+    ctx.fillText("27", x+10, top+27);
+
     ctx.font = "12px system-ui";
     ctx.fillStyle = "rgba(255,255,255,.92)";
-    ctx.fillText("dcop", p.x+1, (p.y - p.h)-6);
+    ctx.fillText("dcop", x+1, top-6);
   }
 
   function drawSpike(s){
@@ -704,18 +739,13 @@
   requestAnimationFrame(loop);
 
   document.getElementById("start").onclick = async () => {
-    await unlockAudioOnce(); // ✅ unlock also here
     resetGame();
     running = true;
     statusPill.textContent = "Goal: 11";
     if(musicOn) startBgm();
   };
 
-  canvas.addEventListener("pointerdown", async (e) => {
-    e.preventDefault();
-    await unlockAudioOnce(); // ✅ unlock on tap too
-    jump();
-  });
+  canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
 
   document.getElementById("muteMusic").onclick = () => {
     musicOn = !musicOn;
@@ -737,8 +767,7 @@
   const coinEl = document.getElementById("coin");
   let coinUsed = false;
 
-  coinEl.onclick = async () => {
-    await unlockAudioOnce();
+  coinEl.onclick = () => {
     if(coinUsed) return;
     coinUsed = true;
     document.getElementById("coinMsg").textContent = "Coin inserted 😏";
@@ -914,7 +943,6 @@
   }
 
   spinBtn.onclick = async () => {
-    await unlockAudioOnce();
     if(spinning) return;
     spinning=true;
 
@@ -955,10 +983,7 @@
     requestAnimationFrame(anim);
   };
 
-  wildBtn.onclick = async () => {
-    await unlockAudioOnce();
-    show("s4b");
-  };
+  wildBtn.onclick = () => show("s4b");
 
   // ---------- Book ----------
   const pages = [
@@ -980,6 +1005,7 @@
   const book = document.getElementById("book");
   const bonusBtn = document.getElementById("bonusBtn");
   let idx = 0;
+  let bonusTimer = null;
 
   function renderBook(){
     book.innerHTML="";
@@ -992,11 +1018,20 @@
     `;
     book.appendChild(p);
 
-    // ✅ only show bonus button on LAST page
+    // ✅ Bonus button ONLY on last page
+    if(bonusTimer) clearTimeout(bonusTimer);
+    bonusBtn.classList.add("hidden");
+    bonusBtn.classList.remove("bonusPop");
+    p.classList.remove("photoShrink");
+
     if(idx === pages.length - 1){
       bonusBtn.classList.remove("hidden");
-    } else {
-      bonusBtn.classList.add("hidden");
+
+      // 1s later: shrink photo + pop button
+      bonusTimer = setTimeout(()=>{
+        p.classList.add("photoShrink");
+        bonusBtn.classList.add("bonusPop");
+      }, 1000);
     }
   }
   renderBook();
@@ -1027,140 +1062,42 @@
   });
 
   document.getElementById("toBook").onclick = () => show("s5");
+  bonusBtn.onclick = () => show("s6");
 
-  // ✅ bonus button goes to S6
-  bonusBtn.onclick = async () => {
-    await unlockAudioOnce();
-    show("s6");
-    drawDcopBig();
-  };
-
-  // ---------- S6 / S7 character drawing (match game vibe) ----------
-  function drawDcopScaled(canvasEl, scale){
-    const c = canvasEl.getContext("2d");
-    c.clearRect(0,0,canvasEl.width,canvasEl.height);
-    c.save();
-    c.imageSmoothingEnabled = false;
-
-    // draw at scale
-    c.translate(0,0);
-    c.scale(scale, scale);
-
-    // center horizontally
-    const baseW = 28;
-    const baseH = 44;
-    const px = Math.floor((canvasEl.width/scale - baseW)/2);
-    const py = Math.floor((canvasEl.height/scale - 8)); // feet near bottom
-    drawPixelBoyAt(c, px, py);
-
-    // redraw "27" centered better for big scale (fix misalign)
-    // wipe shirt area then draw
-    c.fillStyle = "#f6f6ff";
-    c.fillRect(px+5, (py-baseH)+18, 18, 12);
-    c.fillStyle = "#0b0b10";
-    c.font = "10px system-ui";
-    c.textAlign = "center";
-    c.textBaseline = "middle";
-    c.fillText("27", px+14, (py-baseH)+24);
-
-    c.restore();
-  }
-
-  function drawSljyScaled(canvasEl, scale){
-    const c = canvasEl.getContext("2d");
-    c.clearRect(0,0,canvasEl.width,canvasEl.height);
-    c.save();
-    c.imageSmoothingEnabled = false;
-    c.scale(scale, scale);
-
-    // base girl proportions similar height to dcop
-    const baseW = 30;
-    const baseH = 46;
-    const px = Math.floor((canvasEl.width/scale - baseW)/2);
-    const py = Math.floor((canvasEl.height/scale - 8));
-
-    const top = py - baseH;
-
-    // shadow
-    c.fillStyle = "rgba(0,0,0,.30)";
-    c.fillRect(px+4, py+6, 22, 6);
-
-    // legs (skin)
-    c.fillStyle = "#f1d0b5";
-    c.fillRect(px+10, top+28, 6, 16);
-    c.fillRect(px+18, top+28, 6, 16);
-
-    // red shoes
-    c.fillStyle = "#d31f2a";
-    c.fillRect(px+9, top+44, 8, 2);
-    c.fillRect(px+17, top+44, 8, 2);
-
-    // skirt (black mini)
-    c.fillStyle = "#111";
-    c.fillRect(px+8, top+24, 18, 6);
-
-    // tee (black)
-    c.fillStyle = "#0b0b10";
-    c.fillRect(px+8, top+16, 18, 10);
-
-    // arms (skin)
-    c.fillStyle = "#f1d0b5";
-    c.fillRect(px+6, top+18, 3, 8);
-    c.fillRect(px+27, top+18, 3, 8);
-
-    // head
-    c.fillStyle = "#f1d0b5";
-    c.fillRect(px+10, top+4, 14, 12);
-
-    // hair (dark brown, loose/wavy vibe = slightly bigger block with edges)
-    c.fillStyle = "#3b2418";
-    c.fillRect(px+8, top+1, 18, 6);
-    c.fillRect(px+8, top+6, 4, 6);
-    c.fillRect(px+22, top+6, 4, 6);
-    c.fillRect(px+9, top+6, 16, 4);
-
-    // eyes
-    c.fillStyle = "#000";
-    c.fillRect(px+13, top+9, 2, 2);
-    c.fillRect(px+19, top+9, 2, 2);
-
-    c.restore();
-  }
-
-  // S6 big dcop (clickable)
-  const dcopBig = document.getElementById("dcopBig");
-  const bonusMsgEl = document.getElementById("bonusMsg");
+  // ---------- S6 taps ----------
+  const dcopTap = document.getElementById("dcopTap");
+  const dcopSvg = document.getElementById("dcopSvg");
+  const bonusMsg = document.getElementById("bonusMsg");
+  const congratsMsg = document.getElementById("congratsMsg");
   let tapCount = 0;
 
-  function drawDcopBig(){
-    // scale so it looks like the game sprite but bigger
-    drawDcopScaled(dcopBig, 6);
+  function doDcopJump(){
+    dcopSvg.classList.remove("dcopJump");
+    void dcopSvg.offsetWidth; // reflow
+    dcopSvg.classList.add("dcopJump");
   }
 
-  dcopBig.addEventListener("pointerdown", async (e) => {
-    e.preventDefault();
-    await unlockAudioOnce();
+  // iOS audio unlock (must be inside user gesture)
+  async function unlockAudio(){
+    try{
+      kissAudio.volume = 0;
+      loveAudio.volume = 0;
+      await safePlay(kissAudio);
+      kissAudio.pause(); kissAudio.currentTime = 0;
+      await safePlay(loveAudio);
+      loveAudio.pause(); loveAudio.currentTime = 0;
+      kissAudio.volume = 1;
+      loveAudio.volume = 1;
+    }catch(e){}
+  }
 
-    tapCount++;
-    if(tapCount === 1){
-      bonusMsgEl.textContent = "Better luck next time! Try again";
-    } else if(tapCount === 2){
-      bonusMsgEl.textContent = "Ohhhhh mans…. Try again!";
-    } else {
-      // third tap -> final
-      bonusMsgEl.textContent = "";
-      show("s7");
-      startFinalScene();
-    }
-  });
-
-  // ---------- Final scene sequence ----------
-  let petalsTimer = null;
-
+  // ---------- S7 helpers ----------
+  let petalsStarted = false;
   function startPetals(){
+    if(petalsStarted) return;
+    petalsStarted = true;
     const petals = document.getElementById("petals");
-    if(petalsTimer) return;
-    petalsTimer = setInterval(()=>{
+    setInterval(()=>{
       const s=document.createElement("span");
       s.style.left = (Math.random()*100) + "%";
       s.style.animationDuration = (5.5 + Math.random()*2.5) + "s";
@@ -1170,85 +1107,102 @@
     }, 180);
   }
 
-  function centerKissBetweenHeads(){
-    const sljyBox = document.getElementById("sljyBox");
-    const dcopBox = document.getElementById("dcopBox");
+  function positionKissBetweenHeads(){
+    const kiss = document.getElementById("kissIcon");
+    const a = document.getElementById("sljyFinal").getBoundingClientRect();
+    const b = document.getElementById("dcopFinal").getBoundingClientRect();
+    const sky = document.getElementById("sky").getBoundingClientRect();
+
+    // center X between the two chars
+    const midX = ((a.left + a.right)/2 + (b.left + b.right)/2) / 2;
+
+    // Y: slightly above their heads
+    const topY = Math.min(a.top, b.top) + 18;
+
+    // convert to sky-local coords
+    const x = midX - sky.left;
+    const y = topY - sky.top;
+
+    kiss.style.left = x + "px";
+    kiss.style.top = y + "px";
+  }
+
+  async function startFinalSequence(){
+    const sljy = document.getElementById("sljyFinal");
     const kiss = document.getElementById("kissIcon");
 
-    const r1 = sljyBox.getBoundingClientRect();
-    const r2 = dcopBox.getBoundingClientRect();
-
-    // head approx: top area of sprite
-    const sljyHeadX = r1.left + r1.width/2;
-    const dcopHeadX = r2.left + r2.width/2;
-    const midX = (sljyHeadX + dcopHeadX) / 2;
-
-    // position kiss relative to sljyBox (it owns the kiss icon)
-    const parent = sljyBox.getBoundingClientRect();
-    const leftPx = midX - parent.left;
-    kiss.style.left = leftPx + "px";
-  }
-
-  async function startFinalScene(){
-    await unlockAudioOnce();
-
-    // keep happy looping quietly
+    // ensure happy is low so kiss/love can be heard
     if(musicOn){
-      happy.volume = 0.25;
-      safePlay(happy);
+      happy.volume = 0.18;
     }
 
-    // set scales small enough for iPhone
-    const sljyBox = document.getElementById("sljyBox");
-    const dcopBox = document.getElementById("dcopBox");
-    sljyBox.style.setProperty("--scale","0.9");
-    dcopBox.style.setProperty("--scale","0.9");
+    // walk
+    sljy.classList.add("sljyWalk");
 
-    // draw sprites
-    drawSljyScaled(document.getElementById("sljyCanvas"), 4.5);
-    drawDcopScaled(document.getElementById("dcopCanvas"), 4.5);
-
-    // reset positions (start sljy left)
-    sljyBox.classList.remove("walk");
-    sljyBox.style.left = "30%";
-    dcopBox.style.left = "62%";
-
-    const finalText = document.getElementById("finalText");
-    finalText.innerHTML = "Congrats! You have increased your girlfriend’s luck stat to mosterest!";
-
-    // start walking
-    requestAnimationFrame(()=>{
-      sljyBox.classList.add("walk");
-    });
-
-    // at kiss moment (after walk)
+    // after walk: show kiss, play kiss, then petals + love
     setTimeout(async ()=>{
-      // center kiss emoji
-      centerKissBetweenHeads();
-      const kiss = document.getElementById("kissIcon");
+      positionKissBetweenHeads();
       kiss.style.opacity = 1;
 
-      // play kiss EXACTLY at kiss moment
-      kissAudio.volume = 1.0;
       kissAudio.currentTime = 0;
+      kissAudio.volume = 1;
       await safePlay(kissAudio);
 
-      // start petals AFTER kiss
+      // petals start AFTER kiss
       startPetals();
 
-      // then love audio + final text
       setTimeout(async ()=>{
-        loveAudio.volume = 1.0;
         loveAudio.currentTime = 0;
+        loveAudio.volume = 1;
         await safePlay(loveAudio);
 
-        finalText.innerHTML =
-          "Happy Valentines mi baby! I’m the luckiest to have you.<br><br>With lots of love,<br>Sandra";
-      }, 650);
+        // restore happy to 0.25 after love starts
+        if(musicOn){
+          happy.volume = 0.25;
+        }
+      }, 500);
 
-    }, 2000);
+    }, 1650);
   }
 
+  window.addEventListener("resize", ()=>{
+    const kiss = document.getElementById("kissIcon");
+    if(kiss && kiss.style.opacity === "1") positionKissBetweenHeads();
+  });
+
+  dcopTap.onclick = async () => {
+    doDcopJump();
+
+    tapCount++;
+
+    // unlock audio early so iOS allows later playback
+    if(tapCount === 1) await unlockAudio();
+
+    congratsMsg.classList.add("hidden");
+
+    if(tapCount === 1){
+      bonusMsg.textContent = "Better luck next time! Try again";
+    } else if(tapCount === 2){
+      bonusMsg.textContent = "Ohhhhh mans…. Try again!";
+    } else {
+      // 3rd tap -> show congrats in S6, then go S7
+      bonusMsg.textContent = "";
+      congratsMsg.classList.remove("hidden");
+
+      setTimeout(()=>{
+        show("s7");
+
+        // ensure happy is running (still loop at 0.25 normally)
+        if(musicOn){
+          startHappy();
+          happy.volume = 0.25;
+        }
+
+        // kick off final animation + kiss/love
+        setTimeout(()=>startFinalSequence(), 250);
+      }, 900);
+    }
+  };
 </script>
 </body>
 </html>
