@@ -1105,7 +1105,7 @@
     gap: 0
   };
 
-  function layoutFinalChars(){
+function layoutFinalChars(){
   const sky  = document.getElementById("sky");
   const sljy = document.getElementById("sljyFinal");
   const dcop = document.getElementById("dcopFinal");
@@ -1117,15 +1117,15 @@
 
   const charW = 92;
   const gap = 1;          // 👈 how close they stand (0 = touching)
-  const walkOffset = 40;  // how far sljy starts to the left so she “walks in”
+  const walkOffset = 40;  // how far sljy starts left so she “walks in”
 
-  // ✅ keep dcop on the right (like your screenshot)
+  // keep dcop on the right
   const dcopFinalLeft = w - rightPad - charW;
 
-  // ✅ put sljy close to dcop
+  // put sljy close to dcop
   const sljyFinalLeft = Math.max(leftPad, dcopFinalLeft - charW - gap);
 
-  // ✅ start sljy slightly further left so the walk animation is visible
+  // start sljy slightly further left so the walk animation is visible
   const sljyStartLeft = Math.max(leftPad, sljyFinalLeft - walkOffset);
 
   // apply positions
@@ -1136,14 +1136,17 @@
   dcop.style.left = dcopFinalLeft + "px";
 
   // store for the walk animation
-  finalLayout = { sljyStartLeft, sljyFinalLeft, dcopLeft: dcopFinalLeft, gap };
+  finalLayout = {
+    sljyStartLeft,
+    sljyFinalLeft,
+    dcopLeft: dcopFinalLeft,
+    gap
+  };
+
+  // if kiss is already showing, recalc its position
+  const kiss = document.getElementById("kissIcon");
+  if(kiss && kiss.style.opacity === "1") positionKissBetweenHeads();
 }
-
-
-    // ensure kiss recalcs if visible
-    const kiss = document.getElementById("kissIcon");
-    if(kiss && kiss.style.opacity === "1") positionKissBetweenHeads();
-  }
 
   let petalsStarted = false;
   function startPetals(){
