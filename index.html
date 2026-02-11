@@ -408,12 +408,12 @@
                 <div style="position:absolute;left:30px;top:86px;width:32px;height:14px;background:#111"></div>
 
                 <!-- legs -->
-                <div style="position:absolute;left:34px;top:99px;width:10px;height:28px;background:#f1d0b5"></div>
-                <div style="position:absolute;left:48px;top:99px;width:10px;height:28px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:34px;top:98px;width:10px;height:28px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:48px;top:98px;width:10px;height:28px;background:#f1d0b5"></div>
 
                 <!-- shoes -->
-                <div style="position:absolute;left:32px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
-                <div style="position:absolute;left:46px;top:128px;width:14px;height:6px;background:#d31f2a"></div>
+                <div style="position:absolute;left:32px;top:126px;width:14px;height:6px;background:#d31f2a"></div>
+                <div style="position:absolute;left:46px;top:126px;width:14px;height:6px;background:#d31f2a"></div>
               </div>
             </div>
 
@@ -1161,7 +1161,7 @@ function layoutFinalChars(){
   const dcopFinalLeft = w - rightPad - charW;
 
   // put sljy close to dcop
-  const sljyFinalLeft = Math.max(leftPad, dcopFinalLeft - visualW + overlap);
+  const sljyFinalLeft = Math.max(leftPad, dcopFinalLeft - charW + overlap);
 
   // start sljy slightly further left so the walk animation is visible
   const sljyStartLeft = Math.max(leftPad, sljyFinalLeft - walkOffset);
