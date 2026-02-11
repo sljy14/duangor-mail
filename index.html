@@ -429,7 +429,7 @@
     <div style="position:absolute;left:54px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
 
     <!-- tee body -->
-    <div style="position:absolute;left:28px;top:58px;width:36px;height:28px;background:#f6f6ff"></div>
+    <div style="position:absolute;left:28px;top:58px;width:36px;height:29px;background:#f6f6ff"></div>
 
     <!-- 27 -->
     <div style="position:absolute;left:46px;top:68px;transform:translateX(-50%);color:#0b0b10;font-size:14px;font-weight:800;">27</div>
@@ -439,16 +439,16 @@
     <div style="position:absolute;left:62px;top:58px;width:10px;height:12px;background:#f6f6ff"></div>
 
     <!-- arms (lower) -->
-    <div style="position:absolute;left:22px;top:70px;width:8px;height:16px;background:#f1d0b5"></div>
-    <div style="position:absolute;left:62px;top:70px;width:8px;height:16px;background:#f1d0b5"></div>
+    <div style="position:absolute;left:22px;top:70px;width:8px;height:17px;background:#f1d0b5"></div>
+    <div style="position:absolute;left:62px;top:70px;width:8px;height:17px;background:#f1d0b5"></div>
 
     <!-- legs -->
-    <div style="position:absolute;left:32px;top:85px;width:12px;height:37px;background:#1d1d33"></div>
-    <div style="position:absolute;left:48px;top:85px;width:12px;height:37px;background:#1d1d33"></div>
+    <div style="position:absolute;left:32px;top:86px;width:12px;height:36px;background:#1d1d33"></div>
+    <div style="position:absolute;left:48px;top:86px;width:12px;height:36px;background:#1d1d33"></div>
 
     <!-- shoes -->
-    <div style="position:absolute;left:30px;top:122px;width:16px;height:6px;background:#0b0b10"></div>
-    <div style="position:absolute;left:46px;top:122px;width:16px;height:6px;background:#0b0b10"></div>
+    <div style="position:absolute;left:30px;top:123px;width:16px;height:6px;background:#0b0b10"></div>
+    <div style="position:absolute;left:46px;top:123px;width:16px;height:6px;background:#0b0b10"></div>
   </div>
 </div>
 
@@ -1161,7 +1161,7 @@ function layoutFinalChars(){
   const dcopFinalLeft = w - rightPad - charW;
 
   // put sljy close to dcop
-  const sljyFinalLeft = Math.max(leftPad, dcopFinalLeft - charW + overlap);
+  const sljyFinalLeft = Math.max(leftPad, dcopFinalLeft - charW + gap);
 
   // start sljy slightly further left so the walk animation is visible
   const sljyStartLeft = Math.max(leftPad, sljyFinalLeft - walkOffset);
