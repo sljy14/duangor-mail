@@ -19,29 +19,15 @@
     .envelope{font-size:140px;cursor:pointer;user-select:none;display:inline-block;line-height:1}
     .envelope:active{transform:scale(.98)}
     .envelopeWrap{margin-top:14px}
-    .mailLine{margin-top:10px;font-size:16px;opacity:.92;min-height:22px}
+    .mailText{margin-top:10px;font-weight:700;opacity:.92}
 
     /* Confetti */
     .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
     .confetti i{position:absolute;top:-10px;width:8px;height:10px;opacity:.9;animation:fall 1.8s linear forwards}
     @keyframes fall{to{transform:translateY(120vh) rotate(360deg);opacity:0.1}}
 
-    /* Petals (continuous) */
-    .petals{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
-    .petals i{
-      position:absolute;top:-20px;
-      width:10px;height:14px;border-radius:10px 10px 10px 0;
-      transform:rotate(25deg);
-      opacity:.9;
-      animation:petalFall linear forwards;
-      filter: blur(.2px);
-    }
-    @keyframes petalFall{
-      to{transform:translateY(120vh) translateX(50px) rotate(220deg);opacity:0.25}
-    }
-
     /* Game */
-    canvas.gameCanvas{max-width:520px;width:100%;background:#0f0f1a;border:1px solid #2a2a44;border-radius:14px;touch-action:manipulation}
+    canvas{max-width:520px;width:100%;background:#0f0f1a;border:1px solid #2a2a44;border-radius:14px;touch-action:manipulation}
     .hud{display:flex;justify-content:space-between;gap:10px;max-width:520px;margin:10px auto 0 auto;flex-wrap:wrap}
     .pill{font-size:12px;opacity:.9;border:1px solid #2a2a44;background:rgba(0,0,0,.25);padding:7px 10px;border-radius:999px}
 
@@ -50,7 +36,7 @@
     .coin{font-size:44px;cursor:pointer;user-select:none;display:inline-block}
     .coin.inserted{animation:coinIn .55s ease forwards}
     @keyframes coinIn{
-      0%{transform:translateX(0) translateY(0) scale(1)}
+      0% . {transform:translateX(0) translateY(0) scale(1)}
       70%{transform:translateX(46px) translateY(-4px) scale(.92)}
       100%{transform:translateX(62px) translateY(-2px) scale(.55);opacity:.15}
     }
@@ -60,13 +46,11 @@
     /* Wheel */
     .wheelBox{position:relative;width:300px;height:300px;margin:0 auto}
     #wheel{width:300px;height:300px;border-radius:50%;border:2px solid #3a3a66;transform:rotate(0deg)}
-    .pointer{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:26px}
-    .subtitle{opacity:.9;margin-top:6px;min-height:22px}
-    .result{margin-top:14px;font-size:16px;min-height:22px}
+    .pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:28px}
+    .subtitle{opacity:.9;margin-top:6px}
 
     /* “After spin” page */
     .bigWinMsg{font-size:34px;line-height:1.15;margin:8px 0 10px 0}
-    .hint{opacity:.92;margin-top:6px}
 
     /* Swipe Book */
     .book{position:relative;max-width:420px;margin:0 auto;height:560px;border-radius:16px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
@@ -81,84 +65,118 @@
       padding:10px 12px;border-radius:14px;
       text-align:left;
       backdrop-filter: blur(6px);
-    }
-    .bonusBtnWrap{position:absolute;bottom:12px;left:12px;right:12px;display:flex;justify-content:center}
-
-    /* Bonus tap page */
-    .tapWrap{display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:10px}
-    .tapHint{opacity:.88}
-    .tapAvatar{cursor:pointer;user-select:none}
-    .toast{
-      max-width:520px;margin:12px auto 0 auto;
-      background:rgba(0,0,0,.28);
-      border:1px solid rgba(255,255,255,.14);
-      padding:10px 12px;border-radius:14px;
-      opacity:.92;
-      min-height:22px;
+      font-weight:700;
     }
 
-    /* Final sunny scene */
-    .scene{
+    /* S6 bonus click */
+    .bonusBox{max-width:520px;margin:0 auto}
+    .tapAvatar{display:inline-block;cursor:pointer;user-select:none;margin-top:14px}
+    .tapAvatar:active{transform:scale(.98)}
+    .tapMsg{margin-top:12px;min-height:22px}
+
+    /* S7 Final sunny scene (simple & clean like your screenshot) */
+    .finalWrap{max-width:620px;margin:0 auto;border-radius:18px;overflow:hidden;border:1px solid #2a2a44;background:#0f0f1a}
+    .sky{
       position:relative;
-      width:100%;
-      max-width:560px;
-      margin:0 auto;
-      height:520px;
-      border-radius:16px;
+      height:560px;
+      background:linear-gradient(#a7d7ff,#e9fbff 60%,#7fe07f 60%,#57c457);
       overflow:hidden;
-      border:1px solid #2a2a44;
-      background:linear-gradient(#bfe9ff 0%, #e9fbff 45%, #b8f1b8 45%, #77d477 100%);
     }
-    .sun{
-      position:absolute;top:22px;left:22px;
-      width:90px;height:90px;border-radius:50%;
-      background:radial-gradient(circle at 30% 30%, #fff7b8 0%, #ffd36a 55%, #ffb84e 100%);
-      box-shadow:0 0 40px rgba(255,211,106,.55);
-    }
-    .cloud{
-      position:absolute;top:38px;right:36px;
-      width:170px;height:56px;border-radius:40px;
-      background:rgba(255,255,255,.85);
-      filter: blur(.2px);
-    }
-    .cloud:before,.cloud:after{
-      content:"";position:absolute;background:rgba(255,255,255,.88);border-radius:50%;
-    }
-    .cloud:before{width:70px;height:70px;left:18px;top:-28px}
-    .cloud:after{width:90px;height:90px;left:72px;top:-44px}
+    .sun{position:absolute;top:28px;right:34px;width:110px;height:110px;border-radius:50%;background:#ffd55b;opacity:.92;box-shadow:0 0 24px rgba(255,213,91,.55)}
+    .cloud{position:absolute;top:90px;width:200px;height:62px;background:rgba(255,255,255,.92);border-radius:34px;opacity:.95}
+    .cloud:before,.cloud:after{content:"";position:absolute;background:rgba(255,255,255,.92);border-radius:50%}
+    .cloud:before{width:70px;height:70px;left:28px;top:-30px}
+    .cloud:after{width:92px;height:92px;left:82px;top:-48px}
+    .cloud.c1{left:90px}
+    .cloud.c2{left:300px;top:150px;opacity:.8}
 
-    .charLabel{
+    .charStage{position:absolute;left:0;right:0;bottom:120px;height:260px}
+    .charWrap{position:absolute;bottom:0;transform-origin:bottom center}
+    .namePlain{
       position:absolute;
-      font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(0,0,0,.25);
-      border:1px solid rgba(255,255,255,.18);
-      color:#fff;
-      backdrop-filter: blur(6px);
+      top:-34px;
+      left:50%;
       transform:translateX(-50%);
+      font-size:14px;
+      font-weight:700;
+      color:rgba(255,255,255,.92);
+      text-shadow:0 2px 8px rgba(0,0,0,.55);
       white-space:nowrap;
+      pointer-events:none;
+    }
+
+    /* Use exact game-style pixel layout, then scale up */
+    .pixelDcop, .pixelSljy{position:relative;width:28px;height:44px}
+    .px{position:absolute;box-sizing:border-box}
+
+    /* dcop parts (exactly matches your canvas drawPixelBoy) */
+    .dcop .pantsL{left:6px;top:28px;width:7px;height:14px;background:#1d1d33}
+    .dcop .pantsR{left:15px;top:28px;width:7px;height:14px;background:#1d1d33}
+    .dcop .shoeL{left:5px;top:42px;width:9px;height:2px;background:#0b0b10}
+    .dcop .shoeR{left:14px;top:42px;width:9px;height:2px;background:#0b0b10}
+    .dcop .shirt{left:5px;top:18px;width:18px;height:12px;background:#f6f6ff}
+    .dcop .armL{left:3px;top:20px;width:3px;height:8px;background:#f1d0b5}
+    .dcop .armR{left:23px;top:20px;width:3px;height:8px;background:#f1d0b5}
+    .dcop .head{left:7px;top:4px;width:14px;height:14px;background:#f1d0b5}
+    .dcop .hairTop{left:6px;top:2px;width:16px;height:6px;background:#0b0b10}
+    .dcop .hair1{left:6px;top:7px;width:4px;height:4px;background:#0b0b10}
+    .dcop .hair2{left:10px;top:7px;width:4px;height:3px;background:#0b0b10}
+    .dcop .hair3{left:14px;top:7px;width:4px;height:4px;background:#0b0b10}
+    .dcop .hair4{left:18px;top:7px;width:4px;height:3px;background:#0b0b10}
+    .dcop .eyeL{left:11px;top:10px;width:2px;height:2px;background:#000}
+    .dcop .eyeR{left:17px;top:10px;width:2px;height:2px;background:#000}
+    .dcop .num{
+      left:9px;top:22px;
+      font-size:10px;font-weight:800;color:#0b0b10;
+      font-family:system-ui;
+    }
+
+    /* sljy: same “blocky game vibe” but with your outfit specs */
+    .sljy .hair{left:5px;top:1px;width:18px;height:12px;background:#3b2418}
+    .sljy .hair2{left:4px;top:10px;width:20px;height:5px;background:#3b2418}
+    .sljy .head{left:7px;top:6px;width:14px;height:12px;background:#f1d0b5}
+    .sljy .tee{left:5px;top:18px;width:18px;height:12px;background:#0b0b10}
+    .sljy .skirt{left:6px;top:30px;width:16px;height:6px;background:#111}
+    .sljy .legL{left:8px;top:36px;width:5px;height:8px;background:#f1d0b5}
+    .sljy .legR{left:15px;top:36px;width:5px;height:8px;background:#f1d0b5}
+    .sljy .shoeL{left:7px;top:42px;width:6px;height:2px;background:#d31f2a}
+    .sljy .shoeR{left:14px;top:42px;width:6px;height:2px;background:#d31f2a}
+
+    /* Walk: about “5 steps” (short distance) */
+    .walkToDcop{
+      animation:walkTo 1.6s ease-out forwards;
+    }
+    @keyframes walkTo{
+      to{ transform:translateX(170px) scale(var(--scale)); }
     }
 
     .kissIcon{
       position:absolute;
-      font-size:34px;
+      font-size:42px;
       opacity:0;
-      transition:opacity .35s ease;
-      z-index:5;
+      transition:opacity .25s ease;
+      text-shadow:0 2px 10px rgba(0,0,0,.55);
+      pointer-events:none;
     }
 
-    .finalMsg{
-      max-width:560px;margin:12px auto 0 auto;
-      background:rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.16);
-      padding:12px 14px;border-radius:14px;
-      opacity:0;
-      transform:translateY(6px);
-      transition:opacity .8s ease, transform .8s ease;
+    /* Petals (continuous) */
+    .petals{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .petals span{
+      position:absolute;top:-20px;width:12px;height:12px;
+      background:#ffb7c5;border-radius:60% 40% 60% 40%;
+      opacity:.92;
+      animation:petalFall 6.5s linear infinite;
+    }
+    @keyframes petalFall{
+      to{transform:translateY(620px) rotate(360deg);opacity:.18}
+    }
+
+    .finalText{
+      padding:18px 12px 22px 12px;
+      font-size:22px;
       line-height:1.35;
     }
-    .finalMsg.show{opacity:.95;transform:translateY(0)}
+    .finalTextSmall{font-size:18px;opacity:.95}
   </style>
 </head>
 <body>
@@ -173,17 +191,19 @@
 
       <div class="envelopeWrap">
         <div class="envelope" id="env" title="Click me">💌</div>
-        <div class="mailLine" id="mailLine"></div>
+        <div class="mailText hidden" id="mailText">You’ve got mail!</div>
       </div>
 
       <!-- Audio -->
-      <audio id="hmmm" preload="auto" src="hmmmm.mp3"></audio>
+      <audio id="voice" preload="auto" src="hmmmm.mp3"></audio>
       <audio id="bgm" preload="auto" src="bgm.mp3" loop></audio>
-      <audio id="happyBgm" preload="auto" src="happy.mp3" loop></audio>
+      <audio id="happy" preload="auto" src="happy.mp3" loop></audio>
       <audio id="spinSfx" preload="auto" src="spin.mp3"></audio>
       <audio id="yay" preload="auto" src="yay.mp3"></audio>
-      <audio id="kissSfx" preload="auto" src="kiss.mp3"></audio>
-      <audio id="loveSfx" preload="auto" src="love.mp3"></audio>
+
+      <!-- NEW (not in folder) -->
+      <audio id="kissAudio" preload="auto" src="kiss.mp3"></audio>
+      <audio id="loveAudio" preload="auto" src="love.mp3"></audio>
     </section>
 
     <!-- S2: Game -->
@@ -192,13 +212,13 @@
       <p class="note">Reach 11 to win the game.</p>
 
       <div class="hud">
-        <div class="pill"><b>dcop</b></div>
+        <div class="pill">Player: <b>dcop</b></div>
+        <div class="pill">Score: <b id="score">0</b>/11</div>
         <div class="pill" id="statusPill">Goal: 11</div>
-        <div class="pill">Score: <b id="score">0</b></div>
       </div>
 
       <div style="margin-top:10px;">
-        <canvas class="gameCanvas" id="game" width="520" height="360"></canvas>
+        <canvas id="game" width="520" height="360"></canvas>
       </div>
 
       <div style="margin-top:12px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
@@ -206,7 +226,7 @@
         <button class="btn" id="muteMusic">Music: On</button>
       </div>
 
-      <p class="note" id="gameMsg" style="margin-top:10px;">Tap screen to jump.</p>
+      <p class="note" id="gameMsg" style="margin-top:10px;">Tap the screen to jump.</p>
     </section>
 
     <!-- S3: Coin -->
@@ -242,8 +262,6 @@
       <div style="margin-top:12px;">
         <button class="btn hidden" id="wildBtn">Wild card? Hmmmm</button>
       </div>
-
-      <p class="result" id="wheelResult"></p>
     </section>
 
     <!-- S4B: After wheel -->
@@ -257,99 +275,189 @@
       <div class="big">📊 Luck Stats Report</div>
       <p class="note">Swipe left/right.</p>
       <div class="book" id="book"></div>
+
+      <!-- NEW: Bonus button (always visible; simple) -->
+      <button class="btn" id="bonusBtn" style="margin-top:14px;">Bonus luck here!</button>
     </section>
 
-    <!-- S6: Bonus tap -->
+    <!-- S6: Bonus taps -->
     <section id="s6" class="hidden">
-      <div class="big">Bonus Luck ✨</div>
-      <p class="note">Click on <b>dcop</b> to increase your luck stats!</p>
+      <div class="big">Click on dcop to increase your luck stats!</div>
+      <p class="note">Just tap him 😏</p>
 
-      <div class="tapWrap">
-        <div class="tapAvatar" id="tapDcop" title="tap dcop">
-          <canvas class="gameCanvas" id="tapCanvas" width="260" height="200" style="max-width:320px;"></canvas>
+      <div class="bonusBox">
+        <!-- dcop (exact game style) but bigger via scale -->
+        <div class="tapAvatar" id="dcopTap" aria-label="dcop">
+          <div style="--scale:6; transform:scale(var(--scale)); transform-origin:top center; display:inline-block;">
+            <div class="pixelDcop dcop">
+              <div class="px pantsL"></div><div class="px pantsR"></div>
+              <div class="px shoeL"></div><div class="px shoeR"></div>
+              <div class="px shirt"></div>
+              <div class="px armL"></div><div class="px armR"></div>
+              <div class="px head"></div>
+              <div class="px hairTop"></div>
+              <div class="px hair1"></div><div class="px hair2"></div><div class="px hair3"></div><div class="px hair4"></div>
+              <div class="px eyeL"></div><div class="px eyeR"></div>
+              <div class="px num">27</div>
+            </div>
+          </div>
         </div>
-        <div class="toast" id="tapToast"></div>
+
+        <div class="note tapMsg" id="bonusMsg"></div>
       </div>
     </section>
 
     <!-- S7: Final scene -->
     <section id="s7" class="hidden">
-      <div class="big">💖</div>
-      <p class="note" id="finalTop">Congrats! You have increased your girlfriend’s luck stat to mosterest!</p>
+      <div class="finalWrap">
+        <div class="sky" id="sky">
+          <div class="sun"></div>
+          <div class="cloud c1"></div>
+          <div class="cloud c2"></div>
 
-      <div class="scene" id="scene">
-        <div class="sun"></div>
-        <div class="cloud"></div>
+          <div class="petals" id="petals"></div>
 
-        <!-- kiss icon -->
-        <div class="kissIcon" id="kissIcon">😘</div>
+          <div class="charStage">
+            <!-- sljy starts left -->
+            <div class="charWrap" id="sljyWrap" style="left:200px; --scale:6; transform:translateX(0) scale(var(--scale));">
+              <div class="namePlain">sljy</div>
+              <div class="pixelSljy sljy">
+                <div class="px hair"></div><div class="px hair2"></div>
+                <div class="px head"></div>
+                <div class="px tee"></div>
+                <div class="px skirt"></div>
+                <div class="px legL"></div><div class="px legR"></div>
+                <div class="px shoeL"></div><div class="px shoeR"></div>
+              </div>
+            </div>
 
-        <!-- dcop + label -->
-        <canvas id="dcopBig" width="220" height="240" style="position:absolute;left:80px;bottom:70px;"></canvas>
-        <div class="charLabel" id="labelDcop" style="left:190px;bottom:325px;">dcop</div>
+            <!-- dcop on right -->
+            <div class="charWrap" id="dcopWrap" style="left:420px; --scale:6; transform:scale(var(--scale));">
+              <div class="namePlain">dcop</div>
+              <div class="pixelDcop dcop">
+                <div class="px pantsL"></div><div class="px pantsR"></div>
+                <div class="px shoeL"></div><div class="px shoeR"></div>
+                <div class="px shirt"></div>
+                <div class="px armL"></div><div class="px armR"></div>
+                <div class="px head"></div>
+                <div class="px hairTop"></div>
+                <div class="px hair1"></div><div class="px hair2"></div><div class="px hair3"></div><div class="px hair4"></div>
+                <div class="px eyeL"></div><div class="px eyeR"></div>
+                <div class="px num">27</div>
+              </div>
+            </div>
 
-        <!-- sljy + label -->
-        <canvas id="sljy" width="220" height="240" style="position:absolute;left:360px;bottom:70px;"></canvas>
-        <div class="charLabel" id="labelSljy" style="left:470px;bottom:325px;">sljy</div>
+            <!-- kiss icon (positioned by JS to be centered between heads) -->
+            <div class="kissIcon" id="kissIcon">😘</div>
+          </div>
+        </div>
       </div>
 
-      <div class="finalMsg" id="finalMsg">
-        Happy Valentines mi baby! I’m the luckiest to have you.<br/>
-        With lots of love,<br/>
-        Sandra
+      <div class="finalText" id="finalText">
+        Congrats! You have increased your girlfriend’s luck stat to mosterest!
       </div>
+      <div class="finalTextSmall" id="finalText2"></div>
     </section>
 
   </div>
 </div>
 
 <div class="confetti hidden" id="confetti"></div>
-<div class="petals hidden" id="petals"></div>
 
 <script>
-(() => {
-  // ---------- Helpers ----------
+  // ---------- Screen router ----------
   const show = (id) => {
     ["s1","s2","s3","s4","s4b","s5","s6","s7"].forEach(x => document.getElementById(x).classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
+
+    // when we enter s4b, we stop bgm & start happy (quiet)
+    if(id === "s4b" && musicOn){
+      stopBgm();
+      startHappy();
+    }
   };
 
-  async function safePlay(audioEl){
-    if(!audioEl) return;
-    try { await audioEl.play(); } catch(e) {}
-  }
-  function safePause(audioEl){
-    if(!audioEl) return;
-    try { audioEl.pause(); } catch(e) {}
-  }
-
   // ---------- Audio ----------
-  const hmmm = document.getElementById("hmmm");
-  const bgm = document.getElementById("bgm");
-  const happyBgm = document.getElementById("happyBgm");
+  const voice = document.getElementById("voice");
+  const bgm   = document.getElementById("bgm");
+  const happy = document.getElementById("happy");
   const spinSfx = document.getElementById("spinSfx");
   const yay = document.getElementById("yay");
-  const kissSfx = document.getElementById("kissSfx");
-  const loveSfx = document.getElementById("loveSfx");
+
+  const kissAudio = document.getElementById("kissAudio");
+  const loveAudio = document.getElementById("loveAudio");
 
   let musicOn = true;
 
-  // volumes
-  bgm.volume = 1.0;
-  happyBgm.volume = 0.25;
+  async function safePlay(audioEl){
+    try { await audioEl.play(); } catch(e) {}
+  }
 
-  // ---------- Landing ----------
-  const env = document.getElementById("env");
-  const mailLine = document.getElementById("mailLine");
-  env.addEventListener("click", async () => {
+  function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+
+  let fadeRAF = null;
+  function fadeBgmTo(target, ms=320){
+    if(!musicOn) return;
+    target = clamp01(target);
+    const startV = (typeof bgm.volume === "number") ? bgm.volume : 1;
+    const startT = performance.now();
+
+    if(fadeRAF) cancelAnimationFrame(fadeRAF);
+
+    const step = (now) => {
+      const p = Math.min(1, (now - startT)/ms);
+      const eased = 1 - Math.pow(1-p, 3);
+      bgm.volume = clamp01(startV + (target - startV) * eased);
+      if(p < 1) fadeRAF = requestAnimationFrame(step);
+    };
+    fadeRAF = requestAnimationFrame(step);
+  }
+
+  function startBgm(){
+    stopHappy();
+    bgm.volume = 1;
+    safePlay(bgm);
+  }
+
+  function duckBgm(){ fadeBgmTo(0.25, 260); } // your final requirement
+  function stopBgm(){
+    if(fadeRAF) cancelAnimationFrame(fadeRAF);
+    fadeRAF = null;
+    bgm.pause();
+    bgm.currentTime = 0;
+  }
+
+  function startHappy(){
+    stopBgm();
+    // ✅ keep happy quiet so kiss/love are clear
+    happy.volume = 0.25;
+    safePlay(happy);
+  }
+
+  function stopHappy(){
+    happy.pause();
+    happy.currentTime = 0;
+  }
+
+  function stopAllMusic(){
+    stopBgm();
+    stopHappy();
+  }
+
+  // Landing: envelope click -> play hmmmm -> change icon/text -> game
+  document.getElementById("env").addEventListener("click", async () => {
+    const env = document.getElementById("env");
+    const mailText = document.getElementById("mailText");
+
     env.textContent = "📨";
-    mailLine.textContent = "You’ve got mail!";
-    hmmm.currentTime = 0;
-    await safePlay(hmmm);
+    mailText.classList.remove("hidden");
+
+    await safePlay(voice);
+
     let moved = false;
     const go = () => { if(moved) return; moved = true; show("s2"); };
-    const t = setTimeout(go, 1700);
-    hmmm.onended = () => { clearTimeout(t); go(); };
+    const t = setTimeout(go, 2200);
+    voice.onended = () => { clearTimeout(t); go(); };
   });
 
   // ---------- Game ----------
@@ -361,7 +469,7 @@
   const gameMsg = document.getElementById("gameMsg");
 
   let running = false;
-  let last = performance.now();
+  let last = 0;
   let score = 0;
 
   const groundY = 300;
@@ -398,8 +506,8 @@
     spawnTimer = 0;
     hearts = [];
     statusPill.textContent = "Goal: 11";
-    gameMsg.textContent = "Tap screen to jump.";
-    draw(); // IMPORTANT: always draw
+    gameMsg.textContent = "Tap the screen to jump.";
+    draw();
   }
 
   function jump(){
@@ -428,11 +536,8 @@
     running = false;
     statusPill.textContent = "WIN ✅";
     gameMsg.textContent = "Damn, you’re an 11/10 indeed!";
+    if(musicOn) duckBgm();
     spawnHearts();
-
-    // DROP BGM volume to 0.25 when game ends/win
-    try { bgm.volume = 0.25; } catch(e) {}
-
     setTimeout(() => show("s3"), 900);
   }
 
@@ -497,60 +602,51 @@
     ctx.fillRect(x+3, y+9, 3, 3);
   }
 
-  function drawPixelBoy(ctx2, x, y, scale=1, name="dcop"){
-    // x,y is bottom-left anchor
-    const w = 28*scale, h = 44*scale;
-    const top = y - h;
+  function drawPixelBoy(){
+    const x = p.x, y = p.y;
+    const top = y - p.h;
 
-    // shadow
-    ctx2.fillStyle = "rgba(0,0,0,.25)";
-    ctx2.fillRect(x+3*scale, y+6*scale, 22*scale, 6*scale);
+    ctx.fillStyle = "rgba(0,0,0,.35)";
+    ctx.fillRect(x+3, y+6, 22, 6);
 
-    // legs/pants
-    ctx2.fillStyle = "#1d1d33";
-    ctx2.fillRect(x+6*scale, top+28*scale, 7*scale, 14*scale);
-    ctx2.fillRect(x+15*scale, top+28*scale, 7*scale, 14*scale);
+    ctx.fillStyle = "#1d1d33";
+    ctx.fillRect(x+6, top+28, 7, 14);
+    ctx.fillRect(x+15, top+28, 7, 14);
 
-    // shoes
-    ctx2.fillStyle = "#0b0b10";
-    ctx2.fillRect(x+5*scale, top+42*scale, 9*scale, 2*scale);
-    ctx2.fillRect(x+14*scale, top+42*scale, 9*scale, 2*scale);
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+5, top+42, 9, 2);
+    ctx.fillRect(x+14, top+42, 9, 2);
 
-    // shirt white
-    ctx2.fillStyle = "#f6f6ff";
-    ctx2.fillRect(x+5*scale, top+18*scale, 18*scale, 12*scale);
+    ctx.fillStyle = "#f6f6ff";
+    ctx.fillRect(x+5, top+18, 18, 12);
 
-    // arms skin
-    ctx2.fillStyle = "#f1d0b5";
-    ctx2.fillRect(x+3*scale, top+20*scale, 3*scale, 8*scale);
-    ctx2.fillRect(x+23*scale, top+20*scale, 3*scale, 8*scale);
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+3, top+20, 3, 8);
+    ctx.fillRect(x+23, top+20, 3, 8);
 
-    // head
-    ctx2.fillStyle = "#f1d0b5";
-    ctx2.fillRect(x+7*scale, top+4*scale, 14*scale, 14*scale);
+    ctx.fillStyle = "#f1d0b5";
+    ctx.fillRect(x+7, top+4, 14, 14);
 
-    // hair
-    ctx2.fillStyle = "#0b0b10";
-    ctx2.fillRect(x+6*scale, top+2*scale, 16*scale, 6*scale);
-    ctx2.fillRect(x+6*scale, top+7*scale, 4*scale, 4*scale);
-    ctx2.fillRect(x+10*scale, top+7*scale, 4*scale, 3*scale);
-    ctx2.fillRect(x+14*scale, top+7*scale, 4*scale, 4*scale);
-    ctx2.fillRect(x+18*scale, top+7*scale, 4*scale, 3*scale);
+    ctx.fillStyle,
+/* keep same hair */
+    ctx.fillStyle = "#0b0b10";
+    ctx.fillRect(x+6, top+2, 16, 6);
+    ctx.fillRect(x+6, top+7, 4, 4);
+    ctx.fillRect(x+10, top+7, 4, 3);
+    ctx.fillRect(x+14, top+7, 4, 4);
+    ctx.fillRect(x+18, top+7, 4, 3);
 
-    // eyes
-    ctx2.fillStyle = "#000";
-    ctx2.fillRect(x+11*scale, top+10*scale, 2*scale, 2*scale);
-    ctx2.fillRect(x+17*scale, top+10*scale, 2*scale, 2*scale);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(x+11, top+10, 2, 2);
+    ctx.fillRect(x+17, top+10, 2, 2);
 
-    // “27”
-    ctx2.fillStyle = "#0b0b10";
-    ctx2.font = `${10*scale}px system-ui`;
-    ctx2.fillText("27", x+10*scale, top+27*scale);
+    ctx.fillStyle = "#0b0b10";
+    ctx.font = "10px system-ui";
+    ctx.fillText("27", x+10, top+27);
 
-    // name above head
-    ctx2.font = `${12*scale}px system-ui`;
-    ctx2.fillStyle = "rgba(255,255,255,.92)";
-    ctx2.fillText(name, x+1*scale, top-6*scale);
+    ctx.font = "12px system-ui";
+    ctx.fillStyle = "rgba(255,255,255,.92)";
+    ctx.fillText("dcop", x+1, top-6);
   }
 
   function drawSpike(s){
@@ -580,7 +676,7 @@
     ctx.fillRect(0, groundY, 520, 2);
 
     spikes.forEach(drawSpike);
-    drawPixelBoy(ctx, p.x, p.y, 1, "dcop");
+    drawPixelBoy();
     hearts.forEach(h => drawHeart(h.x, h.y));
   }
 
@@ -596,11 +692,7 @@
     resetGame();
     running = true;
     statusPill.textContent = "Goal: 11";
-    if(musicOn){
-      bgm.currentTime = 0;
-      bgm.volume = 1.0; // game bgm loud
-      await safePlay(bgm);
-    }
+    if(musicOn) startBgm();
   };
 
   canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
@@ -609,19 +701,19 @@
     musicOn = !musicOn;
     const btn = document.getElementById("muteMusic");
     btn.textContent = musicOn ? "Music: On" : "Music: Off";
+
     if(!musicOn){
-      safePause(bgm); bgm.currentTime = 0;
-      safePause(happyBgm); happyBgm.currentTime = 0;
+      stopAllMusic();
     } else {
-      // resume whatever is appropriate later
-      safePlay(bgm);
+      const s4bVisible = !document.getElementById("s4b").classList.contains("hidden");
+      if(s4bVisible) startHappy();
+      else startBgm();
     }
   };
 
-  // draw immediately so game never appears blank
   resetGame();
 
-  // ---------- Coin insert -> wheel ----------
+  // ---------- Coin insert animation -> wheel ----------
   const coinEl = document.getElementById("coin");
   let coinUsed = false;
 
@@ -633,7 +725,145 @@
     setTimeout(() => show("s4"), 620);
   };
 
-  // ---------- Confetti ----------
+  // ---------- Wheel ----------
+  const wheelSubtitle = document.getElementById("wheelSubtitle");
+  const wildBtn = document.getElementById("wildBtn");
+
+  const segments = [
+    { label: "Free massage for girlfriend", weight: 0.225 },
+    { label: "You plan next date",          weight: 0.225 },
+    { label: "5 mins Onyx",                 weight: 0.225 },
+    { label: "Tomyum ramen on you",         weight: 0.225 },
+    { label: "Wild card",                   weight: 0.10  }
+  ];
+  const forcedLabel = "Wild card";
+
+  const wheel = document.getElementById("wheel");
+  const wctx = wheel.getContext("2d");
+  const cx=150, cy=150, r=138;
+  const innerR = 55;
+
+  const totalW = segments.reduce((a,s)=>a+s.weight,0);
+  segments.forEach(s => s.weight = s.weight/totalW);
+
+  function breakLongWord(ctx, word, maxWidth){
+    const parts = [];
+    let cur = "";
+    for(const ch of word){
+      const test = cur + ch;
+      if(ctx.measureText(test).width <= maxWidth){
+        cur = test;
+      } else {
+        if(cur) parts.push(cur);
+        cur = ch;
+      }
+    }
+    if(cur) parts.push(cur);
+    return parts;
+  }
+
+  function wrapLines(ctx, text, maxWidth){
+    const rawWords = text.split(" ");
+    const words = [];
+    for(const w of rawWords){
+      if(ctx.measureText(w).width <= maxWidth) {
+        words.push(w);
+      } else {
+        words.push(...breakLongWord(ctx, w, maxWidth));
+      }
+    }
+
+    const lines = [];
+    let line = "";
+    for(const w of words){
+      const test = line ? (line + " " + w) : w;
+      if(ctx.measureText(test).width <= maxWidth){
+        line = test;
+      } else {
+        if(line) lines.push(line);
+        line = w;
+      }
+    }
+    if(line) lines.push(line);
+    return lines.slice(0, 5);
+  }
+
+  function linesFit(ctx, lines, maxWidth){
+    return lines.every(ln => ctx.measureText(ln).width <= maxWidth);
+  }
+
+  function drawWheel(){
+    wctx.clearRect(0,0,300,300);
+    let a = 0;
+
+    for(let i=0;i<segments.length;i++){
+      const s = segments[i];
+      const slice = (Math.PI*2) * s.weight;
+      const a0 = a;
+      const a1 = a + slice;
+
+      wctx.beginPath();
+      wctx.moveTo(cx,cy);
+      wctx.arc(cx,cy,r,a0,a1);
+      wctx.closePath();
+      wctx.fillStyle = (i%2===0) ? "#1d1d33" : "#141423";
+      wctx.fill();
+      wctx.strokeStyle="#3a3a66";
+      wctx.stroke();
+
+      wctx.save();
+      wctx.beginPath();
+      wctx.moveTo(cx,cy);
+      wctx.arc(cx,cy,r,a0,a1);
+      wctx.closePath();
+      wctx.clip();
+
+      const mid = a0 + slice/2;
+      wctx.translate(cx,cy);
+      wctx.rotate(mid);
+
+      const upsideDown = (mid > Math.PI/2 && mid < (Math.PI*3)/2);
+      if(upsideDown) wctx.rotate(Math.PI);
+
+      wctx.fillStyle="rgba(255,255,255,.92)";
+      wctx.textAlign="center";
+      wctx.textBaseline="middle";
+
+      const textRadius = (innerR + r) / 2;
+      const xPos = upsideDown ? -textRadius : textRadius;
+
+      const forcedWrapWidth = 64;
+      const arcLen = slice * textRadius;
+      const maxWidth = Math.min(forcedWrapWidth, Math.max(52, arcLen - 22));
+
+      let size = 11;
+      while(size >= 8){
+        wctx.font = `${size}px system-ui`;
+        const lines = wrapLines(wctx, s.label, maxWidth);
+
+        if(linesFit(wctx, lines, maxWidth)){
+          const lineH = size + 2;
+          const totalH = (lines.length - 1) * lineH;
+          lines.forEach((ln, idx) => {
+            const y = (idx * lineH) - totalH/2;
+            wctx.fillText(ln, xPos, y);
+          });
+          break;
+        }
+        size--;
+      }
+
+      wctx.restore();
+      a = a1;
+    }
+
+    wctx.beginPath();
+    wctx.arc(cx,cy,innerR,0,Math.PI*2);
+    wctx.fillStyle="#0b0b10"; wctx.fill();
+    wctx.strokeStyle="#3a3a66"; wctx.stroke();
+  }
+  drawWheel();
+
   function confetti(){
     const c = document.getElementById("confetti");
     c.innerHTML="";
@@ -648,153 +878,52 @@
     setTimeout(()=>c.classList.add("hidden"), 1800);
   }
 
-  // ---------- Wheel (FORCED wild card) ----------
-  const wheelSubtitle = document.getElementById("wheelSubtitle");
-  const wheel = document.getElementById("wheel");
-  const wctx = wheel.getContext("2d");
-  const cx=150, cy=150, r=138;
-
-  const segments = [
-    { label: "Free massage\nfor girlfriend", weight: 0.2 },
-    { label: "You plan\nnext date",        weight: 0.2 },
-    { label: "5 mins\nOnyx",               weight: 0.2 },
-    { label: "Tomyum ramen\non you",       weight: 0.2 },
-    { label: "Wild card",                  weight: 0.2 }
-  ];
-  const forcedLabel = "Wild card";
-
-  function drawWrappedTextOnRadius(text, maxWidth, baseFont){
-    // returns {fontPx, lines}
-    const rawLines = text.split("\n");
-    let fontPx = baseFont;
-    let lines = [...rawLines];
-
-    // shrink until all lines fit
-    for(let tries=0; tries<10; tries++){
-      wctx.font = `${fontPx}px system-ui`;
-      let ok = true;
-      for(const ln of lines){
-        if(wctx.measureText(ln).width > maxWidth) ok = false;
-      }
-      if(ok) break;
-      fontPx -= 1;
-      if(fontPx < 8) break;
-    }
-    return { fontPx, lines };
-  }
-
-  function drawWheel(){
-    wctx.clearRect(0,0,300,300);
-    let a = 0;
-    for(let i=0;i<segments.length;i++){
-      const s = segments[i];
-      const slice = (Math.PI*2) * s.weight;
-      const a0 = a;
-      const a1 = a + slice;
-
-      // slice
-      wctx.beginPath();
-      wctx.moveTo(cx,cy);
-      wctx.arc(cx,cy,r,a0,a1);
-      wctx.closePath();
-      wctx.fillStyle = (i%2===0) ? "#1d1d33" : "#141423";
-      wctx.fill();
-      wctx.strokeStyle="#3a3a66";
-      wctx.stroke();
-
-      // label
-      const mid = a0 + slice/2;
-      wctx.save();
-      wctx.translate(cx,cy);
-      wctx.rotate(mid);
-
-      const upsideDown = (mid > Math.PI/2 && mid < (Math.PI*3)/2);
-      if(upsideDown) wctx.rotate(Math.PI);
-
-      const textRadius = 88;
-      const maxWidth = 110; // conservative so it stays inside slice
-      const { fontPx, lines } = drawWrappedTextOnRadius(s.label, maxWidth, 11);
-
-      wctx.fillStyle="rgba(255,255,255,.92)";
-      wctx.font=`${fontPx}px system-ui`;
-      wctx.textAlign="center";
-      wctx.textBaseline="middle";
-
-      // multi-line stack centered
-      const lineH = fontPx + 2;
-      const totalH = (lines.length-1)*lineH;
-      lines.forEach((ln, idx) => {
-        const y = (idx*lineH) - totalH/2;
-        wctx.fillText(ln, textRadius, y);
-      });
-
-      wctx.restore();
-      a = a1;
-    }
-
-    // hub
-    wctx.beginPath();
-    wctx.arc(cx,cy,34,0,Math.PI*2);
-    wctx.fillStyle="#0b0b10"; wctx.fill();
-    wctx.strokeStyle="#3a3a66"; wctx.stroke();
-  }
-  drawWheel();
+  const spinBtn = document.getElementById("spin");
+  let spinning=false;
 
   function angleForSegmentLabel(label){
     let a = 0;
     for(const s of segments){
       const slice = (Math.PI*2)*s.weight;
       const mid = a + slice/2;
-      const pure = s.label.replace(/\n/g," ").trim().toLowerCase();
-      if(pure === label.toLowerCase()) return { mid };
-      a += slice;
-    }
-    // fallback: find contains
-    a = 0;
-    for(const s of segments){
-      const slice = (Math.PI*2)*s.weight;
-      const mid = a + slice/2;
-      if(s.label.toLowerCase().includes(label.toLowerCase())) return { mid };
+      if(s.label === label) return { mid };
       a += slice;
     }
     return { mid: 0 };
   }
 
-  const spinBtn = document.getElementById("spin");
-  const wildBtn = document.getElementById("wildBtn");
-  let spinning=false;
-
   spinBtn.onclick = async () => {
     if(spinning) return;
     spinning=true;
 
-    wildBtn.classList.add("hidden");
+    if(musicOn) duckBgm();
+
     wheelSubtitle.textContent = "";
-    // spin sound
+    wildBtn.classList.add("hidden");
+
     spinSfx.currentTime = 0;
     await safePlay(spinSfx);
 
-    // FORCE wild card
     const target = angleForSegmentLabel(forcedLabel);
-    const pointerAngle = Math.PI * 1.5; // top
+    const pointerAngle = Math.PI * 1.5;
     const turns = 5;
     const targetRot = (Math.PI*2)*turns + (pointerAngle - target.mid);
 
     const start = performance.now();
-    const dur = 3300;
+    const dur = 3600;
 
     const anim = (now) => {
       const p = Math.min(1,(now-start)/dur);
       const ease = 1 - Math.pow(1-p, 3);
       const rot = ease * targetRot;
       wheel.style.transform = `rotate(${rot}rad)`;
+
       if(p<1) requestAnimationFrame(anim);
       else{
         spinning=false;
 
-        // LAND: confetti + yay ONCE (only here)
         confetti();
-        yay.currentTime = 0;
+        yay.currentTime = 0;       // ✅ only once, here
         safePlay(yay);
 
         wheelSubtitle.textContent = "Wild card? Hmmmm";
@@ -804,75 +933,38 @@
     requestAnimationFrame(anim);
   };
 
-  wildBtn.onclick = () => {
-    show("s4b");
-    // switch to happy.mp3 on Aha page
-    try {
-      if(musicOn){
-        safePause(bgm);
-        bgm.currentTime = 0;
-        happyBgm.currentTime = 0;
-        happyBgm.volume = 0.25;
-        safePlay(happyBgm);
-      }
-    } catch(e) {}
-  };
-
-  document.getElementById("toBook").onclick = () => show("s5");
+  wildBtn.onclick = () => show("s4b");
 
   // ---------- Book ----------
+  const pages = [
+    "photos/page1.jpg",
+    "photos/page2.jpg",
+    "photos/page3.jpg",
+    "photos/page4.jpg",
+    "photos/page5.jpg"
+  ];
+
   const captions = [
     "Luck stat: 1",
     "Luck stat increasing to…2",
     "Luck stat increasing more…3",
     "Luck stat increasing morer…4",
-    "Luck stat increasing morerest…5!"
+    "Luck stat increasing morerest…5"
   ];
 
   const book = document.getElementById("book");
   let idx = 0;
 
-  function makeImgWithFallback(basePath){
-    // try jpg first; fallback to png on error
-    const img = document.createElement("img");
-    img.alt = "page";
-    img.src = basePath + ".jpg";
-    img.onerror = () => { img.onerror = null; img.src = basePath + ".png"; };
-    return img;
-  }
-
   function renderBook(){
     book.innerHTML="";
-    const page = document.createElement("div");
-    page.className="page";
-
-    const base = `photos/page${idx+1}`;
-    const img = makeImgWithFallback(base);
-
-    const cap = document.createElement("div");
-    cap.className="caption";
-    cap.textContent = captions[idx];
-
-    const num = document.createElement("div");
-    num.className="pageNumber";
-    num.textContent = `${idx+1} / 5`;
-
-    page.appendChild(img);
-    page.appendChild(cap);
-    page.appendChild(num);
-
-    if(idx === 4){
-      const wrap = document.createElement("div");
-      wrap.className = "bonusBtnWrap";
-      wrap.innerHTML = `<button class="btn" id="bonusBtn">Bonus luck here!</button>`;
-      page.appendChild(wrap);
-      setTimeout(() => {
-        const b = document.getElementById("bonusBtn");
-        if(b) b.onclick = () => show("s6");
-      }, 0);
-    }
-
-    book.appendChild(page);
+    const p = document.createElement("div");
+    p.className="page";
+    p.innerHTML = `
+      <img src="${pages[idx]}" alt="page"/>
+      <div class="caption">${captions[idx]}</div>
+      <div class="pageNumber">${idx+1} / ${pages.length}</div>
+    `;
+    book.appendChild(p);
   }
   renderBook();
 
@@ -884,12 +976,11 @@
     const dx = endX - startX;
     startX=null;
     if(Math.abs(dx) < 35) return;
-    if(dx < 0 && idx < 4) idx++;
+    if(dx < 0 && idx < pages.length-1) idx++;
     if(dx > 0 && idx > 0) idx--;
     renderBook();
   });
 
-  // desktop swipe
   let mouseDown=false, mX=0;
   book.addEventListener("mousedown",(e)=>{mouseDown=true;mX=e.clientX;});
   window.addEventListener("mouseup",(e)=>{
@@ -897,97 +988,120 @@
     mouseDown=false;
     const dx=e.clientX-mX;
     if(Math.abs(dx) < 50) return;
-    if(dx < 0 && idx < 4) idx++;
+    if(dx < 0 && idx < pages.length-1) idx++;
     if(dx > 0 && idx > 0) idx--;
     renderBook();
   });
 
-  // ---------- Bonus tap ----------
-  const tapCanvas = document.getElementById("tapCanvas");
-  const tctx = tapCanvas.getContext("2d");
-  const tapToast = document.getElementById("tapToast");
-  const tapDcop = document.getElementById("tapDcop");
+  document.getElementById("toBook").onclick = () => show("s5");
+
+  // ---------- NEW: S5 -> S6 ----------
+  document.getElementById("bonusBtn").onclick = () => {
+    show("s6");
+  };
+
+  // ---------- NEW: S6 taps -> S7 ----------
+  const bonusMsg = document.getElementById("bonusMsg");
   let tapCount = 0;
 
-  function drawTapCard(){
-    tctx.clearRect(0,0,tapCanvas.width,tapCanvas.height);
-    tctx.fillStyle = "#0f0f1a";
-    tctx.fillRect(0,0,tapCanvas.width,tapCanvas.height);
-
-    // tiny stars
-    tctx.fillStyle = "rgba(255,255,255,.10)";
-    for(let i=0;i<18;i++){
-      tctx.fillRect((i*41)%tapCanvas.width, (i*27)%tapCanvas.height, 2,2);
-    }
-
-    // ground
-    tctx.fillStyle = "#141423";
-    tctx.fillRect(0, 160, tapCanvas.width, 40);
-    tctx.fillStyle = "#2a2a44";
-    tctx.fillRect(0, 160, tapCanvas.width, 2);
-
-    // dcop bigger
-    drawPixelBoy(tctx, 115, 160, 2.2, "dcop");
-  }
-  drawTapCard();
-
-  tapDcop.addEventListener("click", () => {
+  document.getElementById("dcopTap").onclick = async () => {
     tapCount++;
     if(tapCount === 1){
-      tapToast.textContent = "Better luck next time! Try again";
+      bonusMsg.textContent = "Better luck next time! Try again";
     } else if(tapCount === 2){
-      tapToast.textContent = "Ohhhhh mans…. Try again!";
+      bonusMsg.textContent = "Ohhhhh mans…. Try again!";
     } else {
-      // go final
+      // third tap -> final
       show("s7");
-      startFinalScene();
+      startFinalSequence();
     }
-  });
+  };
 
-  // ---------- Petals ----------
+  // ---------- NEW: Final sequence ----------
+  let petalsTimer = null;
+
   function startPetals(){
-    const p = document.getElementById("petals");
-    p.innerHTML = "";
-    p.classList.remove("hidden");
+    const petals = document.getElementById("petals");
+    if(petalsTimer) clearInterval(petalsTimer);
 
-    // continuous creation
-    const makeOne = () => {
-      const i = document.createElement("i");
-      i.style.left = (Math.random()*100) + "vw";
-      i.style.background = (Math.random() < 0.5) ? "rgba(255,182,210,.95)" : "rgba(255,214,231,.95)";
-      const dur = 3.2 + Math.random()*2.6;
-      i.style.animationDuration = dur + "s";
-      i.style.animationTimingFunction = "linear";
-      p.appendChild(i);
-      setTimeout(() => i.remove(), (dur*1000)+200);
-    };
-
-    // spawn rate
-    const interval = setInterval(() => {
-      for(let k=0;k<4;k++) makeOne();
-    }, 250);
-
-    // store so we can stop if needed later
-    p.dataset.intv = String(interval);
+    petalsTimer = setInterval(()=>{
+      const s=document.createElement("span");
+      s.style.left = (Math.random()*100) + "%";
+      s.style.animationDuration = (5.5 + Math.random()*2.5) + "s";
+      s.style.opacity = (0.55 + Math.random()*0.35);
+      petals.appendChild(s);
+      setTimeout(()=>s.remove(), 9000);
+    }, 170);
   }
 
-  // ---------- Final scene (walk + kiss + sounds) ----------
-  const dcopBig = document.getElementById("dcopBig");
-  const sljy = document.getElementById("sljy");
-  const kissIcon = document.getElementById("kissIcon");
-  const finalMsg = document.getElementById("finalMsg");
-  const finalTop = document.getElementById("finalTop");
+  function centerKissBetweenHeads(){
+    const kiss = document.getElementById("kissIcon");
+    const sljy = document.getElementById("sljyWrap");
+    const dcop = document.getElementById("dcopWrap");
 
-  function drawBigDcop(){
-    const c = dcopBig.getContext("2d");
-    c.clearRect(0,0,dcopBig.width,dcopBig.height);
-    // bottom anchor
-    drawPixelBoy(c, 70, 220, 4.2, "dcop");
+    // compute head centers by bounding boxes (good enough visually)
+    const s = sljy.getBoundingClientRect();
+    const d = dcop.getBoundingClientRect();
+
+    // "head area" is around top third of each char
+    const sHeadX = s.left + s.width/2;
+    const dHeadX = d.left + d.width/2;
+    const headY  = Math.min(s.top, d.top) + Math.min(s.height, d.height) * 0.22;
+
+    const midX = (sHeadX + dHeadX) / 2;
+
+    // position kiss relative to the sky container
+    const sky = document.getElementById("sky").getBoundingClientRect();
+    kiss.style.left = (midX - sky.left) + "px";
+    kiss.style.top  = (headY - sky.top - 30) + "px";
+    kiss.style.transform = "translate(-50%, -50%)";
   }
 
-  function drawSljy(){
-    const c = sljy.getContext("2d");
-    c.clearRect(0,0,sljy.width,sljy.height);
+  async function startFinalSequence(){
+    const finalText = document.getElementById("finalText");
+    const finalText2 = document.getElementById("finalText2");
+    const sljyWrap = document.getElementById("sljyWrap");
+    const kiss = document.getElementById("kissIcon");
 
-    // Girl pixel: dark brown hair, black tee, black mini skirt, red shoes, label handled by HTML
-    const scale = 4.0;
+    // reset
+    kiss.style.opacity = 0;
+    finalText.textContent = "Congrats! You have increased your girlfriend’s luck stat to mosterest!";
+    finalText2.textContent = "";
+
+    // keep happy quiet (already 0.25)
+    if(musicOn) startHappy();
+
+    // walk “5 steps”
+    sljyWrap.classList.remove("walkToDcop");
+    void sljyWrap.offsetWidth; // restart animation
+    sljyWrap.classList.add("walkToDcop");
+
+    // after walk ends, place & show kiss, play kiss.mp3 once
+    setTimeout(async ()=>{
+      centerKissBetweenHeads();
+      kiss.style.opacity = 1;
+
+      kissAudio.currentTime = 0;
+      await safePlay(kissAudio);
+
+      // petals start after kiss
+      startPetals();
+
+      // then love.mp3, then swap to final valentine text
+      setTimeout(async ()=>{
+        loveAudio.currentTime = 0;
+        await safePlay(loveAudio);
+
+        finalText.innerHTML =
+          "Happy Valentines mi baby! I’m the luckiest to have you.<br><br>With lots of love,<br>Sandra";
+      }, 650);
+
+    }, 1650);
+
+    // re-center kiss if layout shifts (mobile)
+    setTimeout(centerKissBetweenHeads, 250);
+    window.addEventListener("resize", centerKissBetweenHeads, {passive:true});
+  }
+</script>
+</body>
+</html>
