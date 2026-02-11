@@ -174,7 +174,6 @@
     ["s1","s2","s3","s4","s4b","s5"].forEach(x => document.getElementById(x).classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
 
-    // When we hit Aha page: switch to happy.mp3
     if(id === "s4b" && musicOn){
       stopBgm();
       startHappy();
@@ -182,9 +181,9 @@
   };
 
   // ---------- Audio ----------
-  const voice = document.getElementById("voice");     // hmmmm.mp3
-  const bgm   = document.getElementById("bgm");       // bgm.mp3
-  const happy = document.getElementById("happy");     // happy.mp3
+  const voice = document.getElementById("voice");
+  const bgm   = document.getElementById("bgm");
+  const happy = document.getElementById("happy");
   const spinSfx = document.getElementById("spinSfx");
   const yay = document.getElementById("yay");
 
@@ -196,7 +195,6 @@
 
   function clamp01(v){ return Math.max(0, Math.min(1, v)); }
 
-  // Smooth fade
   let fadeRAF = null;
   function fadeBgmTo(target, ms=320){
     if(!musicOn) return;
@@ -221,15 +219,7 @@
     safePlay(bgm);
   }
 
-  // Duck bgm to 0.25 (as requested)
-  function duckBgm(){
-    fadeBgmTo(0.25, 260);
-  }
-
-  function restoreBgm(){
-    fadeBgmTo(1, 260);
-  }
-
+  function duckBgm(){ fadeBgmTo(0.25, 260); }
   function stopBgm(){
     if(fadeRAF) cancelAnimationFrame(fadeRAF);
     fadeRAF = null;
@@ -345,10 +335,7 @@
     running = false;
     statusPill.textContent = "WIN ✅";
     gameMsg.textContent = "Damn, you’re an 11/10 indeed!";
-
-    // duck bgm here (NO yay here)
     if(musicOn) duckBgm();
-
     spawnHearts();
     setTimeout(() => show("s3"), 900);
   }
@@ -557,7 +544,6 @@
   segments.forEach(s => s.weight = s.weight/totalW);
 
   function breakLongWord(ctx, word, maxWidth){
-    // Break very long word into chunks that fit
     const parts = [];
     let cur = "";
     for(const ch of word){
@@ -580,7 +566,6 @@
       if(ctx.measureText(w).width <= maxWidth) {
         words.push(w);
       } else {
-        // word itself too long -> break it
         words.push(...breakLongWord(ctx, w, maxWidth));
       }
     }
@@ -597,7 +582,7 @@
       }
     }
     if(line) lines.push(line);
-    return lines.slice(0, 4); // max 4 lines for neatness
+    return lines.slice(0, 5); // allow up to 5 lines
   }
 
   function linesFit(ctx, lines, maxWidth){
@@ -643,19 +628,21 @@
       wctx.textAlign="center";
       wctx.textBaseline="middle";
 
-      // text placement in ring
-      const textRadius = (innerR + r) / 2; // ~96
-      const xPos = upsideDown ? -textRadius : textRadius; // KEY FIX (prevents clipped/missing labels)
+      const textRadius = (innerR + r) / 2;
+      const xPos = upsideDown ? -textRadius : textRadius;
 
-      // max width based on arc length at text radius
+      // ✅ FORCE WRAP: intentionally narrower width so it breaks into lines
+      // (instead of letting arc-length keep it as one long line)
+      const forcedWrapWidth = 64;                 // <- tweak if you want tighter/looser
       const arcLen = slice * textRadius;
-      const maxWidth = Math.max(58, arcLen - 18);
+      const maxWidth = Math.min(forcedWrapWidth, Math.max(52, arcLen - 22));
 
-      // auto font-size + wrap + shrink if needed
-      let size = 12;
-      while(size >= 9){
+      // ✅ Smaller font range
+      let size = 11;
+      while(size >= 8){
         wctx.font = `${size}px system-ui`;
-        let lines = wrapLines(wctx, s.label, maxWidth);
+        const lines = wrapLines(wctx, s.label, maxWidth);
+
         if(linesFit(wctx, lines, maxWidth)){
           const lineH = size + 2;
           const totalH = (lines.length - 1) * lineH;
