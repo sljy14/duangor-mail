@@ -1,4 +1,3 @@
-<!doctype html>
 <html>
 <head>
   <meta charset="utf-8"/>
@@ -137,11 +136,13 @@
       width:92px;height:132px;
       transform-origin:bottom center;
     }
-    /* sljy slightly shorter (realistic) */
-    .char.sljy{
-      --sljyScale: 0.92;
-      transform: translateX(0) scale(var(--sljyScale));
-    }
+    
+    /* sljy slightly shorter than dcop (real body height) */
+#sljyFinal{
+  transform: scaleY(0.92);
+  transform-origin: bottom center;
+}
+
     .char.dcop{
       transform: translateX(0) scale(1);
     }
@@ -1078,27 +1079,26 @@
 
   // ---------- S7 helpers ----------
   function layoutFinalChars(){
-  const sky  = document.getElementById("sky");
+  const sky = document.getElementById("sky");
   const sljy = document.getElementById("sljyFinal");
   const dcop = document.getElementById("dcopFinal");
 
   const w = sky.clientWidth;
 
+  const leftPad = Math.max(18, w * 0.08);
+  const rightPad = Math.max(18, w * 0.08);
+
   const charW = 92;
-  const gap = 0; // ✅ change this: 0 = touching, -2 = tiny overlap, 2 = small gap
+  const gap = 2; // 👈 VERY close
 
-  // center both characters together as a pair
-  const totalW = (charW * 2) + gap;
-  let sljyLeft = Math.round((w - totalW) / 2);
-  let dcopLeft = sljyLeft + charW + gap;
-
-  // safety clamp so they never go off-screen
-  sljyLeft = Math.max(8, Math.min(sljyLeft, w - totalW - 8));
-  dcopLeft = sljyLeft + charW + gap;
+  const sljyLeft = leftPad;
+  const dcopLeft = sljyLeft + charW + gap;
 
   sljy.style.left = sljyLeft + "px";
   dcop.style.left = dcopLeft + "px";
 }
+
+
 
 
   let petalsStarted = false;
