@@ -1079,17 +1079,29 @@
 
   // iOS audio unlock (must be inside user gesture)
   async function unlockAudio(){
-    try{
-      kissAudio.volume = 0;
-      loveAudio.volume = 0;
-      await safePlay(kissAudio);
-      kissAudio.pause(); kissAudio.currentTime = 0;
-      await safePlay(loveAudio);
-      loveAudio.pause(); loveAudio.currentTime = 0;
-      kissAudio.volume = 1;
-      loveAudio.volume = 1;
-    }catch(e){}
-  }
+  try{
+    // iOS Safari: best unlock pattern = play() while muted inside a user gesture
+    kissAudio.pause(); loveAudio.pause();
+    kissAudio.currentTime = 0; loveAudio.currentTime = 0;
+
+    kissAudio.muted = true;
+    loveAudio.muted = true;
+
+    await safePlay(kissAudio);
+    kissAudio.pause();
+    kissAudio.currentTime = 0;
+
+    await safePlay(loveAudio);
+    loveAudio.pause();
+    loveAudio.currentTime = 0;
+
+    // unmute for real playback later
+    kissAudio.muted = false;
+    loveAudio.muted = false;
+
+  }catch(e){}
+}
+
 
   // ---------- S7 helpers ----------
   function layoutFinalChars(){
@@ -1105,7 +1117,7 @@
   const charW = 92;
 
   const sljyLeft = leftPad;
-  const dcopLeft = Math.max(sljyLeft + 140, w - rightPad - charW);
+  const dcopLeft = Math.max(sljyLeft + 112, w - rightPad - charW);
 
   sljy.style.left = sljyLeft + "px";
   dcop.style.left = dcopLeft + "px";
@@ -1128,16 +1140,17 @@
 
 function positionKissBetweenHeads(){
   const kiss = document.getElementById("kissIcon");
-  const a = document.getElementById("sljyFinal").getBoundingClientRect();
-  const b = document.getElementById("dcopFinal").getBoundingClientRect();
-  const sky = document.getElementById("sky").getBoundingClientRect();
 
-  const aMid = (a.left + a.right) / 2;
-  const bMid = (b.left + b.right) / 2;
+  const aTag = document.getElementById("sljyTag").getBoundingClientRect();
+  const bTag = document.getElementById("dcopTag").getBoundingClientRect();
+  const sky  = document.getElementById("sky").getBoundingClientRect();
+
+  const aMid = (aTag.left + aTag.right) / 2;
+  const bMid = (bTag.left + bTag.right) / 2;
   const midX = (aMid + bMid) / 2;
 
-  // Above BOTH name tags
-  const y = Math.min(a.top, b.top) - 10;
+  // put kiss ABOVE both name tags
+  const y = Math.min(aTag.top, bTag.top) - 22;
 
   kiss.style.left = (midX - sky.left) + "px";
   kiss.style.top  = (y - sky.top) + "px";
@@ -1220,7 +1233,7 @@ function positionKissBetweenHeads(){
   bonusMsg.textContent = "";
   congratsMsg.classList.remove("hidden");
 
-  // Keep congrats on-screen 1.5s
+  // Keep congrats on-screen 2s
   setTimeout(()=>{
     show("s7");
 
@@ -1235,7 +1248,7 @@ function positionKissBetweenHeads(){
 
     // Start walk+kissing immediately after entering S7
     setTimeout(()=>startFinalSequence(), 50);
-  }, 1500);
+  }, 2000);
 }
 
   };
