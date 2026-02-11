@@ -339,10 +339,13 @@
             <rect x="58" y="34" width="44" height="14" fill="#0b0b10"/>
             <rect x="66" y="46" width="10" height="8" fill="#0b0b10"/>
             <rect x="84" y="46" width="10" height="8" fill="#0b0b10"/>
+            <!-- shirt -->
             <rect x="54" y="74" width="52" height="36" fill="#f6f6ff"/>
-            <text x="80" y="100" text-anchor="middle" dominant-baseline="middle" fill="#0b0b10" font-size="16" font-weight="800">27</text>
-            <rect x="46" y="78" width="8" height="30" fill="#f1d0b5"/>
-            <rect x="106" y="78" width="8" height="30" fill="#f1d0b5"/>
+
+            <!-- sleeves (NEW) -->
+            <rect x="46" y="78" width="10" height="14" fill="#f6f6ff"/>
+            <rect x="104" y="78" width="10" height="14" fill="#f6f6ff"/>
+
             <rect x="58" y="110" width="18" height="52" fill="#1d1d33"/>
             <rect x="84" y="110" width="18" height="52" fill="#1d1d33"/>
             <rect x="56" y="162" width="24" height="7" fill="#0b0b10"/>
@@ -402,10 +405,21 @@
             <div class="char dcop" id="dcopFinal">
               <div class="nameTag" id="dcopTag">dcop</div>
               <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
-                <div style="position:absolute;left:34px;top:30px;width:28px;height:28px;background:#f1d0b5"></div>
-                <div style="position:absolute;left:30px;top:26px;width:36px;height:12px;background:#0b0b10"></div>
-                <div style="position:absolute;left:38px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
-                <div style="position:absolute;left:54px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
+                
+                <!-- shirt body -->
+                <div style="position:absolute;left:28px;top:58px;width:36px;height:26px;background:#f6f6ff"></div>
+
+                <!-- sleeves (shirt-colored) -->
+                <div style="position:absolute;left:22px;top:60px;width:8px;height:10px;background:#f6f6ff"></div>
+                <div style="position:absolute;left:62px;top:60px;width:8px;height:10px;background:#f6f6ff"></div>
+
+                <!-- arms (skin) start BELOW sleeves -->
+                <div style="position:absolute;left:22px;top:70px;width:8px;height:16px;background:#f1d0b5"></div>
+                <div style="position:absolute;left:62px;top:70px;width:8px;height:16px;background:#f1d0b5"></div>
+
+                <!-- number -->
+                <div style="position:absolute;left:46px;top:71px;transform:translateX(-50%);color:#0b0b10;font-size:14px;font-weight:800;">27</div>
+
 
                 <div style="position:absolute;left:28px;top:58px;width:36px;height:26px;background:#f6f6ff"></div>
                 <div style="position:absolute;left:46px;top:71px;transform:translateX(-50%);color:#0b0b10;font-size:14px;font-weight:800;">27</div>
@@ -1116,6 +1130,9 @@ function layoutFinalChars(){
   const rightPad = Math.max(18, w * 0.08);
 
   const charW = 92;
+  const visualW = 72;   // 👈 effective visible body width (tune this)
+  const overlap = -10;   // 👈 negative = closer / slight overlap (tune this)
+
   const gap = 1;          // 👈 how close they stand (0 = touching)
   const walkOffset = 40;  // how far sljy starts left so she “walks in”
 
@@ -1123,7 +1140,7 @@ function layoutFinalChars(){
   const dcopFinalLeft = w - rightPad - charW;
 
   // put sljy close to dcop
-  const sljyFinalLeft = Math.max(leftPad, dcopFinalLeft - charW - gap);
+  const sljyFinalLeft = Math.max(leftPad, dcopFinalLeft - visualW + overlap);
 
   // start sljy slightly further left so the walk animation is visible
   const sljyStartLeft = Math.max(leftPad, sljyFinalLeft - walkOffset);
