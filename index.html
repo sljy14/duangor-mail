@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
 <head>
   <meta charset="utf-8"/>
@@ -136,16 +137,15 @@
       width:92px;height:132px;
       transform-origin:bottom center;
     }
-    
-    /* sljy slightly shorter than dcop (real body height) */
-#sljyFinal{
-  transform: scaleY(0.92);
-  transform-origin: bottom center;
-}
 
-    .char.dcop{
-      transform: translateX(0) scale(1);
+    /* sljy: shorter (height only) + supports walking without breaking size */
+    #sljyFinal{
+      --sljyScaleY: 0.92;
+      --walkTo: 0px;
+      transform: translateX(0px) scaleY(var(--sljyScaleY));
+      transform-origin: bottom center;
     }
+    .char.dcop{ transform: translateX(0) scale(1); }
 
     .nameTag{
       position:absolute;
@@ -198,16 +198,35 @@
       line-height:1.35;
     }
 
-    /* S7: walk in (slower by +0.4s = 2.0s) */
+    /* S7: walk in (2.0s) — keeps sljy height scale */
     .sljyWalk{ animation: sljyWalkIn 2.0s ease-out forwards; }
     @keyframes sljyWalkIn{
-      to { transform: translateX(18px) scale(var(--sljyScale)); } /* small walk only */
+      to { transform: translateX(var(--walkTo)) scaleY(var(--sljyScaleY)); }
     }
 
     /* S7: head tilt only (gentle) */
     .sljyHeadTilt .sljyHead{
       transform: rotate(10deg);
       transform-origin: 60% 70%;
+    }
+
+    /* Rainbow tee text */
+    .teeText{
+      position:absolute;
+      left:50%;
+      top:70px; /* sits on the black "shirt" */
+      transform:translateX(-50%);
+      font-size:6px;
+      font-weight:900;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      background: linear-gradient(90deg,#ff4d4d,#ffb84d,#fff04d,#55ff79,#55a7ff,#b055ff);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow:0 1px 0 rgba(0,0,0,.35);
+      pointer-events:none;
+      user-select:none;
     }
   </style>
 </head>
@@ -357,7 +376,7 @@
             <div class="char sljy" id="sljyFinal">
               <div class="nameTag" id="sljyTag">sljy</div>
               <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
-                <!-- hair (straight blocks) -->
+                <!-- hair -->
                 <div style="position:absolute;left:24px;top:18px;width:44px;height:12px;background:#3b2418"></div>
                 <div style="position:absolute;left:22px;top:30px;width:48px;height:34px;background:#3b2418"></div>
                 <div style="position:absolute;left:22px;top:64px;width:12px;height:14px;background:#3b2418"></div>
@@ -366,7 +385,10 @@
                 <!-- head -->
                 <div class="sljyHead" style="position:absolute;left:34px;top:38px;width:28px;height:26px;background:#f1d0b5"></div>
 
+                <!-- shirt -->
                 <div style="position:absolute;left:28px;top:64px;width:36px;height:22px;background:#0b0b10"></div>
+                <div class="teeText">streets cats club</div>
+
                 <div style="position:absolute;left:30px;top:86px;width:32px;height:14px;background:#111"></div>
                 <div style="position:absolute;left:34px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
                 <div style="position:absolute;left:48px;top:100px;width:10px;height:28px;background:#f1d0b5"></div>
@@ -375,14 +397,12 @@
               </div>
             </div>
 
-            <!-- dcop -->
+            <!-- dcop (NO eyes in S7) -->
             <div class="char dcop" id="dcopFinal">
               <div class="nameTag" id="dcopTag">dcop</div>
               <div style="position:absolute;left:0;top:0;width:92px;height:132px;">
                 <div style="position:absolute;left:34px;top:30px;width:28px;height:28px;background:#f1d0b5"></div>
                 <div style="position:absolute;left:30px;top:26px;width:36px;height:12px;background:#0b0b10"></div>
-                <div style="position:absolute;left:38px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
-                <div style="position:absolute;left:54px;top:36px;width:8px;height:6px;background:#0b0b10"></div>
 
                 <div style="position:absolute;left:28px;top:58px;width:36px;height:26px;background:#f6f6ff"></div>
                 <div style="position:absolute;left:46px;top:71px;transform:translateX(-50%);color:#0b0b10;font-size:14px;font-weight:800;">27</div>
@@ -401,7 +421,7 @@
       </div>
 
       <div class="finalMsg" id="finalText">
-        Happy Valentines mi baby! I’m the luckiest to have you.
+        Happy Valentine’s Day mi baby! I’m the luckiest to have you.
         <small>With lots of love,<br/>Sandra</small>
       </div>
     </section>
@@ -421,7 +441,7 @@
     const target = document.getElementById(id);
     if(target) target.classList.remove("hidden");
 
-    // entering s4b -> happy starts
+    // entering s4b -> happy starts (replaces bgm)
     if(id === "s4b" && musicOn){
       stopBgm();
       startHappy();
@@ -443,79 +463,63 @@
     try { await audioEl.play(); } catch(e) {}
   }
 
-  // iOS unlock: muted play/pause (never audible)
+  // iOS unlock (ONLY uses bgm silently; never touches kiss/love)
   let audioUnlocked = false;
   async function unlockAudio(){
-  // iOS unlock: ALWAYS silent
-  try{
-    kissAudio.muted = true;
-    loveAudio.muted = true;
+    if(audioUnlocked) return;
+    audioUnlocked = true;
+    try{
+      const prevMuted = bgm.muted;
+      const prevVol = bgm.volume;
 
-    kissAudio.currentTime = 0;
-    await safePlay(kissAudio);
-    kissAudio.pause();
+      bgm.muted = true;
+      bgm.volume = 0;
+      bgm.currentTime = 0;
+      await safePlay(bgm);
+      bgm.pause();
+      bgm.currentTime = 0;
 
-    loveAudio.currentTime = 0;
-    await safePlay(loveAudio);
-    loveAudio.pause();
-
-    kissAudio.currentTime = 0;
-    loveAudio.currentTime = 0;
-  }catch(e){}
-}
-
-
-
-  function clamp01(v){ return Math.max(0, Math.min(1, v)); }
-
-  let fadeRAF = null;
-  function fadeBgmTo(target, ms=320){
-    if(!musicOn) return;
-    target = clamp01(target);
-    const startV = (typeof bgm.volume === "number") ? bgm.volume : 1;
-    const startT = performance.now();
-
-    if(fadeRAF) cancelAnimationFrame(fadeRAF);
-
-    const step = (now) => {
-      const p = Math.min(1, (now - startT)/ms);
-      const eased = 1 - Math.pow(1-p, 3);
-      bgm.volume = clamp01(startV + (target - startV) * eased);
-      if(p < 1) fadeRAF = requestAnimationFrame(step);
-    };
-    fadeRAF = requestAnimationFrame(step);
+      bgm.muted = prevMuted;
+      bgm.volume = prevVol;
+    }catch(e){}
   }
 
   function startBgm(){
     stopHappy();
-    bgm.volume = 1;
+    bgm.volume = 0.25;              // ✅ always quiet throughout
+    bgm.muted = false;
     safePlay(bgm);
   }
-  function duckBgm(){ fadeBgmTo(0.25, 260); }
+
   function stopBgm(){
-    if(fadeRAF) cancelAnimationFrame(fadeRAF);
-    fadeRAF = null;
     bgm.pause();
     bgm.currentTime = 0;
   }
 
   function startHappy(){
     stopBgm();
-    happy.volume = 0.25;
+    happy.volume = 0.25;            // ✅ also quiet
+    happy.muted = false;
     safePlay(happy);
   }
+
   function stopHappy(){
     happy.pause();
     happy.currentTime = 0;
   }
+
   function stopAllMusic(){
     stopBgm();
     stopHappy();
   }
 
+  function hardResetSfx(a){
+    try{ a.pause(); a.currentTime = 0; }catch(e){}
+  }
+
   // ---------- S1: Envelope ----------
   document.getElementById("env").addEventListener("click", async () => {
-    await unlockAudio(); // ✅ unlock early inside a user gesture (safe)
+    await unlockAudio();
 
     const env = document.getElementById("env");
     const mailText = document.getElementById("mailText");
@@ -607,7 +611,6 @@
     running = false;
     statusPill.textContent = "WIN ✅";
     gameMsg.textContent = "Damn, you’re an 11/10 indeed!";
-    if(musicOn) duckBgm();
     spawnHearts();
     setTimeout(() => show("s3"), 900);
   }
@@ -792,6 +795,9 @@
     document.getElementById("coinMsg").textContent = "Coin inserted 😏";
     coinEl.classList.add("inserted");
     setTimeout(() => show("s4"), 620);
+
+    // wheel scene uses bgm (quiet)
+    if(musicOn) startBgm();
   };
 
   // ---------- Wheel ----------
@@ -953,12 +959,11 @@
     if(spinning) return;
     spinning=true;
 
-    if(musicOn) duckBgm();
-
     wheelSubtitle.textContent = "";
     wildBtn.classList.add("hidden");
 
-    spinSfx.currentTime = 0;
+    spinSfx.volume = 1;
+    hardResetSfx(spinSfx);
     await safePlay(spinSfx);
 
     const target = angleForSegmentLabel(forcedLabel);
@@ -979,8 +984,11 @@
       else{
         spinning=false;
         confetti();
-        yay.currentTime = 0;
+
+        yay.volume = 1;
+        hardResetSfx(yay);
         safePlay(yay);
+
         wheelSubtitle.textContent = "Wild card? Hmmmm";
         wildBtn.classList.remove("hidden");
       }
@@ -1079,27 +1087,31 @@
 
   // ---------- S7 helpers ----------
   function layoutFinalChars(){
-  const sky = document.getElementById("sky");
-  const sljy = document.getElementById("sljyFinal");
-  const dcop = document.getElementById("dcopFinal");
+    const sky = document.getElementById("sky");
+    const sljy = document.getElementById("sljyFinal");
+    const dcop = document.getElementById("dcopFinal");
 
-  const w = sky.clientWidth;
+    const w = sky.clientWidth;
 
-  const leftPad = Math.max(18, w * 0.08);
-  const rightPad = Math.max(18, w * 0.08);
+    const charW = 92;
+    const gap = 2;                 // ✅ VERY close
+    const walkExtra = 60;          // ✅ sljy starts left, then walks in
 
-  const charW = 92;
-  const gap = 2; // 👈 VERY close
+    // final (after-walk) pair is centered
+    const totalPair = (charW * 2) + gap;
+    const finalStart = Math.max(10, (w - totalPair) / 2);
 
-  const sljyLeft = leftPad;
-  const dcopLeft = sljyLeft + charW + gap;
+    const dcopLeft = finalStart + charW + gap;
+    let sljyStart = finalStart - walkExtra;
+    sljyStart = Math.max(10, sljyStart);
 
-  sljy.style.left = sljyLeft + "px";
-  dcop.style.left = dcopLeft + "px";
-}
+    sljy.style.left = sljyStart + "px";
+    dcop.style.left = dcopLeft + "px";
 
-
-
+    // how far sljy needs to walk to become "next to" dcop
+    const walkTo = (finalStart - sljyStart);
+    sljy.style.setProperty("--walkTo", walkTo + "px");
+  }
 
   let petalsStarted = false;
   function startPetals(){
@@ -1123,7 +1135,7 @@
     const sky = document.getElementById("sky").getBoundingClientRect();
 
     const midX = ((a.left + a.right)/2 + (b.left + b.right)/2) / 2;
-    const topY = Math.min(a.top, b.top) - 55;  // ✅ higher than name tags
+    const topY = Math.min(a.top, b.top) - 55;  // above name tags
 
     kiss.style.left = (midX - sky.left) + "px";
     kiss.style.top  = (topY - sky.top) + "px";
@@ -1139,43 +1151,32 @@
     const sljy = document.getElementById("sljyFinal");
     const kiss = document.getElementById("kissIcon");
 
-    // hard reset audio so it NEVER "misfires"
-    try{
-      kissAudio.pause(); kissAudio.currentTime = 0;
-      loveAudio.pause(); loveAudio.currentTime = 0;
-    }catch(e){}
+    // clean, predictable audio
+    hardResetSfx(kissAudio);
+    hardResetSfx(loveAudio);
+    kissAudio.muted = false;
+    loveAudio.muted = false;
+    kissAudio.volume = 1;
+    loveAudio.volume = 1;
 
-    // duck happy slightly while kiss/love plays
-    if(musicOn) happy.volume = 0.18;
-
-    // small walk + head tilt
+    // walk + head tilt
     sljy.classList.add("sljyWalk");
     sljy.classList.add("sljyHeadTilt");
 
-    // after walk ends (~2.0s) show kiss + play kiss, then love
+    // after walk ends (~2.0s): show kiss + play kiss, then love
     setTimeout(async ()=>{
       positionKissBetweenHeads();
       kiss.style.opacity = 1;
 
-  kissAudio.pause();
-kissAudio.currentTime = 0;
-kissAudio.muted = false;   // ✅ unmute ONLY here
-kissAudio.volume = 1;
-await safePlay(kissAudio);
-
+      hardResetSfx(kissAudio);
+      await safePlay(kissAudio);
 
       startPetals();
 
       if(loveTimer) clearTimeout(loveTimer);
       loveTimer = setTimeout(async ()=>{
-        loveAudio.pause();
-loveAudio.currentTime = 0;
-loveAudio.muted = false;   // ✅ unmute ONLY here
-loveAudio.volume = 1;
-await safePlay(loveAudio);
-
-
-        if(musicOn) happy.volume = 0.25;
+        hardResetSfx(loveAudio);
+        await safePlay(loveAudio);
       }, 500);
 
     }, 2000);
@@ -1191,7 +1192,6 @@ await safePlay(loveAudio);
     doDcopJump();
     tapCount++;
 
-    // keep unlocking inside user gestures
     await unlockAudio();
 
     congratsMsg.classList.add("hidden");
@@ -1204,15 +1204,15 @@ await safePlay(loveAudio);
       bonusMsg.textContent = "";
       congratsMsg.classList.remove("hidden");
 
-      // ✅ congrats hold 2.4s
       setTimeout(()=>{
         show("s7");
-        if(musicOn){
-          startHappy();
-          happy.volume = 0.25;
-        }
+
+        // S7 uses happy (quiet) as bg loop
+        if(musicOn) startHappy();
 
         layoutFinalChars();
+
+        // ensure sljy is at start position before anim
         setTimeout(()=>startFinalSequence(), 50);
       }, 2400);
     }
